@@ -1,0 +1,20 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1786822380471,
+      "tag": "0000_jazzy_alex_power",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1786885627566,
+      "tag": "0001_add_network_carrier",
+      "breakpoints": true
+    }
+  ]
+}

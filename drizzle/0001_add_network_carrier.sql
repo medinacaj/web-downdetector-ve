@@ -1,0 +1,1 @@
+ALTER TABLE "reports" ADD COLUMN "network_carrier" varchar(64);
