@@ -25,7 +25,9 @@ export function Header() {
           <span className="font-display text-lg font-semibold tracking-tight">PulsoVE</span>
         </Link>
 
-        <nav aria-label="Principal" className="hidden flex-1 items-center gap-5 md:flex">
+        {/* También en móvil (antes `hidden md:flex` dejaba el menú sin enlaces); si algún día hay
+            más enlaces de los que caben, se desplaza en horizontal en vez de romper el encabezado. */}
+        <nav aria-label="Principal" className="flex min-w-0 flex-1 items-center gap-4 overflow-x-auto whitespace-nowrap sm:gap-5">
           {NAV_LINKS.map((link) => (
             <Link
               key={link.href}
