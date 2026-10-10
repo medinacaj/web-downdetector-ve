@@ -6,7 +6,7 @@ import type { OperationalStatus } from '@/lib/engine/status-bands';
 
 export const metadata: Metadata = {
   title: 'Servicios',
-  description: 'Directorio de servicios monitoreados en Venezuela: telecomunicaciones, banca, electricidad y plataformas digitales.',
+  description: 'Directorio de servicios monitoreados en Venezuela: telecomunicaciones, banca, servicios públicos, plataformas, streaming, videojuegos, delivery y loterías.',
 };
 
 const STATUS_OPTIONS: { value: OperationalStatus; label: string }[] = [

@@ -26,7 +26,7 @@ export const metadata: Metadata = {
     template: '%s | PulsoVE',
   },
   description:
-    'Consulta si un servicio de telecomunicaciones, banca, electricidad o plataformas digitales presenta problemas en Venezuela. Monitoreo ciudadano y técnico, independiente.',
+    'Consulta si un servicio presenta problemas en Venezuela: internet, bancos, servicios públicos, redes, streaming, juegos y delivery. Monitoreo ciudadano.',
 };
 
 // Aplica el tema guardado ANTES de que React hidrate, para no parpadear
