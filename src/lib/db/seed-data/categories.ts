@@ -1,13 +1,21 @@
 /**
- * Categorías de nivel superior (brief, sección 4.1). Deliberadamente planas
- * (sin jerarquía padre/hijo): las distinciones más finas de esa sección
- * ("Internet fijo" vs. "Datos móviles", etc.) se resuelven a nivel de
+ * Categorías de nivel superior. Las cuatro primeras vienen del brief
+ * (sección 4.1); las otras cuatro (streaming, videojuegos, delivery y
+ * movilidad, apuestas y loterías) se añadieron después, a pedido de la
+ * persona propietaria — ver docs/CATALOGO-SERVICIOS.md (criterio, fuentes).
+ *
+ * Deliberadamente planas (sin jerarquía padre/hijo): las distinciones más
+ * finas ("Internet fijo" vs. "Datos móviles", etc.) se resuelven a nivel de
  * servicio individual (description) e issue_types, no como subcategorías —
  * evita duplicar "Otro" por cada nivel y mantiene el admin panel simple.
  *
- * `icon` referencia nombres de lucide-react (^0.383.0, ya disponible en el
- * stack de artifacts/frontend) para que el componente de ícono del Etapa 4
- * pueda hacer icons[category.icon] directamente sin tabla de mapeo aparte.
+ * `icon` guarda nombres de ícono con la convención de lucide. Hoy `lucide-react`
+ * NO es dependencia del proyecto y ninguna pantalla dibuja el ícono de la
+ * categoría: el valor solo se devuelve como dato (p. ej. en /api/services).
+ * Si se añade un mapa de íconos en la UI, estos son los nombres a resolver.
+ *
+ * `db:seed` sincroniza estas filas con upsert (nombre, descripción, ícono y
+ * orden); el `slug` es la clave y NO debe cambiarse sin una redirección.
  */
 export const categoriesSeed = [
   {
@@ -20,22 +28,53 @@ export const categoriesSeed = [
   {
     slug: 'banca-y-pagos',
     name: 'Banca y pagos',
-    description: 'Aplicaciones bancarias, banca en línea, pago móvil, transferencias y puntos de venta.',
+    description:
+      'Bancos, aplicaciones bancarias, pago móvil, transferencias, billeteras digitales y plataformas de pago.',
     icon: 'landmark',
     sortOrder: 2,
   },
   {
     slug: 'servicios-publicos',
     name: 'Servicios públicos',
-    description: 'Electricidad, portales públicos, sistemas de trámites y plataformas gubernamentales.',
+    description: 'Electricidad, agua, portales públicos, sistemas de trámites y plataformas gubernamentales.',
     icon: 'zap',
     sortOrder: 3,
   },
   {
     slug: 'plataformas-digitales',
     name: 'Plataformas digitales',
-    description: 'Mensajería, redes sociales, correo, streaming y aplicaciones de uso masivo.',
+    description:
+      'Mensajería, redes sociales, correo y aplicaciones de uso masivo, incluido el comercio electrónico.',
     icon: 'smartphone',
     sortOrder: 4,
+  },
+  {
+    slug: 'streaming',
+    name: 'Streaming',
+    description: 'Video y música bajo demanda: plataformas por suscripción y de acceso gratuito.',
+    icon: 'tv',
+    sortOrder: 5,
+  },
+  {
+    slug: 'videojuegos',
+    name: 'Videojuegos',
+    description: 'Juegos con partidas en línea, tiendas y redes de consolas y PC.',
+    icon: 'gamepad-2',
+    sortOrder: 6,
+  },
+  {
+    slug: 'delivery-y-movilidad',
+    name: 'Delivery y movilidad',
+    description: 'Pedidos a domicilio y transporte privado por aplicación.',
+    icon: 'bike',
+    sortOrder: 7,
+  },
+  {
+    slug: 'apuestas-y-loterias',
+    name: 'Apuestas y loterías',
+    description:
+      'Loterías y casas de apuestas en línea. PulsoVE solo informa disponibilidad técnica: no las promueve ni confirma que estén autorizadas.',
+    icon: 'dices',
+    sortOrder: 8,
   },
 ] as const;

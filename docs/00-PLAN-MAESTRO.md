@@ -10,9 +10,10 @@
 
 PulsoVE es una plataforma independiente (identidad, arquitectura y código
 propios — no una réplica de Downdetector ni de ninguna otra plataforma) de
-monitoreo ciudadano y técnico para 4 categorías de servicios en Venezuela
+monitoreo ciudadano y técnico para 8 categorías de servicios en Venezuela
 (telecomunicaciones, banca y pagos, servicios públicos, plataformas
-digitales). Combina reportes ciudadanos anónimos, mediciones técnicas
+digitales y, añadidas después, streaming, videojuegos, delivery y movilidad,
+apuestas y loterías; ver `docs/CATALOGO-SERVICIOS.md`). Combina reportes ciudadanos anónimos, mediciones técnicas
 automáticas y un motor estadístico explicable (no una caja negra ni un
 LLM) para responder, con lenguaje prudente y nunca categórico, si un
 servicio presenta una falla general, regional o limitada al usuario.
@@ -526,3 +527,50 @@ desde ahora. Confirmado con servidor real: aparece en `/servicios`, en el
 filtro `?category=banca-y-pagos` junto a los tres bancos, en
 `/servicios/cashea` con metadata propia, y en `GET /api/services`. Prueba
 `seed-data.test.ts` actualizada para esperar 17 servicios en vez de 16.
+
+### Catálogo ampliado — 2026-10-10
+
+A pedido de la persona propietaria ("streaming, juegos, plataformas,
+apuestas, etc."). El catálogo pasó de 17 servicios en 4 categorías a **71
+servicios en 8 categorías** y de 13 a **25 tipos de problema**:
+
+- Categorías nuevas: `streaming`, `videojuegos`, `delivery-y-movilidad`,
+  `apuestas-y-loterias`, cada una con 3 tipos de problema propios (sin ellos el
+  formulario de reporte solo habría ofrecido "Otro").
+- Servicios nuevos (54): más bancos (BBVA Provincial, BNC, Banco Digital de los
+  Trabajadores, Bancamiga, Banco del Tesoro, Bancaribe, Banplus), billeteras y
+  plataformas de pago (Ubii, Zinli, Reserve, Binance, Creska, Mony, Wally),
+  telecomunicaciones (Simple TV, Supercable, Airtek, G-Network), portales
+  públicos (Hidroven, SENIAT, SAIME, BCV), redes y plataformas (Facebook,
+  Messenger, X, TikTok, Telegram, LinkedIn, Mercado Libre), streaming,
+  videojuegos, delivery y movilidad, y apuestas y loterías.
+- **Criterio de inclusión: evidencia pública y fechada** de uso o disponibilidad
+  en Venezuela, anotada servicio por servicio en `docs/CATALOGO-SERVICIOS.md`,
+  junto con lo que quedó fuera y por qué. Descripciones neutras, sin cifras ni
+  afirmaciones de cobertura o legalidad; `official_url: null` e
+  `is_demo: true` como en el resto.
+- `scripts/seed.ts` ahora **sincroniza** categorías y tipos de problema con
+  upsert por `slug` (antes `onConflictDoNothing`, que habría dejado intactas las
+  descripciones ya sembradas); estados y servicios siguen siendo
+  "insertar si falta". Dos corridas seguidas: 54 servicios nuevos y luego 0.
+- Apuestas y loterías: las fuentes sobre su situación legal se contradicen
+  (FocusGN 2023 vs. Altenar 2025), así que PulsoVE no toma posición. Las páginas
+  de esos servicios muestran un aviso ("solo informa disponibilidad técnica; no es
+  una promoción ni confirma que esté autorizado"). **La revisión legal
+  profesional sigue pendiente.**
+- `tests/seed-data.test.ts`: la prueba que exigía el conjunto exacto de 17
+  servicios pasó a "los 17 originales siguen presentes", y se añadieron pruebas de
+  calidad (formato y longitud de slugs, nombres únicos, descripciones sin enlaces,
+  ningún `officialUrl`, cada categoría con servicios y con al menos dos tipos de
+  problema propios). 55 → **63 pruebas**.
+- Verificado contra Postgres 16 y servidor real: `typecheck` limpio, 63 pruebas en
+  verde, `db:seed` idempotente, `/servicios?category=<slug>` devuelve exactamente
+  los servicios de cada categoría, el formulario de cada servicio ofrece los tipos
+  de su categoría, un `POST /api/reports` real sobre un servicio nuevo respondió
+  201 y el estado siguió en "Sin datos suficientes". `/servicios` con 71 servicios
+  responde en ~0,15 s con la base local (el directorio sigue haciendo una consulta
+  de estado por servicio; no es un problema a esta escala, pero sigue siendo una
+  brecha conocida).
+- **No verificado:** `npm run build` (en este entorno `fonts.googleapis.com` está
+  bloqueado); no todas las fuentes se contrastaron con una segunda; varios
+  artículos solo se leyeron como titular (ver sección 7 del catálogo).

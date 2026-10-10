@@ -1,8 +1,9 @@
 # PulsoVE
 
 Plataforma independiente de monitoreo ciudadano y técnico del estado de
-servicios de telecomunicaciones, banca, electricidad y plataformas digitales
-en Venezuela. No es una copia de Downdetector ni de ninguna plataforma
+servicios en Venezuela: telecomunicaciones, banca y pagos, servicios públicos,
+plataformas digitales, streaming, videojuegos, delivery y movilidad, y
+apuestas y loterías. No es una copia de Downdetector ni de ninguna plataforma
 existente: identidad visual, arquitectura, código y metodología propios.
 
 **Estado actual del proyecto: Etapa 4c de 10 — inicio + directorio +
@@ -17,13 +18,14 @@ metodología, y el gráfico de la página de servicio.
 - Esquema completo de base de datos (17 tablas) en Drizzle ORM, con
   migraciones generadas y verificadas contra PostgreSQL 16 real (incluida
   una segunda migración aditiva: `reports.network_carrier`).
-- Datos semilla verificados: 24 estados (códigos ISO 3166-2:VE reales), 4
-  categorías, 13 tipos de problema, 17 servicios de demostración (los 16
-  de la sección 4.2 del brief más Cashea — fintech BNPL venezolana,
-  agregada después y verificada por búsqueda antes de describirla). Todo
-  marcado `is_demo: true` donde corresponde; ningún dato inventado (URLs
-  oficiales, cobertura, estadísticas — ver sección "Datos de
-  demostración" más abajo).
+- Datos semilla verificados: 24 estados (códigos ISO 3166-2:VE reales), 8
+  categorías, 25 tipos de problema y 71 servicios de demostración: los 16
+  de la sección 4.2 del brief, Cashea y el resto del catálogo ampliado
+  (más bancos y billeteras, portales públicos, redes, streaming,
+  videojuegos, delivery y movilidad, apuestas y loterías), cada uno con
+  evidencia pública fechada en `docs/CATALOGO-SERVICIOS.md`. Todo marcado
+  `is_demo: true`; ningún dato inventado (URLs oficiales, cobertura,
+  estadísticas — ver sección "Datos de demostración" más abajo).
 - **API pública real y probada**: 9 endpoints (ver tabla abajo), con
   validación (zod), rate limiting por identidad anónima (Redis opcional /
   memoria), hash de privacidad (identidad anónima + IP truncada), sobre de
@@ -40,9 +42,9 @@ metodología, y el gráfico de la página de servicio.
   tanto en la base de datos como a través de la API pública.
 - Configuración de proyecto (Next.js 16, Tailwind, TypeScript, Vitest) y
   variables de entorno documentadas con valores por defecto seguros.
-- 55 pruebas automatizadas (datos semilla, privacidad, bandas de estado,
-  integración real de `POST /api/reports`, estadística robusta del motor,
-  combinación ponderada de señales).
+- 63 pruebas automatizadas (datos semilla y calidad del catálogo,
+  privacidad, bandas de estado, integración real de `POST /api/reports`,
+  estadística robusta del motor, combinación ponderada de señales).
 - **Página de inicio real** (`/`): buscador, panel de "pulso nacional" con
   datos en vivo, incidentes activos, servicios, metodología resumida.
   Header, footer, modo oscuro con selector y tipografía (Space Grotesk +
@@ -101,8 +103,8 @@ npm run dev:synthetic-traffic              # genera historial + pico contra un s
 npm run aggregate:run -- --at=<ventana>    # correr para cada ventana que indique la salida del comando anterior
 npm run dev:synthetic-traffic -- --cleanup # elimina el servicio de prueba y todos sus datos derivados
 ```
-El servicio de prueba (`Servicio de Prueba (Motor)`) nunca es uno de los 16
-reales — existe solo para ejercitar el motor (brief, sección 28).
+El servicio de prueba (`Servicio de Prueba (Motor)`) nunca es uno del
+catálogo real — existe solo para ejercitar el motor (brief, sección 28).
 
 ## Qué NO existe todavía
 
@@ -133,7 +135,7 @@ cp .env.example .env
 
 npm run db:generate        # (ya generado; solo necesario si editas schema.ts)
 npm run db:migrate:deploy  # aplica drizzle/0000_*.sql y 0001_add_network_carrier.sql
-npm run db:seed            # carga categorías, estados, tipos y servicios
+npm run db:seed            # carga categorías, estados, tipos y servicios (idempotente)
 npm run typecheck
 npm test
 ```
@@ -146,20 +148,20 @@ npm test
 > debería funcionar sin problema; si no, usa `psql -f` como alternativa
 > confiable.
 
-`npm run dev` ya responde de verdad: prueba `curl http://localhost:3000/api/services`.
-Todavía no hay páginas — eso llega en la Etapa 4.
+`npm run dev` ya responde de verdad: abre `http://localhost:3000` (inicio,
+`/servicios`, `/servicios/:slug`) o prueba `curl http://localhost:3000/api/services`.
 
 ## Scripts disponibles
 
 | Script | Qué hace |
 |---|---|
-| `npm run dev` / `build` / `start` | Next.js — la API responde de verdad; sin páginas todavía |
+| `npm run dev` / `build` / `start` | Next.js (inicio, directorio, página de servicio y API reales). `build` necesita acceso a Google Fonts |
 | `npm run typecheck` | `tsc --noEmit` |
-| `npm test` / `test:watch` | Vitest (34 pruebas; las de integración de reportes requieren Postgres real) |
+| `npm test` / `test:watch` | Vitest (63 pruebas; las de integración de reportes requieren Postgres real) |
 | `npm run db:generate` | Genera migración SQL a partir de `schema.ts` |
 | `npm run db:migrate` | `drizzle-kit push` (sincroniza esquema directo, sin historial — útil en dev) |
 | `npm run db:migrate:deploy` | Aplica las migraciones versionadas de `drizzle/` |
-| `npm run db:seed` | Carga los datos semilla (idempotente) |
+| `npm run db:seed` | Carga los datos semilla (idempotente): sincroniza categorías y tipos de problema; inserta los estados y servicios que falten |
 | `npm run db:studio` | Explorador visual de la base de datos |
 | `npm run create-admin` | **Pendiente de implementar** (Etapa 6 — panel admin) |
 | `npm run aggregate:run -- [--window=N] [--at=ISO]` | Un ciclo del motor: agregación + línea base + anomalías + incidentes |
@@ -269,3 +271,6 @@ antes de cualquier despliegue con datos reales (sección 4.2 del brief).
 
 - `docs/00-PLAN-MAESTRO.md` — evaluación, arquitectura, plan de etapas,
   estructura del repositorio, registro de cambios por etapa.
+- `docs/CATALOGO-SERVICIOS.md` — qué servicios monitorea PulsoVE, criterio de
+  inclusión, fuente y fecha de cada uno, exclusiones, cautelas (apuestas y
+  loterías, bloqueos de plataformas) y cómo añadir o retirar servicios.

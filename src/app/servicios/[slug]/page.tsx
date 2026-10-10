@@ -89,6 +89,15 @@ export default async function ServiceDetailPage({ params }: { params: Promise<{ 
             Datos demostrativos
           </p>
         )}
+
+        {/* Apuestas y loterías: la revisión legal profesional está pendiente (CLAUDE.md,
+            docs/CATALOGO-SERVICIOS.md). Se aclara que PulsoVE no promueve ni valida. */}
+        {service.category.slug === 'apuestas-y-loterias' && (
+          <p className="mt-3 max-w-xl rounded border border-border bg-surface px-3 py-2 text-xs text-ink-muted">
+            PulsoVE solo informa la disponibilidad técnica de este servicio. Incluirlo aquí no es una promoción ni
+            confirma que esté autorizado.
+          </p>
+        )}
       </div>
 
       {/* Reportar */}
