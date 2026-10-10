@@ -186,7 +186,8 @@ reevaluar `@neondatabase/serverless` o un pool externo (PgBouncer).
 | 1 | Fundación de datos: esquema, migración, seeds, config, pruebas de integridad de datos | — | **Completada** |
 | 2 | API pública de lectura + `POST /api/reports` con validación/rate limiting básico | 1 | **Completada esta sesión** |
 | 3 | Motor de agregación y anomalías (`aggregate:run`), apertura/cierre de incidentes | 2 | **Completada** |
-| 4 | Frontend público: inicio, directorio, página de servicio, mapa, incidentes, estadísticas, metodología | 2, 3 | **En curso — 4a (layout + inicio) completada, el resto pendiente** |
+| 4 | Frontend público: inicio, directorio, página de servicio, mapa, incidentes, estadísticas, metodología | 2, 3 | **En curso — 4a (layout + inicio), 4b (directorio) y 4c (página de servicio con reporte) completadas; 4d (gráfico histórico, mapa, incidentes, estadísticas, metodología) pendiente** |
+| SEO | SEO técnico e indexación: dominio y `metadataBase`, `robots.ts`, `sitemap.ts`, canonical, Open Graph, favicon, datos estructurados y decisión de indexación. Regla permanente de la persona propietaria: forma parte de cada entrega web | 4a–4c | **Pendiente — ver `docs/SEO-PENDIENTE.md`** |
 | 5 | Formulario de reporte conectado de extremo a extremo (UI + API + Turnstile + geolocalización aproximada) | 2, 4 | Pendiente |
 | 6 | Panel administrativo (auth, CRUD servicios/categorías, incidentes, moderación, auditoría, `create-admin`) | 1–3 | Pendiente |
 | 7 | Prevención de abuso avanzada: puntuación de confianza, detección de campañas coordinadas | 2, 3 | Pendiente |
@@ -196,42 +197,78 @@ reevaluar `@neondatabase/serverless` o un pool externo (PgBouncer).
 
 ## Parte 4 — Estructura del repositorio
 
+Estado real a 2026-10-10 (repositorio `medinacaj/web-downdetector-ve`; la
+plataforma se llama PulsoVE):
+
 ```
-pulsove/
+web-downdetector-ve/
+├── AGENTS.md                     # aviso de Next 16; lo regenera `next dev`, no se edita a mano
+├── CLAUDE.md                     # instrucciones para Claude Code (importa AGENTS.md)
+├── README.md
+├── .claude/
+│   └── rules/
+│       └── seo-tecnico.md        # reglas permanentes de SEO técnico e indexación (por rutas)
 ├── docs/
-│   └── 00-PLAN-MAESTRO.md
-├── drizzle/                      # migraciones generadas (SQL versionado)
+│   ├── 00-PLAN-MAESTRO.md
+│   ├── CATALOGO-SERVICIOS.md     # criterio, fuentes y exclusiones del catálogo
+│   ├── MIGRACION-CLAUDE-CODE.md
+│   └── SEO-PENDIENTE.md
+├── drizzle/                      # migraciones SQL versionadas
 │   ├── 0000_jazzy_alex_power.sql
-│   └── meta/
-├── public/                       # (vacío — Etapa 4)
+│   ├── 0001_add_network_carrier.sql
+│   └── meta/                     # snapshots y _journal.json
 ├── scripts/
-│   └── seed.ts
+│   ├── aggregate-cron.ts         # npm run aggregate:run
+│   ├── dev-bootstrap.sh          # entorno desde cero: deps, Postgres, .env, migraciones, semillas
+│   ├── dev-synthetic-traffic.ts  # tráfico sintético para probar el motor
+│   └── seed.ts                   # npm run db:seed
 ├── src/
-│   ├── app/                      # (vacío — Etapa 2 en adelante: páginas y rutas API)
-│   ├── components/ui/            # (vacío — Etapa 4)
-│   ├── lib/
-│   │   └── db/
-│   │       ├── client.ts
-│   │       ├── schema.ts
-│   │       └── seed-data/
-│   │           ├── categories.ts
-│   │           ├── issue-types.ts
-│   │           ├── services.ts
-│   │           └── states.ts
-│   └── types/                    # (vacío)
-├── tests/
-│   └── seed-data.test.ts
-├── .env / .env.example
+│   ├── app/
+│   │   ├── api/                  # 9 endpoints públicos
+│   │   │   ├── incidents/route.ts
+│   │   │   ├── map/route.ts
+│   │   │   ├── reports/route.ts
+│   │   │   ├── statistics/route.ts
+│   │   │   └── services/
+│   │   │       ├── route.ts
+│   │   │       └── [slug]/       # route.ts + status/, reports/ e incidents/ (cada uno con route.ts)
+│   │   ├── servicios/
+│   │   │   ├── page.tsx          # directorio
+│   │   │   └── [slug]/page.tsx   # página de servicio + formulario de reporte
+│   │   ├── globals.css
+│   │   ├── layout.tsx
+│   │   └── page.tsx              # inicio
+│   ├── components/
+│   │   ├── directory/            # ServiceGrid, ViewToggle
+│   │   ├── layout/               # Header, Footer
+│   │   ├── service/              # ReportForm
+│   │   └── ui/                   # StatusBadge, ThemeToggle
+│   └── lib/
+│       ├── api/respond.ts        # sobre de respuesta { data, meta } / { error }
+│       ├── db/                   # client.ts, schema.ts (17 tablas), seed-data/ (categorías, tipos de problema, estados, servicios)
+│       ├── engine/               # aggregate, anomaly, baseline, incident-lifecycle, robust-stats, status-bands, time-bucket
+│       ├── nav.ts                # registro de rutas: enlaces solo a páginas que existen
+│       ├── privacy.ts
+│       ├── queries/              # directory, home, service-detail, services, status
+│       ├── security/             # rate-limit, sanitize
+│       └── validation/reports.ts
+├── tests/                        # 7 archivos de prueba + setup.ts; 66 pruebas
+├── .env.example                  # .env no se versiona
 ├── .gitignore
 ├── drizzle.config.ts
+├── next-env.d.ts
 ├── next.config.mjs
-├── package.json
+├── package.json / package-lock.json
 ├── postcss.config.js
-├── README.md
 ├── tailwind.config.ts
 ├── tsconfig.json
 └── vitest.config.ts
 ```
+
+Todavía no existen: contenido en `public/` (ni en `src/types/`; son carpetas
+vacías que git no versiona), `src/app/{robots,sitemap,not-found}`, favicon e
+imagen Open Graph (ver `docs/SEO-PENDIENTE.md`); las páginas de mapa,
+incidentes, estadísticas y metodología (Etapa 4d); `src/app/admin` (Etapa 6).
 
 ---
 
@@ -574,3 +611,53 @@ servicios en 8 categorías** y de 13 a **25 tipos de problema**:
 - **No verificado:** `npm run build` (en este entorno `fonts.googleapis.com` está
   bloqueado); no todas las fuentes se contrastaron con una segunda; varios
   artículos solo se leyeron como titular (ver sección 7 del catálogo).
+
+### Arreglos de navegación y metadatos — 2026-10-10
+
+Detectados al revisar el sitio con un navegador real después de ampliar el
+catálogo:
+
+- **Enlaces internos rotos.** El encabezado, el pie, la portada y el formulario
+  de reporte enlazaban a `/mapa`, `/incidentes`, `/estadisticas` y
+  `/metodologia`, que aún no existen (Etapa 4d): 404 desde todas las páginas del
+  sitio. Se creó `src/lib/nav.ts` (registro `ROUTE` + `isRouteAvailable`) y todos
+  esos enlaces pasan por él; al crear una página se activa allí con
+  `available: true`. `tests/nav.test.ts` (3 pruebas) falla si `available` no
+  coincide con la existencia de `src/app/<ruta>/page.tsx` o si alguien escribe a
+  mano la ruta de una página no disponible (se comprobó que ambas guardas
+  fallan al romper la regla).
+- **Menú móvil.** El menú principal estaba `hidden md:flex`: en móvil no había
+  navegación. Ahora se muestra siempre y se desplaza en horizontal si algún día
+  hay más enlaces de los que caben. Comprobado a 390 px sin desbordamiento.
+- **Meta descripciones** de la portada y del directorio, que seguían nombrando 4
+  categorías.
+- Pruebas: 63 → **66**.
+
+### Migración a Claude Code — 2026-10-10
+
+A pedido de la persona propietaria ("quiero mover el proyecto del chat al
+Code"), el proyecto vive ahora en el repositorio público
+`medinacaj/web-downdetector-ve`; su primer commit es la Etapa 4c del chat más
+Cashea.
+
+- `CLAUDE.md` (importa `AGENTS.md`, el aviso de Next 16 que genera `next dev`):
+  acuerdo de trabajo, reglas innegociables, comandos, mapa del código,
+  convenciones, trampas conocidas y hoja de ruta.
+- `.claude/rules/seo-tecnico.md`: las instrucciones permanentes de SEO técnico e
+  indexación de la persona propietaria, condensadas; se cargan al tocar
+  `src/app`, `src/components`, `src/lib/seo`, `next.config.mjs` o `public`.
+- `scripts/dev-bootstrap.sh`: entorno desde cero (dependencias, Postgres local,
+  `.env` con secretos nuevos, rol y base, migraciones y semillas), idempotente.
+  Probado desde un estado en blanco (~30 s) y repetido sin cambios.
+- `docs/SEO-PENDIENTE.md`: auditoría de SEO técnico en local. **El sitio aún no
+  está listo para publicarse**: sin `robots.txt`, `sitemap.xml`, canonical, Open
+  Graph, favicon, datos estructurados ni dominio. Incluye la decisión de
+  indexación pendiente (todo es demostrativo) y los pasos de Google Search
+  Console que corresponden a la persona propietaria; no se usó Search Console ni
+  se simuló.
+- `docs/MIGRACION-CLAUDE-CODE.md`: qué se movió, cómo abrirlo en Code y la
+  pregunta abierta sobre una versión más avanzada (según su `CLAUDE.md`: SEO
+  base, 159 pruebas, 60 servicios) que no está en este repositorio.
+- `.gitignore`: `CLAUDE.local.md` y `.claude/settings.local.json`.
+- **No verificado:** `npm run build` (Google Fonts bloqueado en el entorno); el
+  bootstrap fuera de Linux; nada del SEO contra un dominio real.

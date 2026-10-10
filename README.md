@@ -13,6 +13,10 @@ el plan de etapas. Ya se puede reportar una falla desde la interfaz, de
 verdad — no solo vía la API. Falta: mapa, incidentes, estadísticas,
 metodología, y el gráfico de la página de servicio.
 
+**Todavía no está listo para publicarse:** falta la capa de SEO técnico
+(`robots.txt`, `sitemap.xml`, canonical, Open Graph, favicon, datos
+estructurados y dominio). Ver `docs/SEO-PENDIENTE.md`.
+
 ## Qué existe hoy
 
 - Esquema completo de base de datos (17 tablas) en Drizzle ORM, con
@@ -42,9 +46,10 @@ metodología, y el gráfico de la página de servicio.
   tanto en la base de datos como a través de la API pública.
 - Configuración de proyecto (Next.js 16, Tailwind, TypeScript, Vitest) y
   variables de entorno documentadas con valores por defecto seguros.
-- 63 pruebas automatizadas (datos semilla y calidad del catálogo,
-  privacidad, bandas de estado, integración real de `POST /api/reports`,
-  estadística robusta del motor, combinación ponderada de señales).
+- 66 pruebas automatizadas (datos semilla y calidad del catálogo, registro
+  de rutas de navegación, privacidad, bandas de estado, integración real de
+  `POST /api/reports`, estadística robusta del motor, combinación ponderada
+  de señales).
 - **Página de inicio real** (`/`): buscador, panel de "pulso nacional" con
   datos en vivo, incidentes activos, servicios, metodología resumida.
   Header, footer, modo oscuro con selector y tipografía (Space Grotesk +
@@ -114,6 +119,10 @@ ya instalado, sin usar), mapa nacional (cartograma — los datos
 global, estadísticas, metodología completa. El formulario de reporte
 funciona pero sin Turnstile ni geolocalización (Etapa 5).
 
+SEO técnico e indexación: `robots.txt`, `sitemap.xml`, canonical, Open
+Graph, favicon, datos estructurados, dominio y la decisión de indexar o no
+mientras todo sea demostrativo (`docs/SEO-PENDIENTE.md`).
+
 Panel administrativo, autenticación, tiempo real, mediciones técnicas
 activas (sección 10 del brief), moderación — Etapas 5 en adelante. Las
 carpetas para esto ya están planificadas en `src/app` pero sin
@@ -127,6 +136,10 @@ implementar.
   implementación en memoria válida para una sola instancia)
 
 ## Instalación
+
+Atajo (Linux con PostgreSQL 16 instalado): `bash scripts/dev-bootstrap.sh` deja
+todo listo desde cero —dependencias, Postgres local, `.env` con secretos
+nuevos, rol y base, migraciones y semillas— y es idempotente. Paso a paso:
 
 ```bash
 npm install
@@ -151,13 +164,25 @@ npm test
 `npm run dev` ya responde de verdad: abre `http://localhost:3000` (inicio,
 `/servicios`, `/servicios/:slug`) o prueba `curl http://localhost:3000/api/services`.
 
+## Trabajar con Claude Code
+
+El proyecto está preparado para Claude Code: `CLAUDE.md` (acuerdo de trabajo,
+reglas innegociables, comandos, mapa del código, trampas y hoja de ruta; importa
+`AGENTS.md`, el aviso de Next 16 que regenera `next dev`) y
+`.claude/rules/seo-tecnico.md` (reglas permanentes de SEO técnico e
+indexación, que se cargan al tocar `src/app`, `src/components`, `next.config.mjs`
+o `public`). Para empezar: `bash scripts/dev-bootstrap.sh` y luego `claude` en
+esta carpeta. Cómo llegó aquí el proyecto, qué falta resolver y qué se verificó:
+`docs/MIGRACION-CLAUDE-CODE.md`.
+
 ## Scripts disponibles
 
 | Script | Qué hace |
 |---|---|
 | `npm run dev` / `build` / `start` | Next.js (inicio, directorio, página de servicio y API reales). `build` necesita acceso a Google Fonts |
+| `bash scripts/dev-bootstrap.sh` | Entorno de desarrollo desde cero (ver "Instalación"); idempotente, nunca toca un `.env` existente |
 | `npm run typecheck` | `tsc --noEmit` |
-| `npm test` / `test:watch` | Vitest (63 pruebas; las de integración de reportes requieren Postgres real) |
+| `npm test` / `test:watch` | Vitest (66 pruebas; las de integración de reportes requieren Postgres real) |
 | `npm run db:generate` | Genera migración SQL a partir de `schema.ts` |
 | `npm run db:migrate` | `drizzle-kit push` (sincroniza esquema directo, sin historial — útil en dev) |
 | `npm run db:migrate:deploy` | Aplica las migraciones versionadas de `drizzle/` |
@@ -274,3 +299,10 @@ antes de cualquier despliegue con datos reales (sección 4.2 del brief).
 - `docs/CATALOGO-SERVICIOS.md` — qué servicios monitorea PulsoVE, criterio de
   inclusión, fuente y fecha de cada uno, exclusiones, cautelas (apuestas y
   loterías, bloqueos de plataformas) y cómo añadir o retirar servicios.
+- `docs/SEO-PENDIENTE.md` — auditoría de SEO técnico e indexación, problemas
+  detectados por prioridad, decisión de indexación pendiente y pasos de Google
+  Search Console para la persona propietaria.
+- `docs/MIGRACION-CLAUDE-CODE.md` — migración del chat a este repositorio, cómo
+  abrirlo en Claude Code, pregunta abierta sobre una versión más avanzada y qué
+  se verificó.
+- `CLAUDE.md` y `.claude/rules/` — instrucciones para Claude Code.
