@@ -1,4 +1,8 @@
 import Link from 'next/link';
+import { ROUTE, isRouteAvailable } from '@/lib/nav';
+
+// Solo las páginas que existen (ver src/lib/nav.ts).
+const FOOTER_LINKS = [ROUTE.methodology, ROUTE.statistics, ROUTE.incidents].filter(isRouteAvailable);
 
 export function Footer() {
   return (
@@ -19,17 +23,15 @@ export function Footer() {
             </p>
           </div>
 
-          <nav aria-label="Pie de página" className="grid grid-cols-2 gap-x-10 gap-y-2 text-sm sm:flex sm:gap-8">
-            <Link href="/metodologia" className="text-ink-muted hover:text-ink">
-              Metodología
-            </Link>
-            <Link href="/estadisticas" className="text-ink-muted hover:text-ink">
-              Estadísticas
-            </Link>
-            <Link href="/incidentes" className="text-ink-muted hover:text-ink">
-              Incidentes
-            </Link>
-          </nav>
+          {FOOTER_LINKS.length > 0 && (
+            <nav aria-label="Pie de página" className="grid grid-cols-2 gap-x-10 gap-y-2 text-sm sm:flex sm:gap-8">
+              {FOOTER_LINKS.map((link) => (
+                <Link key={link.href} href={link.href} className="text-ink-muted hover:text-ink">
+                  {link.label}
+                </Link>
+              ))}
+            </nav>
+          )}
         </div>
 
         <p className="mt-8 text-xs text-ink-muted">

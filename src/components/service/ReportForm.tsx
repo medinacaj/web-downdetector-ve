@@ -1,6 +1,7 @@
 'use client';
 
 import { useId, useState } from 'react';
+import { ROUTE, isRouteAvailable } from '@/lib/nav';
 
 interface Option {
   slug?: string;
@@ -177,11 +178,16 @@ export function ReportForm({
           className="mt-0.5"
         />
         <span>
-          Envío este reporte de forma anónima y entiendo que no se solicitan datos personales.{' '}
-          <a href="/metodologia" className="underline underline-offset-2 hover:text-ink">
-            Cómo se protege la ubicación
-          </a>
-          .
+          Envío este reporte de forma anónima y entiendo que no se solicitan datos personales.
+          {isRouteAvailable(ROUTE.methodology) && (
+            <>
+              {' '}
+              <a href={ROUTE.methodology.href} className="underline underline-offset-2 hover:text-ink">
+                Cómo se protege la ubicación
+              </a>
+              .
+            </>
+          )}
         </span>
       </label>
 

@@ -1,13 +1,12 @@
 import Link from 'next/link';
 import { ThemeToggle } from '@/components/ui/ThemeToggle';
+import { ROUTE, isRouteAvailable } from '@/lib/nav';
 
-const NAV_LINKS = [
-  { href: '/servicios', label: 'Servicios' },
-  { href: '/mapa', label: 'Mapa' },
-  { href: '/incidentes', label: 'Incidentes' },
-  { href: '/estadisticas', label: 'Estadísticas' },
-  { href: '/metodologia', label: 'Metodología' },
-];
+// Solo las páginas que existen (ver src/lib/nav.ts): un enlace a una página
+// planificada sería un 404 en todas las páginas del sitio.
+const NAV_LINKS = [ROUTE.services, ROUTE.map, ROUTE.incidents, ROUTE.statistics, ROUTE.methodology].filter(
+  isRouteAvailable,
+);
 
 export function Header() {
   return (

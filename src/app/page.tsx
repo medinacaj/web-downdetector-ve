@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { getHomeData } from '@/lib/queries/home';
 import { StatusBadge } from '@/components/ui/StatusBadge';
+import { ROUTE, isRouteAvailable } from '@/lib/nav';
 
 function formatUpdatedAt(date: Date) {
   return new Intl.DateTimeFormat('es-VE', {
@@ -163,11 +164,16 @@ export default async function HomePage() {
           ) : (
             <p className="mt-3 max-w-md text-sm text-ink-muted">
               Todavía no hay suficientes reportes en las últimas 24 horas para mostrar una
-              tendencia.{' '}
-              <Link href="/metodologia" className="underline underline-offset-2 hover:text-ink">
-                Cómo funciona esto
-              </Link>
-              .
+              tendencia.
+              {isRouteAvailable(ROUTE.methodology) && (
+                <>
+                  {' '}
+                  <Link href={ROUTE.methodology.href} className="underline underline-offset-2 hover:text-ink">
+                    Cómo funciona esto
+                  </Link>
+                  .
+                </>
+              )}
             </p>
           )}
         </div>
@@ -185,12 +191,14 @@ export default async function HomePage() {
             </li>
           ))}
         </ol>
-        <Link
-          href="/metodologia"
-          className="mt-6 inline-block text-sm text-brand-600 underline-offset-2 hover:underline"
-        >
-          Leer la metodología completa
-        </Link>
+        {isRouteAvailable(ROUTE.methodology) && (
+          <Link
+            href={ROUTE.methodology.href}
+            className="mt-6 inline-block text-sm text-brand-600 underline-offset-2 hover:underline"
+          >
+            Leer la metodología completa
+          </Link>
+        )}
       </section>
     </>
   );
