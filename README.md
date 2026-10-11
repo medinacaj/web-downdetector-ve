@@ -13,9 +13,12 @@ el plan de etapas. Ya se puede reportar una falla desde la interfaz, de
 verdad — no solo vía la API. Falta: mapa, incidentes, estadísticas,
 metodología, y el gráfico de la página de servicio.
 
-**Todavía no está listo para publicarse:** falta la capa de SEO técnico
-(`robots.txt`, `sitemap.xml`, canonical, Open Graph, favicon, datos
-estructurados y dominio). Ver `docs/SEO-PENDIENTE.md`.
+**Todavía no está listo para publicarse.** Ya hay `robots.txt`, `sitemap.xml`
+y política de indexación: **noindex global** mientras los datos sean
+demostrativos (decisión del 2026-10-11; se abre con `SITE_INDEXING="true"`).
+Faltan el dominio, canonical, Open Graph, favicon y datos estructurados, y
+actualizar `next` (vulnerabilidades de producción, ver "Seguridad"). Ver
+`docs/SEO-PENDIENTE.md`.
 
 ## Qué existe hoy
 
@@ -46,8 +49,8 @@ estructurados y dominio). Ver `docs/SEO-PENDIENTE.md`.
   tanto en la base de datos como a través de la API pública.
 - Configuración de proyecto (Next.js 16, Tailwind, TypeScript, Vitest) y
   variables de entorno documentadas con valores por defecto seguros.
-- 66 pruebas automatizadas (datos semilla y calidad del catálogo, registro
-  de rutas de navegación, privacidad, bandas de estado, integración real de
+- 76 pruebas automatizadas (datos semilla y calidad del catálogo, registro
+  de rutas de navegación, configuración SEO e indexación (robots, sitemap), privacidad, bandas de estado, integración real de
   `POST /api/reports`, estadística robusta del motor, combinación ponderada
   de señales).
 - **Página de inicio real** (`/`): buscador, panel de "pulso nacional" con
@@ -119,9 +122,9 @@ ya instalado, sin usar), mapa nacional (cartograma — los datos
 global, estadísticas, metodología completa. El formulario de reporte
 funciona pero sin Turnstile ni geolocalización (Etapa 5).
 
-SEO técnico e indexación: `robots.txt`, `sitemap.xml`, canonical, Open
-Graph, favicon, datos estructurados, dominio y la decisión de indexar o no
-mientras todo sea demostrativo (`docs/SEO-PENDIENTE.md`).
+SEO técnico: dominio (aún no existe), canonical, Open Graph, favicon,
+datos estructurados, 404 propia y páginas de categoría
+(`docs/SEO-PENDIENTE.md`).
 
 Panel administrativo, autenticación, tiempo real, mediciones técnicas
 activas (sección 10 del brief), moderación — Etapas 5 en adelante. Las
@@ -182,7 +185,7 @@ esta carpeta. Cómo llegó aquí el proyecto, qué falta resolver y qué se veri
 | `npm run dev` / `build` / `start` | Next.js (inicio, directorio, página de servicio y API reales). `build` necesita acceso a Google Fonts |
 | `bash scripts/dev-bootstrap.sh` | Entorno de desarrollo desde cero (ver "Instalación"); idempotente, nunca toca un `.env` existente |
 | `npm run typecheck` | `tsc --noEmit` |
-| `npm test` / `test:watch` | Vitest (66 pruebas; las de integración de reportes requieren Postgres real) |
+| `npm test` / `test:watch` | Vitest (76 pruebas; las de integración de reportes requieren Postgres real) |
 | `npm run db:generate` | Genera migración SQL a partir de `schema.ts` |
 | `npm run db:migrate` | `drizzle-kit push` (sincroniza esquema directo, sin historial — útil en dev) |
 | `npm run db:migrate:deploy` | Aplica las migraciones versionadas de `drizzle/` |
@@ -200,6 +203,10 @@ propósito y, cuando aplica, por qué su valor por defecto es conservador
 sondeos ni verificaciones anti-abuso reales contra terceros hasta que se
 configuren credenciales explícitamente). Esta etapa añadió
 `RATE_LIMIT_REPORTS_MAX` y `RATE_LIMIT_REPORTS_WINDOW_SECONDS`.
+
+`SITE_URL` (origen canónico, sin barra final) y `SITE_INDEXING` (`"false"`
+por defecto = noindex global y sitemap vacío; `"true"` solo surte efecto con
+un `SITE_URL` público en `https`). Se leen al arrancar el servidor.
 
 ## Seguridad — hallazgos de esta etapa
 
@@ -221,7 +228,14 @@ la consulta SQL, en la respuesta HTTP — ahora todas las rutas devuelven un
 `internal_error` genérico y registran el detalle solo en el log del
 servidor.
 
-Quedan 9 vulnerabilidades de severidad moderada/alta/crítica, **todas
+> **Actualización 2026-10-11:** `npm audit` informa hoy **20** vulnerabilidades,
+> y **3 están en dependencias de producción**: `next` 16.0.0–16.3.7 (crítica:
+> varias ejecuciones remotas de código y envenenamiento de caché), `sharp`
+> (alta) y `source-map-js` (alta). Todas tienen arreglo disponible y no se han
+> aplicado todavía: hay que actualizar antes de publicar. El párrafo siguiente
+> describe la situación de etapas anteriores.
+
+Quedaban 9 vulnerabilidades de severidad moderada/alta/crítica, **todas
 confinadas a herramientas de desarrollo** (`vitest`/`vite`/`esbuild` vía la
 cadena de `drizzle-kit` y `@vitest/ui`) — no se ejecutan en producción, solo
 al correr pruebas o el explorador visual de base de datos en local. Requieren

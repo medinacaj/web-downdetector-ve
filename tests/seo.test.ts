@@ -1,0 +1,85 @@
+import { describe, it, expect } from 'vitest';
+import { readFileSync, readdirSync } from 'node:fs';
+import { join } from 'node:path';
+import { LOCAL_ORIGIN, absoluteUrl, resolveSiteConfig } from '../src/lib/seo/site';
+import { buildRobots, buildSitemap } from '../src/lib/seo/crawl';
+
+const PROD = { SITE_URL: 'https://pulsove.example', SITE_INDEXING: 'true' };
+
+describe('seo: configuración del sitio', () => {
+  it('por defecto (sin variables) el sitio queda en noindex con origen local', () => {
+    expect(resolveSiteConfig({})).toEqual({ origin: LOCAL_ORIGIN, indexable: false, problem: null });
+  });
+
+  it('SITE_INDEXING distinto de "true" mantiene el noindex aunque haya dominio', () => {
+    for (const value of [undefined, '', 'false', '1', 'yes']) {
+      const site = resolveSiteConfig({ SITE_URL: PROD.SITE_URL, SITE_INDEXING: value });
+      expect(site.indexable, String(value)).toBe(false);
+      expect(site.origin).toBe('https://pulsove.example');
+    }
+  });
+
+  it('indexa solo con SITE_INDEXING="true" y un origen público en https', () => {
+    expect(resolveSiteConfig(PROD)).toEqual({ origin: 'https://pulsove.example', indexable: true, problem: null });
+    expect(resolveSiteConfig({ ...PROD, SITE_URL: 'https://pulsove.example/' }).origin).toBe('https://pulsove.example');
+  });
+
+  it('pedir indexación con un dominio inválido, local o sin https deja el sitio en noindex y explica por qué', () => {
+    for (const url of [undefined, '', 'no es url', 'http://pulsove.example', 'https://localhost:3000', 'https://pulsove.example/es', 'https://pulsove.example?x=1', 'ftp://pulsove.example']) {
+      const site = resolveSiteConfig({ SITE_URL: url, SITE_INDEXING: 'true' });
+      expect(site.indexable, String(url)).toBe(false);
+      expect(site.problem, String(url)).toMatch(/SITE_/);
+    }
+  });
+
+  it('absoluteUrl compone URLs canónicas sin barra final', () => {
+    expect(absoluteUrl('https://pulsove.example', '/')).toBe('https://pulsove.example');
+    expect(absoluteUrl('https://pulsove.example', '/servicios')).toBe('https://pulsove.example/servicios');
+    expect(() => absoluteUrl('https://pulsove.example', 'servicios')).toThrow();
+  });
+});
+
+describe('seo: robots.txt', () => {
+  it('nunca bloquea el sitio entero y excluye solo /api/', () => {
+    for (const env of [{}, PROD]) {
+      const robots = buildRobots(resolveSiteConfig(env));
+      expect(robots.rules).toEqual({ userAgent: '*', allow: '/', disallow: '/api/' });
+    }
+  });
+
+  it('anuncia el sitemap solo cuando el sitio es indexable', () => {
+    expect(buildRobots(resolveSiteConfig({})).sitemap).toBeUndefined();
+    expect(buildRobots(resolveSiteConfig(PROD)).sitemap).toBe('https://pulsove.example/sitemap.xml');
+  });
+});
+
+describe('seo: sitemap.xml', () => {
+  it('queda vacío mientras el sitio está en noindex', () => {
+    expect(buildSitemap(resolveSiteConfig({}), ['netflix'])).toEqual([]);
+  });
+
+  it('con indexación abierta lista portada, directorio y servicios: absolutas, únicas y sin parámetros', () => {
+    const urls = buildSitemap(resolveSiteConfig(PROD), ['banesco', 'netflix', 'netflix']).map((e) => e.url);
+    expect(urls).toEqual([
+      'https://pulsove.example',
+      'https://pulsove.example/servicios',
+      'https://pulsove.example/servicios/banesco',
+      'https://pulsove.example/servicios/netflix',
+    ]);
+    for (const url of urls) expect(url).toMatch(/^https:\/\/pulsove\.example(\/[a-z0-9-]+)*$/);
+  });
+});
+
+describe('seo: la política de indexación vive solo en el layout raíz', () => {
+  it('ninguna página ni layout fuera de src/app/layout.tsx define robots en su metadata', () => {
+    // Un `robots` en una página taparía la política global (p. ej. un index
+    // olvidado mientras el sitio debe estar en noindex). Si una página necesita
+    // otra regla, debe derivarla de getSiteConfig() y ajustarse esta prueba.
+    const appDir = join(process.cwd(), 'src', 'app');
+    const offenders = (readdirSync(appDir, { recursive: true }) as string[])
+      .map((f) => f.replace(/\\/g, '/'))
+      .filter((f) => /(^|\/)(page|layout)\.tsx$/.test(f) && f !== 'layout.tsx')
+      .filter((f) => /\brobots\s*:/.test(readFileSync(join(appDir, f), 'utf8')));
+    expect(offenders).toEqual([]);
+  });
+});

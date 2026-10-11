@@ -187,7 +187,7 @@ reevaluar `@neondatabase/serverless` o un pool externo (PgBouncer).
 | 2 | API pública de lectura + `POST /api/reports` con validación/rate limiting básico | 1 | **Completada esta sesión** |
 | 3 | Motor de agregación y anomalías (`aggregate:run`), apertura/cierre de incidentes | 2 | **Completada** |
 | 4 | Frontend público: inicio, directorio, página de servicio, mapa, incidentes, estadísticas, metodología | 2, 3 | **En curso — 4a (layout + inicio), 4b (directorio) y 4c (página de servicio con reporte) completadas; 4d (gráfico histórico, mapa, incidentes, estadísticas, metodología) pendiente** |
-| SEO | SEO técnico e indexación: dominio y `metadataBase`, `robots.ts`, `sitemap.ts`, canonical, Open Graph, favicon, datos estructurados y decisión de indexación. Regla permanente de la persona propietaria: forma parte de cada entrega web | 4a–4c | **Pendiente — ver `docs/SEO-PENDIENTE.md`** |
+| SEO | SEO técnico e indexación: dominio y `metadataBase`, `robots.ts`, `sitemap.ts`, canonical, Open Graph, favicon, datos estructurados y decisión de indexación. Regla permanente de la persona propietaria: forma parte de cada entrega web | 4a–4c | **En curso** — política de indexación decidida (opción A: noindex global mientras todo sea demostrativo), `robots.ts`, `sitemap.ts`, `SITE_URL` y `metadataBase` hechos (2026-10-11); faltan dominio, canonical, Open Graph, favicon, 404 propia, categorías y datos estructurados. Ver `docs/SEO-PENDIENTE.md` |
 | 5 | Formulario de reporte conectado de extremo a extremo (UI + API + Turnstile + geolocalización aproximada) | 2, 4 | Pendiente |
 | 6 | Panel administrativo (auth, CRUD servicios/categorías, incidentes, moderación, auditoría, `create-admin`) | 1–3 | Pendiente |
 | 7 | Prevención de abuso avanzada: puntuación de confianza, detección de campañas coordinadas | 2, 3 | Pendiente |
@@ -197,7 +197,7 @@ reevaluar `@neondatabase/serverless` o un pool externo (PgBouncer).
 
 ## Parte 4 — Estructura del repositorio
 
-Estado real a 2026-10-10 (repositorio `medinacaj/web-downdetector-ve`; la
+Estado real a 2026-10-11 (repositorio `medinacaj/web-downdetector-ve`; la
 plataforma se llama PulsoVE):
 
 ```
@@ -236,8 +236,10 @@ web-downdetector-ve/
 │   │   │   ├── page.tsx          # directorio
 │   │   │   └── [slug]/page.tsx   # página de servicio + formulario de reporte
 │   │   ├── globals.css
-│   │   ├── layout.tsx
-│   │   └── page.tsx              # inicio
+│   │   ├── layout.tsx            # metadataBase + política de indexación global
+│   │   ├── page.tsx              # inicio
+│   │   ├── robots.ts             # robots.txt dinámico
+│   │   └── sitemap.ts            # sitemap.xml dinámico (vacío mientras rija el noindex)
 │   ├── components/
 │   │   ├── directory/            # ServiceGrid, ViewToggle
 │   │   ├── layout/               # Header, Footer
@@ -251,8 +253,9 @@ web-downdetector-ve/
 │       ├── privacy.ts
 │       ├── queries/              # directory, home, service-detail, services, status
 │       ├── security/             # rate-limit, sanitize
+│       ├── seo/                  # site.ts (SITE_URL, SITE_INDEXING), crawl.ts (robots y sitemap)
 │       └── validation/reports.ts
-├── tests/                        # 7 archivos de prueba + setup.ts; 66 pruebas
+├── tests/                        # 8 archivos de prueba + setup.ts; 76 pruebas
 ├── .env.example                  # .env no se versiona
 ├── .gitignore
 ├── drizzle.config.ts
@@ -266,7 +269,7 @@ web-downdetector-ve/
 ```
 
 Todavía no existen: contenido en `public/` (ni en `src/types/`; son carpetas
-vacías que git no versiona), `src/app/{robots,sitemap,not-found}`, favicon e
+vacías que git no versiona), `src/app/not-found.tsx`, favicon e
 imagen Open Graph (ver `docs/SEO-PENDIENTE.md`); las páginas de mapa,
 incidentes, estadísticas y metodología (Etapa 4d); `src/app/admin` (Etapa 6).
 
@@ -661,3 +664,31 @@ Cashea.
 - `.gitignore`: `CLAUDE.local.md` y `.claude/settings.local.json`.
 - **No verificado:** `npm run build` (Google Fonts bloqueado en el entorno); el
   bootstrap fuera de Linux; nada del SEO contra un dominio real.
+
+### SEO técnico base, primer bloque — 2026-10-11
+
+Primera sesión en Claude Code. Antes de escribir código se verificó el entorno:
+`scripts/dev-bootstrap.sh` funcionó sin cambios en Ubuntu 24.04 (Node 22.22,
+PostgreSQL 16.15), 66/66 pruebas en verde y las rutas clave con los códigos
+esperados en `next dev`.
+
+- **Decisión de la persona propietaria: opción A**, `noindex` global mientras los
+  servicios sean demostrativos (`docs/SEO-PENDIENTE.md`, sección 5).
+- `src/lib/seo/site.ts`: `SITE_URL` (solo origen) y `SITE_INDEXING`. Se indexa
+  únicamente con `SITE_INDEXING="true"` y un origen público en `https`; con
+  cualquier otra cosa el sitio queda en noindex y, si se pidió indexar, el servidor
+  registra el motivo. Abrir la indexación no requiere tocar código.
+- `layout.tsx`: `metadataBase` y `robots` (`noindex, follow` hoy). Única fuente de la
+  política: una prueba falla si una página o layout define su propio `robots`.
+- `src/app/robots.ts` y `src/app/sitemap.ts` (dinámicos) sobre funciones puras de
+  `src/lib/seo/crawl.ts`. `robots.txt` nunca bloquea el sitio (`Disallow: /api/`) y
+  anuncia el sitemap solo si es indexable; el sitemap queda vacío en noindex y, con
+  la indexación abierta, lista portada, directorio y servicios activos.
+- `.env.example`: `SITE_URL` y `SITE_INDEXING`.
+- Pruebas: 66 → **76** (`tests/seo.test.ts`).
+- Verificado en `next dev` con tres configuraciones (por defecto, indexable con un
+  dominio ficticio y mal configurada): ver el registro de `docs/SEO-PENDIENTE.md`.
+- **Hallazgo, sin corregir:** `npm audit` da hoy 20 vulnerabilidades, 3 en
+  producción (`next` crítica, `sharp` y `source-map-js` altas), todas con arreglo
+  disponible. Ya no es cierto que solo afecten a herramientas de desarrollo.
+- **No verificado:** dominio real, `npm run build`, Search Console.

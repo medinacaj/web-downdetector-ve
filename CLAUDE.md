@@ -63,7 +63,7 @@ confirmación en decisiones menores y sin dejar nada a medias.
 ```bash
 bash scripts/dev-bootstrap.sh         # entorno desde cero: deps, Postgres, .env, migraciones, semillas
 npm run dev                           # http://localhost:3000 (PORT=3100 npm run dev para otro puerto)
-npm run typecheck && npm test         # 66 pruebas; las de API usan Postgres real
+npm run typecheck && npm test         # 76 pruebas; las de API usan Postgres real
 npm run db:seed                       # idempotente (ver "Semillas y catálogo")
 npm run aggregate:run -- --window=15  # un ciclo del motor (cron externo)
 npm run dev:synthetic-traffic         # tráfico sintético; añade -- --cleanup para limpiarlo
@@ -78,17 +78,18 @@ comandos con base de datos comprueba que Postgres esté arriba (`pg_isready`;
 ## Mapa del código
 
 - `src/app/` — `page.tsx` (inicio), `servicios/` y `servicios/[slug]`, `api/` (9
-  endpoints públicos). **No hay** `robots`, `sitemap`, `not-found`, favicon ni imagen
-  OG todavía. Las páginas de mapa, incidentes, estadísticas y metodología (Etapa 4d)
+  endpoints públicos), `robots.ts` y `sitemap.ts`. **No hay** `not-found`, favicon ni
+  imagen OG todavía. Las páginas de mapa, incidentes, estadísticas y metodología (Etapa 4d)
   no existen: sus enlaces pasan por `src/lib/nav.ts`.
 - `src/lib/db/` — `schema.ts` (17 tablas), `client.ts`, `seed-data/` (categorías, tipos
   de problema, estados, servicios). `scripts/seed.ts` las siembra.
 - `src/lib/engine/` — agregación, línea base, anomalías, ciclo de vida de incidentes.
 - `src/lib/queries/` — lecturas compartidas por API y páginas (`status.ts` deriva el
   estado). `src/lib/api/respond.ts` (sobre de respuesta), `security/`, `privacy.ts`,
-  `validation/`, `nav.ts` (registro de rutas).
+  `validation/`, `nav.ts` (registro de rutas), `seo/` (`site.ts`: `SITE_URL` y política
+  de indexación; `crawl.ts`: robots y sitemap).
 - `src/components/` — `layout/`, `directory/`, `service/`, `ui/`.
-- `tests/` — Vitest (7 archivos). `drizzle/` — migraciones 0000 y 0001.
+- `tests/` — Vitest (8 archivos). `drizzle/` — migraciones 0000 y 0001.
 - `docs/` — plan maestro, catálogo de servicios, SEO pendiente, migración a Code.
 
 ## Convenciones
@@ -102,6 +103,10 @@ comandos con base de datos comprueba que Postgres esté arriba (`pg_isready`;
 - En Next 16 `params` y `searchParams` son **Promesas**. Páginas con datos en vivo:
   `export const dynamic = 'force-dynamic'`. Un `page.tsx`/`layout.tsx` no puede exportar
   nombres extra.
+- Indexación: hoy **noindex global** (opción A, decidida el 2026-10-11). La política se
+  define solo en el `metadata` de `src/app/layout.tsx` vía `getSiteConfig()`; ninguna
+  página pone su propio `robots` (lo comprueba `tests/seo.test.ts`). Se abre con
+  `SITE_URL` en https + `SITE_INDEXING="true"`, sin tocar código.
 - Todo enlace a una página que puede no existir usa `ROUTE` + `isRouteAvailable` de
   `src/lib/nav.ts`; una página nueva se activa allí (`available: true`). `tests/nav.test.ts`
   falla si `available` no coincide con el archivo o si alguien escribe la ruta a mano.
@@ -143,19 +148,23 @@ de problema propios o su formulario solo ofrecería "Otro" (lo comprueba una pru
 Hecho: Etapas 1–3 (datos, API, motor) y 4a–4c (inicio, directorio, servicio con reporte),
 catálogo ampliado a 71 servicios, registro de rutas, menú móvil.
 
-Pendiente, en orden: **SEO técnico base antes de publicar nada** (robots, sitemap,
-canonical, Open Graph, JSON-LD, favicon, dominio y regla de indexación; ver
+SEO base, primer bloque (2026-10-11): política de indexación (opción A, noindex global),
+`SITE_URL`/`metadataBase`, `robots.ts` y `sitemap.ts`.
+
+Pendiente, en orden: **actualizar `next`, `sharp` y `source-map-js`** (vulnerabilidades
+de producción, una crítica) · **resto del SEO base antes de publicar** (canonical, Open
+Graph, favicon, 404 propia, categorías, JSON-LD; dominio cuando exista; ver
 `docs/SEO-PENDIENTE.md`) · **4d** (gráfico histórico con `recharts`, mapa, incidentes,
 estadísticas, metodología; al crearlas, activar en `nav.ts`) · **5** Turnstile y
 geolocalización aproximada · **6** panel admin y `create-admin` (los slugs no deben poder
 editarse sin redirección; `/admin` con noindex y autenticación) · **7** abuso avanzado ·
-**8** tiempo real (SSE) · **9** observabilidad · **10** e2e/carga/Docker/CI, ESLint y 9
-vulnerabilidades solo de herramientas de desarrollo (vitest/vite/esbuild).
+**8** tiempo real (SSE) · **9** observabilidad · **10** e2e/carga/Docker/CI, ESLint y las
+vulnerabilidades de herramientas de desarrollo (vitest/vite/esbuild).
 
 Brechas conocidas: señales técnica y oficial del motor sin fuente real (se excluyen y el
 resto se renormaliza); municipios sin sembrar; el directorio hace una consulta de estado
 por servicio (N+1; ~0,15 s con 71 servicios en local); sin páginas de categoría
-indexables (solo el filtro `?category=`); el SEO no se probó contra un dominio real ni en
+indexables (solo el filtro `?category=`); no hay dominio todavía y el SEO no se probó contra uno real ni en
 Google Search Console (no se usó); revisión legal profesional de apuestas y loterías
 pendiente; `npm run build` sin verificar en el sandbox.
 

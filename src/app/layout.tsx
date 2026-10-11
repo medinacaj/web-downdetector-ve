@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { Space_Grotesk, Inter, JetBrains_Mono } from 'next/font/google';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
+import { getSiteConfig } from '@/lib/seo/site';
 import './globals.css';
 
 const display = Space_Grotesk({
@@ -20,7 +21,12 @@ const mono = JetBrains_Mono({
   display: 'swap',
 });
 
+const site = getSiteConfig();
+
 export const metadata: Metadata = {
+  metadataBase: new URL(site.origin),
+  // Política de indexación: ver src/lib/seo/site.ts (hoy noindex global, opción A).
+  robots: site.indexable ? { index: true, follow: true } : { index: false, follow: true },
   title: {
     default: 'PulsoVE — Estado de servicios en Venezuela',
     template: '%s | PulsoVE',
