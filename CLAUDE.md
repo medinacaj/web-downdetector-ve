@@ -165,3 +165,6 @@ pendiente; `npm run build` sin verificar en el sandbox.
 `docs/CATALOGO-SERVICIOS.md` · `docs/SEO-PENDIENTE.md` · `docs/MIGRACION-CLAUDE-CODE.md` ·
 `README.md`. Las reglas por área viven en `.claude/rules/` y se cargan al tocar esos
 archivos.
+
+## Marco legal-tecnológico
+Leer `docs/ASESOR_LEGAL_TECNOLOGICO.md` en tareas con implicaciones legales, datos, IA, derechos de contenido, seguridad, proveedores, contratos o continuidad. Aplicar solo los controles pertinentes y distinguir requisitos jurídicos verificados de buenas prácticas; registrar evidencia, jurisdicción, riesgo y validación pendiente. Coordinar con `AGENTS.md`.
