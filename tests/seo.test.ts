@@ -4,6 +4,7 @@ import { join } from 'node:path';
 import { LOCAL_ORIGIN, absoluteUrl, resolveSiteConfig } from '../src/lib/seo/site';
 import { buildRobots, buildSitemap } from '../src/lib/seo/crawl';
 import { pageMetadata } from '../src/lib/seo/metadata';
+import { breadcrumbJsonLd, serializeJsonLd, siteJsonLd } from '../src/lib/seo/json-ld';
 
 const PROD = { SITE_URL: 'https://pulsove.example', SITE_INDEXING: 'true' };
 
@@ -125,5 +126,40 @@ describe('seo: metadata de página', () => {
     expect(pages.length).toBeGreaterThan(0);
     const missing = pages.filter((f) => !/pageMetadata\(/.test(readFileSync(join(appDir, f), 'utf8')));
     expect(missing).toEqual([]);
+  });
+});
+
+describe('seo: datos estructurados (JSON-LD)', () => {
+  const ORIGIN = 'https://pulsove.example';
+
+  it('portada: WebSite y Organization con URL absolutas y solo datos reales', () => {
+    const data = siteJsonLd(ORIGIN);
+    const graph = data['@graph'] as Record<string, unknown>[];
+    expect(graph.map((n) => n['@type'])).toEqual(['WebSite', 'Organization']);
+    expect(graph[0]).toMatchObject({ name: 'PulsoVE', url: ORIGIN, inLanguage: 'es-VE' });
+    expect(graph[1]).toMatchObject({ url: ORIGIN, logo: `${ORIGIN}/apple-icon.png` });
+    // Nada que el sitio no pueda respaldar (ni inventado ni demostrativo).
+    expect(JSON.stringify(data)).not.toMatch(/telephone|address|sameAs|aggregateRating|review|email/i);
+  });
+
+  it('miga de pan: posiciones desde 1 y URL absolutas, en el orden visible', () => {
+    const data = breadcrumbJsonLd(ORIGIN, [
+      { name: 'Servicios', path: '/servicios' },
+      { name: 'Streaming', path: '/categorias/streaming' },
+      { name: 'Netflix', path: '/servicios/netflix' },
+    ]);
+    expect(data['@type']).toBe('BreadcrumbList');
+    expect(data.itemListElement).toEqual([
+      { '@type': 'ListItem', position: 1, name: 'Servicios', item: `${ORIGIN}/servicios` },
+      { '@type': 'ListItem', position: 2, name: 'Streaming', item: `${ORIGIN}/categorias/streaming` },
+      { '@type': 'ListItem', position: 3, name: 'Netflix', item: `${ORIGIN}/servicios/netflix` },
+    ]);
+    expect(() => breadcrumbJsonLd(ORIGIN, [])).toThrow();
+  });
+
+  it('la serialización escapa "<" para que un texto no pueda cerrar el <script>', () => {
+    const out = serializeJsonLd({ name: '</script><script>alert(1)</script>' });
+    expect(out).not.toContain('<');
+    expect(JSON.parse(out)).toEqual({ name: '</script><script>alert(1)</script>' });
   });
 });

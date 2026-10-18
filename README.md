@@ -16,9 +16,10 @@ metodología, y el gráfico de la página de servicio.
 **Todavía no está listo para publicarse.** Ya hay `robots.txt`, `sitemap.xml`
 y política de indexación: **noindex global** mientras los datos sean
 demostrativos (decisión del 2026-10-11; se abre con `SITE_INDEXING="true"`).
-Ya hay canonical, Open Graph con imagen, favicon, 404 propia y páginas de
-categoría. Faltan el dominio, los datos estructurados y descripciones propias
-por servicio. Ver `docs/SEO-PENDIENTE.md`.
+El SEO técnico base está hecho y verificado en local: canonical, Open Graph
+con imagen, favicon, 404 propia, páginas de categoría, datos estructurados
+(JSON-LD) y metadescripciones propias. Falta lo que depende de terceros:
+dominio, hosting y Search Console. Ver `docs/SEO-PENDIENTE.md`.
 
 ## Qué existe hoy
 
@@ -49,7 +50,7 @@ por servicio. Ver `docs/SEO-PENDIENTE.md`.
   tanto en la base de datos como a través de la API pública.
 - Configuración de proyecto (Next.js 16, Tailwind, TypeScript, Vitest) y
   variables de entorno documentadas con valores por defecto seguros.
-- 82 pruebas automatizadas (metadata de página: canonical, Open Graph y Twitter,
+- 85 pruebas automatizadas (datos estructurados JSON-LD, metadata de página: canonical, Open Graph y Twitter,
   renderizado dinámico de las páginas con datos,
   datos semilla y calidad del catálogo, registro
   de rutas de navegación, configuración SEO e indexación (robots, sitemap), privacidad, bandas de estado, integración real de
@@ -128,8 +129,8 @@ ya instalado, sin usar), mapa nacional (cartograma — los datos
 global, estadísticas, metodología completa. El formulario de reporte
 funciona pero sin Turnstile ni geolocalización (Etapa 5).
 
-SEO técnico: dominio (aún no existe), datos estructurados y descripciones
-propias por servicio (`docs/SEO-PENDIENTE.md`).
+SEO técnico: solo lo que depende de terceros (dominio, hosting, Search
+Console; `docs/SEO-PENDIENTE.md`).
 
 Panel administrativo, autenticación, tiempo real, mediciones técnicas
 activas (sección 10 del brief), moderación — Etapas 5 en adelante. Las
@@ -190,7 +191,7 @@ esta carpeta. Cómo llegó aquí el proyecto, qué falta resolver y qué se veri
 | `npm run dev` / `build` / `start` | Next.js (inicio, directorio, página de servicio y API reales). `build` necesita acceso a Google Fonts |
 | `bash scripts/dev-bootstrap.sh` | Entorno de desarrollo desde cero (ver "Instalación"); idempotente, nunca toca un `.env` existente |
 | `npm run typecheck` | `tsc --noEmit` |
-| `npm test` / `test:watch` | Vitest (82 pruebas; las de integración de reportes requieren Postgres real) |
+| `npm test` / `test:watch` | Vitest (85 pruebas; las de integración de reportes requieren Postgres real) |
 | `npm run db:generate` | Genera migración SQL a partir de `schema.ts` |
 | `npm run db:migrate` | `drizzle-kit push` (sincroniza esquema directo, sin historial — útil en dev) |
 | `npm run db:migrate:deploy` | Aplica las migraciones versionadas de `drizzle/` |

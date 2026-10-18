@@ -63,7 +63,7 @@ confirmación en decisiones menores y sin dejar nada a medias.
 ```bash
 bash scripts/dev-bootstrap.sh         # entorno desde cero: deps, Postgres, .env, migraciones, semillas
 npm run dev                           # http://localhost:3000 (PORT=3100 npm run dev para otro puerto)
-npm run typecheck && npm test         # 82 pruebas; las de API usan Postgres real
+npm run typecheck && npm test         # 85 pruebas; las de API usan Postgres real
 npm run db:seed                       # idempotente (ver "Semillas y catálogo")
 npm run aggregate:run -- --window=15  # un ciclo del motor (cron externo)
 npm run dev:synthetic-traffic         # tráfico sintético; añade -- --cleanup para limpiarlo
@@ -88,7 +88,7 @@ comandos con base de datos comprueba que Postgres esté arriba (`pg_isready`;
 - `src/lib/queries/` — lecturas compartidas por API y páginas (`status.ts` deriva el
   estado). `src/lib/api/respond.ts` (sobre de respuesta), `security/`, `privacy.ts`,
   `validation/`, `nav.ts` (registro de rutas), `seo/` (`site.ts`: `SITE_URL` y política
-  de indexación; `crawl.ts`: robots y sitemap; `metadata.ts`: `pageMetadata`; `brand.ts`;
+  de indexación; `crawl.ts`: robots y sitemap; `metadata.ts`: `pageMetadata`; `json-ld.ts`; `brand.ts`;
   `share-image.tsx`).
 - `src/components/` — `layout/`, `directory/`, `service/`, `ui/`.
 - `tests/` — Vitest (9 archivos). `drizzle/` — migraciones 0000 y 0001.
@@ -115,6 +115,9 @@ comandos con base de datos comprueba que Postgres esté arriba (`pg_isready`;
   path })` (canonical, Open Graph y Twitter coherentes, imagen incluida); lo exige
   `tests/seo.test.ts`. La metadata de Next se fusiona de forma superficial: no pongas
   `openGraph` suelto en una página.
+- JSON-LD solo con datos reales y visibles (`src/lib/seo/json-ld.ts`, `<JsonLd>`). Las
+  migas de pan van con `<Breadcrumbs>` (`src/components/layout/`): pinta la visible y su
+  `BreadcrumbList` desde la misma lista. Nada de `Rating`, `Service` ni contactos.
 - Enlaces a servicios y categorías con `serviceHref(slug)` y `categoryHref(slug)` de
   `src/lib/nav.ts`, no escritos a mano.
 - Apuestas y loterías: el aviso legal lo ponen `GamblingNotice` y
@@ -174,11 +177,11 @@ SEO base, primer bloque (2026-10-11): política de indexación (opción A, noind
 vulnerabilidades (2026-10-18: `next` 16.3.8, `sharp` 0.35.5, `source-map-js` 1.2.2);
 `npm run build` y `npm start` verificados; portada dinámica. SEO base, tercer bloque
 (2026-10-18): canonical, Open Graph y Twitter con imagen, favicon e iconos, 404 propia;
-páginas de categoría en `/categorias/<slug>` (URL elegida por la persona propietaria).
+páginas de categoría en `/categorias/<slug>` (URL elegida por la persona propietaria);
+JSON-LD (`WebSite`, `Organization`, `BreadcrumbList`) y metadescripciones propias por
+servicio. **El SEO base está completo en local**; falta lo que depende de terceros.
 
-Pendiente, en orden: **resto del SEO base antes de publicar** (JSON-LD —`WebSite`,
-`Organization`, `BreadcrumbList` en categorías—, descripciones propias por servicio;
-dominio cuando exista; ver `docs/SEO-PENDIENTE.md`) · **4d** (gráfico histórico con `recharts`, mapa, incidentes,
+Pendiente, en orden: **4d** (gráfico histórico con `recharts`, mapa, incidentes,
 estadísticas, metodología; al crearlas, activar en `nav.ts`) · **5** Turnstile y
 geolocalización aproximada · **6** panel admin y `create-admin` (los slugs no deben poder
 editarse sin redirección; `/admin` con noindex y autenticación) · **7** abuso avanzado ·
@@ -188,7 +191,7 @@ vulnerabilidades de herramientas de desarrollo (vitest/vite/esbuild; `npm audit 
 Brechas conocidas: señales técnica y oficial del motor sin fuente real (se excluyen y el
 resto se renormaliza); municipios sin sembrar; el directorio hace una consulta de estado
 por servicio (N+1; ~0,15 s con 71 servicios en local; también en las páginas de
-categoría); no hay índice `/categorias` (404; el directorio cumple esa función); no hay dominio todavía y el SEO no se probó contra uno real ni en
+categoría); no hay índice `/categorias` (404; el directorio cumple esa función); no hay dominio todavía (S3: dominio y redirecciones; S12: rendimiento en producción) y el SEO no se probó contra uno real ni en
 Google Search Console (no se usó); revisión legal profesional de apuestas y loterías
 pendiente.
 

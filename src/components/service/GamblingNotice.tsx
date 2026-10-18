@@ -3,8 +3,9 @@
 // página de cada servicio de la categoría y en la de la categoría.
 export const GAMBLING_CATEGORY_SLUG = 'apuestas-y-loterias';
 
-/** Frase fija para la metadescripción de la categoría (no depende de texto editable). */
+/** Frases fijas para las metadescripciones (no dependen de texto editable). */
 export const GAMBLING_META_DISCLAIMER = 'PulsoVE no las promueve ni confirma que estén autorizadas.';
+export const GAMBLING_META_DISCLAIMER_SERVICE = 'PulsoVE no lo promueve ni confirma que esté autorizado.';
 
 export function GamblingNotice({ subject }: { subject: 'service' | 'category' }) {
   return (

@@ -4,6 +4,9 @@ import { pageMetadata, SITE_NAME } from '@/lib/seo/metadata';
 import { getHomeData } from '@/lib/queries/home';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { ROUTE, isRouteAvailable } from '@/lib/nav';
+import { JsonLd } from '@/components/seo/JsonLd';
+import { siteJsonLd } from '@/lib/seo/json-ld';
+import { getSiteConfig } from '@/lib/seo/site';
 
 export const metadata: Metadata = pageMetadata({
   title: `${SITE_NAME} — Estado de servicios en Venezuela`,
@@ -38,6 +41,7 @@ export default async function HomePage() {
 
   return (
     <>
+      <JsonLd data={siteJsonLd(getSiteConfig().origin)} />
       {/* Hero — izquierda: el trabajo real (buscar); derecha: pulso nacional en vivo */}
       <section className="border-b border-border">
         <div className="mx-auto grid max-w-6xl gap-10 px-4 py-14 sm:px-6 lg:grid-cols-[1.1fr_0.9fr] lg:items-center lg:py-20">

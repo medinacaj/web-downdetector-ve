@@ -187,7 +187,7 @@ reevaluar `@neondatabase/serverless` o un pool externo (PgBouncer).
 | 2 | API pública de lectura + `POST /api/reports` con validación/rate limiting básico | 1 | **Completada esta sesión** |
 | 3 | Motor de agregación y anomalías (`aggregate:run`), apertura/cierre de incidentes | 2 | **Completada** |
 | 4 | Frontend público: inicio, directorio, página de servicio, mapa, incidentes, estadísticas, metodología | 2, 3 | **En curso — 4a (layout + inicio), 4b (directorio) y 4c (página de servicio con reporte) completadas; 4d (gráfico histórico, mapa, incidentes, estadísticas, metodología) pendiente** |
-| SEO | SEO técnico e indexación: dominio y `metadataBase`, `robots.ts`, `sitemap.ts`, canonical, Open Graph, favicon, datos estructurados y decisión de indexación. Regla permanente de la persona propietaria: forma parte de cada entrega web | 4a–4c | **En curso** — política de indexación decidida (opción A: noindex global mientras todo sea demostrativo), `robots.ts`, `sitemap.ts`, `SITE_URL` y `metadataBase` hechos (2026-10-11); canonical, Open Graph, favicon, 404 propia y páginas de categoría (2026-10-18); faltan dominio, datos estructurados y descripciones por servicio. Ver `docs/SEO-PENDIENTE.md` |
+| SEO | SEO técnico e indexación: dominio y `metadataBase`, `robots.ts`, `sitemap.ts`, canonical, Open Graph, favicon, datos estructurados y decisión de indexación. Regla permanente de la persona propietaria: forma parte de cada entrega web | 4a–4c | **En curso** — política de indexación decidida (opción A: noindex global mientras todo sea demostrativo), `robots.ts`, `sitemap.ts`, `SITE_URL` y `metadataBase` hechos (2026-10-11); canonical, Open Graph, favicon, 404 propia, páginas de categoría, JSON-LD y metadescripciones por servicio (2026-10-18). **Completo en local**; faltan dominio, hosting y Search Console. Ver `docs/SEO-PENDIENTE.md` |
 | 5 | Formulario de reporte conectado de extremo a extremo (UI + API + Turnstile + geolocalización aproximada) | 2, 4 | Pendiente |
 | 6 | Panel administrativo (auth, CRUD servicios/categorías, incidentes, moderación, auditoría, `create-admin`) | 1–3 | Pendiente |
 | 7 | Prevención de abuso avanzada: puntuación de confianza, detección de campañas coordinadas | 2, 3 | Pendiente |
@@ -247,7 +247,8 @@ web-downdetector-ve/
 │   │   └── sitemap.ts            # sitemap.xml dinámico (vacío mientras rija el noindex)
 │   ├── components/
 │   │   ├── directory/            # ServiceGrid, ViewToggle
-│   │   ├── layout/               # Header, Footer
+│   │   ├── layout/               # Header, Footer, Breadcrumbs (miga visible + BreadcrumbList)
+│   │   ├── seo/                  # JsonLd
 │   │   ├── service/              # ReportForm
 │   │   └── ui/                   # StatusBadge, ThemeToggle
 │   └── lib/
@@ -258,9 +259,9 @@ web-downdetector-ve/
 │       ├── privacy.ts
 │       ├── queries/              # directory, home, service-detail, services, status
 │       ├── security/             # rate-limit, sanitize
-│       ├── seo/                  # site.ts (SITE_URL, SITE_INDEXING), crawl.ts (robots y sitemap), metadata.ts (pageMetadata), brand.ts, share-image.tsx
+│       ├── seo/                  # site.ts (SITE_URL, SITE_INDEXING), crawl.ts (robots y sitemap), metadata.ts (pageMetadata), json-ld.ts, brand.ts, share-image.tsx
 │       └── validation/reports.ts
-├── tests/                        # 9 archivos de prueba + setup.ts; 82 pruebas
+├── tests/                        # 9 archivos de prueba + setup.ts; 85 pruebas
 ├── .env.example                  # .env no se versiona
 ├── .gitignore
 ├── drizzle.config.ts
@@ -274,8 +275,7 @@ web-downdetector-ve/
 ```
 
 Todavía no existen: contenido en `public/` (ni en `src/types/`; son carpetas
-vacías que git no versiona), datos estructurados (ver
-`docs/SEO-PENDIENTE.md`); las páginas de mapa,
+vacías que git no versiona); las páginas de mapa,
 incidentes, estadísticas y metodología (Etapa 4d); `src/app/admin` (Etapa 6).
 
 ---
@@ -772,3 +772,20 @@ esperados en `next dev`.
 - Verificado en `next dev` y `npm run build` + `npm start` (ver el registro de
   `docs/SEO-PENDIENTE.md`) y en Chromium a 390 y 1280 px. **No verificado:** dominio
   real, Search Console.
+
+### SEO técnico base, último bloque — 2026-10-18
+
+- **Datos estructurados** (S9): `src/lib/seo/json-ld.ts` (funciones puras) y
+  `<JsonLd>`. Portada: `WebSite` + `Organization` con nombre, URL y logo propio, nada
+  más. Categorías y servicios: `BreadcrumbList` generado por `<Breadcrumbs>` desde la
+  misma lista que la miga de pan visible (nueva en los servicios: Servicios /
+  Categoría / Servicio). Se escapa `<`. Descartados: `SearchAction` (Google retiró
+  ese cuadro), `Rating`, `Service`, `Product` y cualquier contacto.
+- **Metadescripciones de servicio** (S10): la descripción propia de la semilla más qué
+  ofrece la página; frase legal fija en apuestas. 71 distintas.
+- Pruebas: 82 → **85**.
+- Verificado en `next dev` y `npm run build` + `npm start` extrayendo y parseando el
+  JSON-LD del HTML real, y en Chromium a 390 px. **No verificado:** prueba de
+  resultados enriquecidos de Google (necesita URL pública), dominio, Search Console.
+- **Con esto, el SEO técnico base queda completo en local.** Lo que falta (dominio y
+  redirecciones, rendimiento en producción, Search Console) depende de terceros.

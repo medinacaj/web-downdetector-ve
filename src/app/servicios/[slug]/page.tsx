@@ -1,12 +1,16 @@
 import type { Metadata } from 'next';
-import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { getServiceDetailData } from '@/lib/queries/service-detail';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { ReportForm } from '@/components/service/ReportForm';
 import { pageMetadata } from '@/lib/seo/metadata';
-import { categoryHref, serviceHref } from '@/lib/nav';
-import { GamblingNotice, GAMBLING_CATEGORY_SLUG } from '@/components/service/GamblingNotice';
+import { ROUTE, categoryHref, serviceHref } from '@/lib/nav';
+import {
+  GamblingNotice,
+  GAMBLING_CATEGORY_SLUG,
+  GAMBLING_META_DISCLAIMER_SERVICE,
+} from '@/components/service/GamblingNotice';
+import { Breadcrumbs } from '@/components/layout/Breadcrumbs';
 
 // Datos en vivo: se renderiza en cada petición (si no, `next build` la congela).
 export const dynamic = 'force-dynamic';
@@ -39,7 +43,15 @@ export async function generateMetadata({
   if (!data) return { title: 'Servicio no encontrado' };
   return pageMetadata({
     title: `Estado de ${data.service.name} en Venezuela`,
-    description: `Consulta reportes ciudadanos, incidentes y estado actual de ${data.service.name} (${data.service.category.name}) en Venezuela.`,
+    // Descripción propia del servicio (semilla) + qué ofrece la página. El nombre, único,
+    // hace única la frase aunque dos servicios compartan descripción ("Internet fijo.").
+    description: [
+      data.service.description,
+      data.service.category.slug === GAMBLING_CATEGORY_SLUG ? GAMBLING_META_DISCLAIMER_SERVICE : null,
+      `Consulta reportes ciudadanos, incidentes y el estado actual de ${data.service.name} en Venezuela.`,
+    ]
+      .filter(Boolean)
+      .join(' '),
     // El slug de la base, no el de la URL pedida: es la forma canónica.
     path: serviceHref(data.service.slug),
   });
@@ -56,11 +68,13 @@ export default async function ServiceDetailPage({ params }: { params: Promise<{ 
     <div className="mx-auto max-w-4xl px-4 py-10 sm:px-6">
       {/* Cabecera */}
       <div className="border-b border-border pb-6">
-        <p className="text-sm text-ink-muted">
-          <Link href={categoryHref(service.category.slug)} className="underline-offset-4 hover:text-ink hover:underline">
-            {service.category.name}
-          </Link>
-        </p>
+        <Breadcrumbs
+          crumbs={[
+            { name: ROUTE.services.label, path: ROUTE.services.href },
+            { name: service.category.name, path: categoryHref(service.category.slug) },
+            { name: service.name, path: serviceHref(service.slug) },
+          ]}
+        />
         <div className="mt-1 flex flex-wrap items-center justify-between gap-3">
           <h1 className="font-display text-2xl font-semibold tracking-tight sm:text-3xl">{service.name}</h1>
           <StatusBadge status={statusDetail.status} />

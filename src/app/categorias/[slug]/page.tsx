@@ -7,6 +7,7 @@ import { ServiceGrid } from '@/components/directory/ServiceGrid';
 import { GamblingNotice, GAMBLING_CATEGORY_SLUG, GAMBLING_META_DISCLAIMER } from '@/components/service/GamblingNotice';
 import { pageMetadata } from '@/lib/seo/metadata';
 import { ROUTE, categoryHref } from '@/lib/nav';
+import { Breadcrumbs } from '@/components/layout/Breadcrumbs';
 
 // Datos en vivo: se renderiza en cada petición (si no, `next build` la congela).
 export const dynamic = 'force-dynamic';
@@ -50,13 +51,12 @@ export default async function CategoryPage({ params }: { params: Params }) {
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6">
-      <nav aria-label="Ruta" className="text-sm text-ink-muted">
-        <Link href={ROUTE.services.href} className="underline-offset-4 hover:text-ink hover:underline">
-          Servicios
-        </Link>
-        <span aria-hidden="true"> / </span>
-        <span>{category.name}</span>
-      </nav>
+      <Breadcrumbs
+        crumbs={[
+          { name: ROUTE.services.label, path: ROUTE.services.href },
+          { name: category.name, path: categoryHref(category.slug) },
+        ]}
+      />
 
       <div className="mt-2 flex items-baseline justify-between gap-4">
         <h1 className="font-display text-2xl font-semibold tracking-tight sm:text-3xl">{category.name}</h1>
