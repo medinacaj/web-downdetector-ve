@@ -3,6 +3,7 @@ import { readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { LOCAL_ORIGIN, absoluteUrl, resolveSiteConfig } from '../src/lib/seo/site';
 import { buildRobots, buildSitemap } from '../src/lib/seo/crawl';
+import { pageMetadata } from '../src/lib/seo/metadata';
 
 const PROD = { SITE_URL: 'https://pulsove.example', SITE_INDEXING: 'true' };
 
@@ -81,5 +82,44 @@ describe('seo: la política de indexación vive solo en el layout raíz', () => 
       .filter((f) => /(^|\/)(page|layout)\.tsx$/.test(f) && f !== 'layout.tsx')
       .filter((f) => /\brobots\s*:/.test(readFileSync(join(appDir, f), 'utf8')));
     expect(offenders).toEqual([]);
+  });
+});
+
+describe('seo: metadata de página', () => {
+  it('canonical, Open Graph y Twitter coinciden entre sí', () => {
+    const m = pageMetadata({ title: 'Servicios', description: 'Directorio.', path: '/servicios' });
+    expect(m.title).toBe('Servicios');
+    expect(m.alternates?.canonical).toBe('/servicios');
+    expect(m.openGraph).toMatchObject({
+      url: '/servicios',
+      title: 'Servicios | PulsoVE',
+      description: 'Directorio.',
+      locale: 'es_VE',
+      siteName: 'PulsoVE',
+    });
+    expect(m.twitter).toMatchObject({ card: 'summary_large_image', title: 'Servicios | PulsoVE' });
+    expect(m).not.toHaveProperty('robots');
+  });
+
+  it('el título absoluto (portada) no recibe el sufijo del sitio', () => {
+    const m = pageMetadata({ title: 'PulsoVE — Inicio real', description: 'x', path: '/', absoluteTitle: true });
+    expect(m.title).toEqual({ absolute: 'PulsoVE — Inicio real' });
+    expect(m.openGraph?.title).toBe('PulsoVE — Inicio real');
+  });
+
+  it('rechaza canónicas relativas o con parámetros', () => {
+    for (const path of ['servicios', '/servicios?category=banca', '/servicios#x']) {
+      expect(() => pageMetadata({ title: 't', description: 'd', path }), path).toThrow();
+    }
+  });
+
+  it('toda página pública construye su metadata con pageMetadata (canonical incluida)', () => {
+    const appDir = join(process.cwd(), 'src', 'app');
+    const pages = (readdirSync(appDir, { recursive: true }) as string[])
+      .map((f) => f.replace(/\\/g, '/'))
+      .filter((f) => /(^|\/)page\.tsx$/.test(f) && !f.startsWith('api/'));
+    expect(pages.length).toBeGreaterThan(0);
+    const missing = pages.filter((f) => !/pageMetadata\(/.test(readFileSync(join(appDir, f), 'utf8')));
+    expect(missing).toEqual([]);
   });
 });

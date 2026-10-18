@@ -63,7 +63,7 @@ confirmación en decisiones menores y sin dejar nada a medias.
 ```bash
 bash scripts/dev-bootstrap.sh         # entorno desde cero: deps, Postgres, .env, migraciones, semillas
 npm run dev                           # http://localhost:3000 (PORT=3100 npm run dev para otro puerto)
-npm run typecheck && npm test         # 77 pruebas; las de API usan Postgres real
+npm run typecheck && npm test         # 81 pruebas; las de API usan Postgres real
 npm run db:seed                       # idempotente (ver "Semillas y catálogo")
 npm run aggregate:run -- --window=15  # un ciclo del motor (cron externo)
 npm run dev:synthetic-traffic         # tráfico sintético; añade -- --cleanup para limpiarlo
@@ -78,8 +78,9 @@ comandos con base de datos comprueba que Postgres esté arriba (`pg_isready`;
 ## Mapa del código
 
 - `src/app/` — `page.tsx` (inicio), `servicios/` y `servicios/[slug]`, `api/` (9
-  endpoints públicos), `robots.ts` y `sitemap.ts`. **No hay** `not-found`, favicon ni
-  imagen OG todavía. Las páginas de mapa, incidentes, estadísticas y metodología (Etapa 4d)
+  endpoints públicos), `robots.ts`, `sitemap.ts`, `not-found.tsx`, iconos (`favicon.ico`,
+  `icon.svg`, `apple-icon.png`; se regeneran con `node scripts/generate-icons.mjs`) e
+  imagen para compartir (`opengraph-image.tsx`, `twitter-image.tsx`). Las páginas de mapa, incidentes, estadísticas y metodología (Etapa 4d)
   no existen: sus enlaces pasan por `src/lib/nav.ts`.
 - `src/lib/db/` — `schema.ts` (17 tablas), `client.ts`, `seed-data/` (categorías, tipos
   de problema, estados, servicios). `scripts/seed.ts` las siembra.
@@ -87,7 +88,8 @@ comandos con base de datos comprueba que Postgres esté arriba (`pg_isready`;
 - `src/lib/queries/` — lecturas compartidas por API y páginas (`status.ts` deriva el
   estado). `src/lib/api/respond.ts` (sobre de respuesta), `security/`, `privacy.ts`,
   `validation/`, `nav.ts` (registro de rutas), `seo/` (`site.ts`: `SITE_URL` y política
-  de indexación; `crawl.ts`: robots y sitemap).
+  de indexación; `crawl.ts`: robots y sitemap; `metadata.ts`: `pageMetadata`; `brand.ts`;
+  `share-image.tsx`).
 - `src/components/` — `layout/`, `directory/`, `service/`, `ui/`.
 - `tests/` — Vitest (9 archivos). `drizzle/` — migraciones 0000 y 0001.
 - `docs/` — plan maestro, catálogo de servicios, SEO pendiente, migración a Code.
@@ -109,6 +111,10 @@ comandos con base de datos comprueba que Postgres esté arriba (`pg_isready`;
   define solo en el `metadata` de `src/app/layout.tsx` vía `getSiteConfig()`; ninguna
   página pone su propio `robots` (lo comprueba `tests/seo.test.ts`). Se abre con
   `SITE_URL` en https + `SITE_INDEXING="true"`, sin tocar código.
+- Metadata: toda página pública exporta la suya con `pageMetadata({ title, description,
+  path })` (canonical, Open Graph y Twitter coherentes, imagen incluida); lo exige
+  `tests/seo.test.ts`. La metadata de Next se fusiona de forma superficial: no pongas
+  `openGraph` suelto en una página.
 - Todo enlace a una página que puede no existir usa `ROUTE` + `isRouteAvailable` de
   `src/lib/nav.ts`; una página nueva se activa allí (`available: true`). `tests/nav.test.ts`
   falla si `available` no coincide con el archivo o si alguien escribe la ruta a mano.
@@ -139,6 +145,11 @@ de problema propios o su formulario solo ofrecería "Otro" (lo comprueba una pru
 - `next dev` regenera el bloque de `AGENTS.md`: no lo edites a mano; la primera línea de
   este archivo debe seguir siendo `@AGENTS.md`.
 - Con red restringida, `next build` falla en `next/font/google`; `next dev` degrada.
+- `SITE_URL`/`SITE_INDEXING` deben existir también en `npm run build`: la 404 general
+  (`/_not-found`) es estática y toma sus valores del build.
+- La 404 de un **servicio** inexistente (`notFound()` en página dinámica) sale como
+  documento `__next_error__` que pinta el cliente (código 404 correcto). Es de Next 16.3,
+  ya pasaba antes; un `not-found.tsx` en el segmento no lo arregla.
 - `next build` reescribe `next-env.d.ts` (`.next/types` en vez de `.next/dev/types`) y
   `next dev` lo devuelve: no lo commitees (`git checkout next-env.d.ts`).
 - No borres `node_modules` con `next dev` en marcha: deja errores "Can't resolve
@@ -155,11 +166,12 @@ catálogo ampliado a 71 servicios, registro de rutas, menú móvil.
 SEO base, primer bloque (2026-10-11): política de indexación (opción A, noindex global),
 `SITE_URL`/`metadataBase`, `robots.ts` y `sitemap.ts`. Dependencias de producción sin
 vulnerabilidades (2026-10-18: `next` 16.3.8, `sharp` 0.35.5, `source-map-js` 1.2.2);
-`npm run build` y `npm start` verificados; portada dinámica.
+`npm run build` y `npm start` verificados; portada dinámica. SEO base, tercer bloque
+(2026-10-18): canonical, Open Graph y Twitter con imagen, favicon e iconos, 404 propia.
 
-Pendiente, en orden: **resto del SEO base antes de publicar** (canonical, Open
-Graph, favicon, 404 propia, categorías, JSON-LD; dominio cuando exista; ver
-`docs/SEO-PENDIENTE.md`) · **4d** (gráfico histórico con `recharts`, mapa, incidentes,
+Pendiente, en orden: **resto del SEO base antes de publicar** (páginas de categoría
+—decidir antes la forma de la URL con la persona propietaria—, JSON-LD, descripciones
+propias por servicio; dominio cuando exista; ver `docs/SEO-PENDIENTE.md`) · **4d** (gráfico histórico con `recharts`, mapa, incidentes,
 estadísticas, metodología; al crearlas, activar en `nav.ts`) · **5** Turnstile y
 geolocalización aproximada · **6** panel admin y `create-admin` (los slugs no deben poder
 editarse sin redirección; `/admin` con noindex y autenticación) · **7** abuso avanzado ·

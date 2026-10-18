@@ -3,6 +3,8 @@ import { notFound } from 'next/navigation';
 import { getServiceDetailData } from '@/lib/queries/service-detail';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { ReportForm } from '@/components/service/ReportForm';
+import { pageMetadata } from '@/lib/seo/metadata';
+import { ROUTE } from '@/lib/nav';
 
 // Datos en vivo: se renderiza en cada petición (si no, `next build` la congela).
 export const dynamic = 'force-dynamic';
@@ -33,10 +35,12 @@ export async function generateMetadata({
   const { slug } = await params;
   const data = await getServiceDetailData(slug);
   if (!data) return { title: 'Servicio no encontrado' };
-  return {
+  return pageMetadata({
     title: `Estado de ${data.service.name} en Venezuela`,
     description: `Consulta reportes ciudadanos, incidentes y estado actual de ${data.service.name} (${data.service.category.name}) en Venezuela.`,
-  };
+    // El slug de la base, no el de la URL pedida: es la forma canónica.
+    path: `${ROUTE.services.href}/${data.service.slug}`,
+  });
 }
 
 export default async function ServiceDetailPage({ params }: { params: Promise<{ slug: string }> }) {

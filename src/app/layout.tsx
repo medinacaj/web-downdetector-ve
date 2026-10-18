@@ -3,6 +3,7 @@ import { Space_Grotesk, Inter, JetBrains_Mono } from 'next/font/google';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 import { getSiteConfig } from '@/lib/seo/site';
+import { SITE_NAME } from '@/lib/seo/metadata';
 import './globals.css';
 
 const display = Space_Grotesk({
@@ -28,9 +29,10 @@ export const metadata: Metadata = {
   // Política de indexación: ver src/lib/seo/site.ts (hoy noindex global, opción A).
   robots: site.indexable ? { index: true, follow: true } : { index: false, follow: true },
   title: {
-    default: 'PulsoVE — Estado de servicios en Venezuela',
-    template: '%s | PulsoVE',
+    default: `${SITE_NAME} — Estado de servicios en Venezuela`,
+    template: `%s | ${SITE_NAME}`,
   },
+  applicationName: SITE_NAME,
   description:
     'Consulta si un servicio presenta problemas en Venezuela: internet, bancos, servicios públicos, redes, streaming, juegos y delivery. Monitoreo ciudadano.',
 };

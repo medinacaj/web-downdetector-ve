@@ -1,7 +1,17 @@
+import type { Metadata } from 'next';
 import Link from 'next/link';
+import { pageMetadata, SITE_NAME } from '@/lib/seo/metadata';
 import { getHomeData } from '@/lib/queries/home';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { ROUTE, isRouteAvailable } from '@/lib/nav';
+
+export const metadata: Metadata = pageMetadata({
+  title: `${SITE_NAME} — Estado de servicios en Venezuela`,
+  description:
+    'Consulta si un servicio presenta problemas en Venezuela: internet, bancos, servicios públicos, redes, streaming, juegos y delivery. Monitoreo ciudadano.',
+  path: '/',
+  absoluteTitle: true,
+});
 
 // Datos en vivo: se renderiza en cada petición (si no, `next build` la congela).
 export const dynamic = 'force-dynamic';

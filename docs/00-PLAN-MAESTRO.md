@@ -187,7 +187,7 @@ reevaluar `@neondatabase/serverless` o un pool externo (PgBouncer).
 | 2 | API pública de lectura + `POST /api/reports` con validación/rate limiting básico | 1 | **Completada esta sesión** |
 | 3 | Motor de agregación y anomalías (`aggregate:run`), apertura/cierre de incidentes | 2 | **Completada** |
 | 4 | Frontend público: inicio, directorio, página de servicio, mapa, incidentes, estadísticas, metodología | 2, 3 | **En curso — 4a (layout + inicio), 4b (directorio) y 4c (página de servicio con reporte) completadas; 4d (gráfico histórico, mapa, incidentes, estadísticas, metodología) pendiente** |
-| SEO | SEO técnico e indexación: dominio y `metadataBase`, `robots.ts`, `sitemap.ts`, canonical, Open Graph, favicon, datos estructurados y decisión de indexación. Regla permanente de la persona propietaria: forma parte de cada entrega web | 4a–4c | **En curso** — política de indexación decidida (opción A: noindex global mientras todo sea demostrativo), `robots.ts`, `sitemap.ts`, `SITE_URL` y `metadataBase` hechos (2026-10-11); faltan dominio, canonical, Open Graph, favicon, 404 propia, categorías y datos estructurados. Ver `docs/SEO-PENDIENTE.md` |
+| SEO | SEO técnico e indexación: dominio y `metadataBase`, `robots.ts`, `sitemap.ts`, canonical, Open Graph, favicon, datos estructurados y decisión de indexación. Regla permanente de la persona propietaria: forma parte de cada entrega web | 4a–4c | **En curso** — política de indexación decidida (opción A: noindex global mientras todo sea demostrativo), `robots.ts`, `sitemap.ts`, `SITE_URL` y `metadataBase` hechos (2026-10-11); canonical, Open Graph, favicon y 404 propia (2026-10-18); faltan dominio, categorías, datos estructurados y descripciones por servicio. Ver `docs/SEO-PENDIENTE.md` |
 | 5 | Formulario de reporte conectado de extremo a extremo (UI + API + Turnstile + geolocalización aproximada) | 2, 4 | Pendiente |
 | 6 | Panel administrativo (auth, CRUD servicios/categorías, incidentes, moderación, auditoría, `create-admin`) | 1–3 | Pendiente |
 | 7 | Prevención de abuso avanzada: puntuación de confianza, detección de campañas coordinadas | 2, 3 | Pendiente |
@@ -219,6 +219,7 @@ web-downdetector-ve/
 │   └── meta/                     # snapshots y _journal.json
 ├── scripts/
 │   ├── aggregate-cron.ts         # npm run aggregate:run
+│   ├── generate-icons.mjs        # favicon.ico y apple-icon.png desde src/app/icon.svg
 │   ├── dev-bootstrap.sh          # entorno desde cero: deps, Postgres, .env, migraciones, semillas
 │   ├── dev-synthetic-traffic.ts  # tráfico sintético para probar el motor
 │   └── seed.ts                   # npm run db:seed
@@ -238,6 +239,9 @@ web-downdetector-ve/
 │   │   ├── globals.css
 │   │   ├── layout.tsx            # metadataBase + política de indexación global
 │   │   ├── page.tsx              # inicio
+│   │   ├── not-found.tsx         # 404 propia
+│   │   ├── favicon.ico, icon.svg, apple-icon.png   # generados por scripts/generate-icons.mjs
+│   │   ├── opengraph-image.tsx, twitter-image.tsx  # imagen para compartir (1200×630)
 │   │   ├── robots.ts             # robots.txt dinámico
 │   │   └── sitemap.ts            # sitemap.xml dinámico (vacío mientras rija el noindex)
 │   ├── components/
@@ -253,9 +257,9 @@ web-downdetector-ve/
 │       ├── privacy.ts
 │       ├── queries/              # directory, home, service-detail, services, status
 │       ├── security/             # rate-limit, sanitize
-│       ├── seo/                  # site.ts (SITE_URL, SITE_INDEXING), crawl.ts (robots y sitemap)
+│       ├── seo/                  # site.ts (SITE_URL, SITE_INDEXING), crawl.ts (robots y sitemap), metadata.ts (pageMetadata), brand.ts, share-image.tsx
 │       └── validation/reports.ts
-├── tests/                        # 9 archivos de prueba + setup.ts; 77 pruebas
+├── tests/                        # 9 archivos de prueba + setup.ts; 81 pruebas
 ├── .env.example                  # .env no se versiona
 ├── .gitignore
 ├── drizzle.config.ts
@@ -269,8 +273,8 @@ web-downdetector-ve/
 ```
 
 Todavía no existen: contenido en `public/` (ni en `src/types/`; son carpetas
-vacías que git no versiona), `src/app/not-found.tsx`, favicon e
-imagen Open Graph (ver `docs/SEO-PENDIENTE.md`); las páginas de mapa,
+vacías que git no versiona), páginas de categoría y datos estructurados
+(ver `docs/SEO-PENDIENTE.md`); las páginas de mapa,
 incidentes, estadísticas y metodología (Etapa 4d); `src/app/admin` (Etapa 6).
 
 ---
@@ -718,3 +722,27 @@ esperados en `next dev`.
   pantalla). Único error de consola: un 404 que coincide con `/favicon.ico` (S7).
 - Pruebas: 76 → **77**.
 - **No verificado:** dominio real, despliegue en un hosting, Search Console.
+
+### SEO técnico base, tercer bloque — 2026-10-18
+
+- **Canonical** (S4, S5): `src/lib/seo/metadata.ts` (`pageMetadata`) da a cada página
+  title, description, canonical, Open Graph y Twitter coherentes. Canónicas absolutas
+  (vía `metadataBase` = `SITE_URL`) y sin parámetros: `/servicios?category=…` apunta a
+  `/servicios`; en los servicios, la del slug de la base. Una prueba exige que toda
+  `page.tsx` pública use `pageMetadata`.
+- **Open Graph y Twitter** (S6): `og:locale es_VE`, `summary_large_image` y una imagen
+  1200×630 generada con `next/og` (`src/lib/seo/share-image.tsx`), solo con la marca
+  propia y sin cifras. Hallazgo: la imagen de archivo no llega a las páginas que
+  definen su propio `openGraph` (la metadata se fusiona de forma superficial), así
+  que `pageMetadata` la declara explícitamente.
+- **Iconos** (S7): `favicon.ico` (16/32), `icon.svg`, `apple-icon.png` (180, a sangre)
+  con el trazo de pulso; `scripts/generate-icons.mjs` los regenera con `sharp`.
+- **404 propia** (S11): `src/app/not-found.tsx`, con buscador y enlaces. Limitación de
+  Next 16.3 documentada: la de un servicio inexistente la pinta el cliente (ya pasaba
+  con la 404 por defecto; comprobado construyendo el commit anterior).
+- **Despliegue:** `SITE_URL`/`SITE_INDEXING` deben existir también en `npm run build`
+  (la 404 general es estática).
+- Pruebas: 77 → **81**.
+- Verificado en `next dev` y en `npm run build` + `npm start`, con y sin un `SITE_URL`
+  ficticio, y en Chromium a 390 px. **No verificado:** dominio real, cómo lo muestran
+  WhatsApp/X/Facebook al compartir (necesitan una URL pública), Search Console.

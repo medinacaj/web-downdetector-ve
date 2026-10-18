@@ -3,14 +3,18 @@ import { getDirectoryServices, getCategories, type DirectorySort } from '@/lib/q
 import { ViewToggleProvider } from '@/components/directory/ViewToggle';
 import { ServiceGrid } from '@/components/directory/ServiceGrid';
 import type { OperationalStatus } from '@/lib/engine/status-bands';
+import { pageMetadata } from '@/lib/seo/metadata';
+import { ROUTE } from '@/lib/nav';
 
 // Datos en vivo: se renderiza en cada petición (si no, `next build` la congela).
 export const dynamic = 'force-dynamic';
 
-export const metadata: Metadata = {
+// Canónica sin parámetros: los filtros (?category=, ?q=…) no compiten con el directorio.
+export const metadata: Metadata = pageMetadata({
   title: 'Servicios',
   description: 'Directorio de servicios monitoreados en Venezuela: telecomunicaciones, banca, servicios públicos, plataformas, streaming, videojuegos, delivery y loterías.',
-};
+  path: ROUTE.services.href,
+});
 
 const STATUS_OPTIONS: { value: OperationalStatus; label: string }[] = [
   { value: 'normal', label: 'Normal' },
