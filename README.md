@@ -316,3 +316,11 @@ Se configuran PRs de actualización semanales con Dependabot y una auditoría pr
 - Las páginas de 4d leen la base en tiempo de ejecución: su fusión no prueba disponibilidad de la instancia desplegada.
 
 Nunca guardar `DATABASE_URL` ni `ANONYMIZATION_SALT` de producción en Git o en archivos públicos.
+
+## Protección P1 de recepción de reportes (18-10-2026)
+
+- Cabeceras de IP **no son confiables por defecto**. En un despliegue con proxy verificado, configurar `TRUSTED_CLIENT_IP_HEADER` únicamente si ese proxy sobrescribe y limpia la cabecera; de otro modo todos los reportes quedan bajo prefijo desconocido y no se les aplica una cuota por red.
+- Cuando se conoce un prefijo de red confiable, se añade una cuota amplia por prefijo **truncado y cifrado con HMAC** además de la cuota por identificador anónimo. No se guarda IP sin procesar. Los prefijos IPv6 comprimidos se normalizan antes del hash.
+- Para operar en varias instancias, configurar Redis. Si Redis está configurado pero se pierde, la recepción de reportes falla de forma restrictiva: **no se degrada a contadores aislados por proceso**. Solo una instalación de una instancia puede utilizar el límite en memoria.
+- El límite por red puede afectar a usuarios legítimos que comparten NAT; se debe ajustar con métricas anonimizadas y pruebas autorizadas. Sin proxy verificado, la cuota por red permanece sin activar y ese riesgo debe constar en el despliegue.
+- `npm run test:unit` comprueba la procedencia de IP, normalización y cuota. Antes del lanzamiento quedan pendientes despliegue real, abuso distribuido y pruebas de privacidad por un responsable.
