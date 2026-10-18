@@ -6,8 +6,7 @@ plataformas digitales, streaming, videojuegos, delivery y movilidad, y
 apuestas y loterías. No es una copia de Downdetector ni de ninguna plataforma
 existente: identidad visual, arquitectura, código y metodología propios.
 
-**Estado actual del proyecto: Etapa 4c de 10 — inicio + directorio +
-página de servicio con reporte funcional.**
+**Estado actual del código: base 4c + páginas informativas 4d (mapa esquemático, incidentes, estadísticas, metodología).**
 Ver `docs/00-PLAN-MAESTRO.md` para la evaluación completa, la arquitectura y
 el plan de etapas. Ya se puede reportar una falla desde la interfaz, de
 verdad — no solo vía la API. Falta: mapa, incidentes, estadísticas,
@@ -306,3 +305,14 @@ antes de cualquier despliegue con datos reales (sección 4.2 del brief).
   abrirlo en Claude Code, pregunta abierta sobre una versión más avanzada y qué
   se verificó.
 - `CLAUDE.md` y `.claude/rules/` — instrucciones para Claude Code.
+
+## Control de dependencias y pruebas (P1 · octubre de 2026)
+
+Se configuran PRs de actualización semanales con Dependabot y una auditoría programada de dependencias de producción con reporte descargable desde GitHub Actions. La auditoría de npm en CI del 18-10 detectó avisos de varias severidades: **no acredita explotación efectiva** ni sustituye estudiar el aviso y actualizar con pruebas.
+
+- `npm run test:unit`: pruebas aisladas; utiliza variables ficticias de CI solo para operaciones criptográficas. No llama a una base real.
+- `npm run test:integration`: requiere una instancia **independiente de PostgreSQL de pruebas**, migrada y sembrada con datos ficticios; no ejecutar contra producción.
+- `npm run typecheck`: comprobación de tipos.
+- Las páginas de 4d leen la base en tiempo de ejecución: su fusión no prueba disponibilidad de la instancia desplegada.
+
+Nunca guardar `DATABASE_URL` ni `ANONYMIZATION_SALT` de producción en Git o en archivos públicos.
