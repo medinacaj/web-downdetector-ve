@@ -4,6 +4,9 @@ import { getServiceDetailData } from '@/lib/queries/service-detail';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { ReportForm } from '@/components/service/ReportForm';
 
+// Datos en vivo: se renderiza en cada petición (si no, `next build` la congela).
+export const dynamic = 'force-dynamic';
+
 function formatDateTime(date: Date | null) {
   if (!date) return null;
   return new Intl.DateTimeFormat('es-VE', {

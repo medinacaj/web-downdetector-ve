@@ -197,7 +197,7 @@ reevaluar `@neondatabase/serverless` o un pool externo (PgBouncer).
 
 ## Parte 4 — Estructura del repositorio
 
-Estado real a 2026-10-11 (repositorio `medinacaj/web-downdetector-ve`; la
+Estado real a 2026-10-18 (repositorio `medinacaj/web-downdetector-ve`; la
 plataforma se llama PulsoVE):
 
 ```
@@ -255,7 +255,7 @@ web-downdetector-ve/
 │       ├── security/             # rate-limit, sanitize
 │       ├── seo/                  # site.ts (SITE_URL, SITE_INDEXING), crawl.ts (robots y sitemap)
 │       └── validation/reports.ts
-├── tests/                        # 8 archivos de prueba + setup.ts; 76 pruebas
+├── tests/                        # 9 archivos de prueba + setup.ts; 77 pruebas
 ├── .env.example                  # .env no se versiona
 ├── .gitignore
 ├── drizzle.config.ts
@@ -692,3 +692,29 @@ esperados en `next dev`.
   producción (`next` crítica, `sharp` y `source-map-js` altas), todas con arreglo
   disponible. Ya no es cierto que solo afecten a herramientas de desarrollo.
 - **No verificado:** dominio real, `npm run build`, Search Console.
+
+### Dependencias de producción y build real — 2026-10-18
+
+- **Vulnerabilidades de producción corregidas** (detectadas el 2026-10-11): `next`
+  16.3.0 → **16.3.8** (crítica: varias RCE, envenenamiento de caché, SSRF en la
+  optimización de imágenes). Se eligió el parche de la misma serie, no la 16.4: es el
+  salto mínimo que cierra los avisos. Con `npm audit fix` sin `--force`: `sharp`
+  0.35.3 → 0.35.5 y `source-map-js` 1.2.1 → 1.2.2. El lockfile solo cambia esos
+  paquetes y sus binarios (`@next/*`, `@img/*`). `npm audit --omit=dev` → **0**;
+  quedan 17, todas de herramientas de desarrollo (Etapa 10).
+- **`npm run build` y `npm start` verificados por primera vez** (esta sesión sí
+  alcanza Google Fonts). Rutas, `robots.txt`, `sitemap.xml` y `noindex` en
+  producción, igual que en desarrollo.
+- **Fallo destapado por el build, corregido:** la portada no declaraba
+  `dynamic` ni leía datos de la petición, así que `next build` la prerenderizaba y
+  en producción habría mostrado para siempre las cifras del momento del build
+  (pulso nacional, incidentes). Ahora `/`, `/servicios` y `/servicios/[slug]`
+  exportan `dynamic = 'force-dynamic'`. Comprobado en `npm start`: tras borrar los
+  reportes, la portada pasó de 17 a 0 sin reiniciar. `tests/rendering.test.ts`
+  exige `force-dynamic` a toda página que importe `@/lib/queries` o `@/lib/db`
+  (falla sin el arreglo, comprobado).
+- Prueba en Chromium a 390 y 1280 px: portada, directorio y servicio con 200 y sin
+  desborde horizontal; envío real del formulario de reporte (201 y confirmación en
+  pantalla). Único error de consola: un 404 que coincide con `/favicon.ico` (S7).
+- Pruebas: 76 → **77**.
+- **No verificado:** dominio real, despliegue en un hosting, Search Console.

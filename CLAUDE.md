@@ -63,11 +63,11 @@ confirmación en decisiones menores y sin dejar nada a medias.
 ```bash
 bash scripts/dev-bootstrap.sh         # entorno desde cero: deps, Postgres, .env, migraciones, semillas
 npm run dev                           # http://localhost:3000 (PORT=3100 npm run dev para otro puerto)
-npm run typecheck && npm test         # 76 pruebas; las de API usan Postgres real
+npm run typecheck && npm test         # 77 pruebas; las de API usan Postgres real
 npm run db:seed                       # idempotente (ver "Semillas y catálogo")
 npm run aggregate:run -- --window=15  # un ciclo del motor (cron externo)
 npm run dev:synthetic-traffic         # tráfico sintético; añade -- --cleanup para limpiarlo
-npm run build                         # necesita internet (next/font/google); no verificado en el sandbox
+npm run build && npm start            # producción; necesita acceso a Google Fonts (verificado el 2026-10-18)
 ```
 
 Requisitos: Node 22+, PostgreSQL 16+ (Redis opcional). Antes de cada bloque de
@@ -89,7 +89,7 @@ comandos con base de datos comprueba que Postgres esté arriba (`pg_isready`;
   `validation/`, `nav.ts` (registro de rutas), `seo/` (`site.ts`: `SITE_URL` y política
   de indexación; `crawl.ts`: robots y sitemap).
 - `src/components/` — `layout/`, `directory/`, `service/`, `ui/`.
-- `tests/` — Vitest (8 archivos). `drizzle/` — migraciones 0000 y 0001.
+- `tests/` — Vitest (9 archivos). `drizzle/` — migraciones 0000 y 0001.
 - `docs/` — plan maestro, catálogo de servicios, SEO pendiente, migración a Code.
 
 ## Convenciones
@@ -101,7 +101,9 @@ comandos con base de datos comprueba que Postgres esté arriba (`pg_isready`;
 - Alias `@/*` → `src/*`. Server Components por defecto; cliente solo para interacción
   (`ReportForm`, `ThemeToggle`, `ViewToggle`, `ServiceGrid`).
 - En Next 16 `params` y `searchParams` son **Promesas**. Páginas con datos en vivo:
-  `export const dynamic = 'force-dynamic'`. Un `page.tsx`/`layout.tsx` no puede exportar
+  `export const dynamic = 'force-dynamic'` (obligatorio aunque la página lea `params`;
+  `tests/rendering.test.ts` lo exige a toda página que importe `@/lib/queries` o
+  `@/lib/db`: sin él, `next build` congeló la portada con las cifras del build). Un `page.tsx`/`layout.tsx` no puede exportar
   nombres extra.
 - Indexación: hoy **noindex global** (opción A, decidida el 2026-10-11). La política se
   define solo en el `metadata` de `src/app/layout.tsx` vía `getSiteConfig()`; ninguna
@@ -137,6 +139,8 @@ de problema propios o su formulario solo ofrecería "Otro" (lo comprueba una pru
 - `next dev` regenera el bloque de `AGENTS.md`: no lo edites a mano; la primera línea de
   este archivo debe seguir siendo `@AGENTS.md`.
 - Con red restringida, `next build` falla en `next/font/google`; `next dev` degrada.
+- `next build` reescribe `next-env.d.ts` (`.next/types` en vez de `.next/dev/types`) y
+  `next dev` lo devuelve: no lo commitees (`git checkout next-env.d.ts`).
 - No borres `node_modules` con `next dev` en marcha: deja errores "Can't resolve
   'drizzle-orm'" pegados en la consola del navegador. Reinicia el servidor.
 - Para parar el servidor: `fuser 3100/tcp` da el PID y luego `kill <pid>`. En el sandbox de
@@ -149,24 +153,25 @@ Hecho: Etapas 1–3 (datos, API, motor) y 4a–4c (inicio, directorio, servicio 
 catálogo ampliado a 71 servicios, registro de rutas, menú móvil.
 
 SEO base, primer bloque (2026-10-11): política de indexación (opción A, noindex global),
-`SITE_URL`/`metadataBase`, `robots.ts` y `sitemap.ts`.
+`SITE_URL`/`metadataBase`, `robots.ts` y `sitemap.ts`. Dependencias de producción sin
+vulnerabilidades (2026-10-18: `next` 16.3.8, `sharp` 0.35.5, `source-map-js` 1.2.2);
+`npm run build` y `npm start` verificados; portada dinámica.
 
-Pendiente, en orden: **actualizar `next`, `sharp` y `source-map-js`** (vulnerabilidades
-de producción, una crítica) · **resto del SEO base antes de publicar** (canonical, Open
+Pendiente, en orden: **resto del SEO base antes de publicar** (canonical, Open
 Graph, favicon, 404 propia, categorías, JSON-LD; dominio cuando exista; ver
 `docs/SEO-PENDIENTE.md`) · **4d** (gráfico histórico con `recharts`, mapa, incidentes,
 estadísticas, metodología; al crearlas, activar en `nav.ts`) · **5** Turnstile y
 geolocalización aproximada · **6** panel admin y `create-admin` (los slugs no deben poder
 editarse sin redirección; `/admin` con noindex y autenticación) · **7** abuso avanzado ·
-**8** tiempo real (SSE) · **9** observabilidad · **10** e2e/carga/Docker/CI, ESLint y las
-vulnerabilidades de herramientas de desarrollo (vitest/vite/esbuild).
+**8** tiempo real (SSE) · **9** observabilidad · **10** e2e/carga/Docker/CI, ESLint y las 17
+vulnerabilidades de herramientas de desarrollo (vitest/vite/esbuild; `npm audit --omit=dev` = 0).
 
 Brechas conocidas: señales técnica y oficial del motor sin fuente real (se excluyen y el
 resto se renormaliza); municipios sin sembrar; el directorio hace una consulta de estado
 por servicio (N+1; ~0,15 s con 71 servicios en local); sin páginas de categoría
 indexables (solo el filtro `?category=`); no hay dominio todavía y el SEO no se probó contra uno real ni en
 Google Search Console (no se usó); revisión legal profesional de apuestas y loterías
-pendiente; `npm run build` sin verificar en el sandbox.
+pendiente.
 
 ## Documentos (léelos por ruta cuando el trabajo los toque)
 

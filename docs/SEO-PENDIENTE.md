@@ -77,7 +77,7 @@ Prioridad: **P0** bloquea la publicación · **P1** hacerlo antes de pedir index
 | S10 | P2 | La descripción de las páginas de servicio es una plantilla ("Consulta reportes ciudadanos, incidentes y estado actual de {nombre} ({categoría}) en Venezuela."). La regla pide evitar textos automáticos cuando pueda escribirse uno mejor. | Incorporar `services.description` (neutra y con evidencia) en `generateMetadata`. |
 | S11 | P2 | No hay `not-found.tsx` propio: la 404 por defecto no lleva `lang` ni enlaces a Inicio o Servicios. El código HTTP sí es correcto. Desde el 2026-10-11 la 404 lleva **dos** `<meta name="robots">`: el `noindex` que Next inyecta en toda respuesta 404 y la política global del layout (`noindex, follow` hoy; `index, follow` con la indexación abierta). Inofensivo (el código 404 ya impide indexar y Google aplica la regla más restrictiva), pero conviene limpiarlo al hacer la 404 propia. | `src/app/not-found.tsx` con navegación y enlace a `/servicios`. |
 | S12 | P2 | Rendimiento sin medir (no hay dominio donde correr Lighthouse o PageSpeed). Todo se renderiza por petición (`force-dynamic`) y el directorio hace una consulta de estado por servicio (~0,15 s en local con 71). `recharts` está instalado y sin usar. | Medir en producción. Cachear o revalidar el directorio. Al usar `recharts`, cargarlo solo en la página de servicio (import dinámico). Los Core Web Vitals reales solo aparecen en Search Console con tráfico real. |
-| S13 | P0 | `npm run build` **no se pudo verificar** en este entorno (bloquea `fonts.googleapis.com`). | Ejecutarlo en una máquina con internet antes de publicar y comprobar que `robots` y `sitemap` salen como se espera. |
+| S13 | P0 | ✅ **Resuelto 2026-10-18:** `npm run build` y `npm start` verificados. En producción local, `/robots.txt` y `/sitemap.xml` salen dinámicos (ƒ) y como en desarrollo; `noindex, follow` en las páginas; 404 real y 308 de la barra final. El build destapó que la portada se prerenderizaba con las cifras del build: corregido (`force-dynamic` + `tests/rendering.test.ts`). Antes: `npm run build` **no se pudo verificar** (bloqueaba `fonts.googleapis.com`). | Ejecutarlo en una máquina con internet antes de publicar y comprobar que `robots` y `sitemap` salen como se espera. |
 
 ## 5. Decisión de indexación mientras todo sea demostrativo
 
@@ -120,7 +120,7 @@ sección 8):
 2. S1 + S2 → `robots.ts` y `sitemap.ts`, con pruebas. **Hecho** (2026-10-11).
 3. S4 + S5 + S6 + S7 + S11 → canonical, Open Graph, favicon, 404 propia.
 4. S8 + S9 + S10 → categorías indexables, datos estructurados, descripciones de servicio.
-5. S13 + S12 → build real y medición.
+5. S13 + S12 → build real y medición. **S13 hecho** (2026-10-18); S12 necesita dominio.
 
 **Google Search Console — lo hace la persona propietaria** (Claude no tiene acceso y no
 lo simula):
@@ -183,4 +183,5 @@ lo simula):
 | Fecha | Quién | Qué se revisó | Resultado |
 |---|---|---|---|
 | 2026-10-10 | Claude (local, sin dominio) | Código en `next dev` | Este documento. Sin acceso a Search Console. |
+| 2026-10-18 | Claude (local, sin dominio) | `npm run build` + `npm start` tras subir `next` a 16.3.8 | Rutas: `/`, `/servicios`, `/servicios/netflix` 200; `/servicios/no-existe` y `/servicios/NETFLIX` 404; `/servicios/` 308; `robots.txt` y `sitemap.xml` 200 (vacío); `noindex, follow`; `Cache-Control: private, no-store` en páginas; sin `X-Robots-Tag`. Portada dinámica comprobada (borrar reportes cambia la cifra sin reiniciar). `/favicon.ico` sigue en 404 (S7). |
 | 2026-10-11 | Claude (local, sin dominio) | Opción A + S1, S2, S3 parcial, en `next dev` con tres configuraciones: por defecto (noindex), `SITE_URL=https://pulsove.example` + `SITE_INDEXING=true` (dominio ficticio, solo para probar) y `http://` + `true` (mal configurado) | Por defecto: `noindex, follow` en `/`, `/servicios`, `/servicios?category=…` y `/servicios/netflix`; `robots.txt` 200 sin `Sitemap:`; `sitemap.xml` 200 vacío; sin `X-Robots-Tag`; 404 real intacto. Indexable: `index, follow`, línea `Sitemap:` y 73 URL. Mal configurado: vuelve a noindex y lo registra. Sin dominio real ni Search Console. |

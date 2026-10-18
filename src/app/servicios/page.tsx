@@ -4,6 +4,9 @@ import { ViewToggleProvider } from '@/components/directory/ViewToggle';
 import { ServiceGrid } from '@/components/directory/ServiceGrid';
 import type { OperationalStatus } from '@/lib/engine/status-bands';
 
+// Datos en vivo: se renderiza en cada petición (si no, `next build` la congela).
+export const dynamic = 'force-dynamic';
+
 export const metadata: Metadata = {
   title: 'Servicios',
   description: 'Directorio de servicios monitoreados en Venezuela: telecomunicaciones, banca, servicios públicos, plataformas, streaming, videojuegos, delivery y loterías.',

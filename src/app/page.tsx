@@ -3,6 +3,9 @@ import { getHomeData } from '@/lib/queries/home';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { ROUTE, isRouteAvailable } from '@/lib/nav';
 
+// Datos en vivo: se renderiza en cada petición (si no, `next build` la congela).
+export const dynamic = 'force-dynamic';
+
 function formatUpdatedAt(date: Date) {
   return new Intl.DateTimeFormat('es-VE', {
     timeZone: 'America/Caracas',

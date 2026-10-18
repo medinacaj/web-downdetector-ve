@@ -16,8 +16,7 @@ metodología, y el gráfico de la página de servicio.
 **Todavía no está listo para publicarse.** Ya hay `robots.txt`, `sitemap.xml`
 y política de indexación: **noindex global** mientras los datos sean
 demostrativos (decisión del 2026-10-11; se abre con `SITE_INDEXING="true"`).
-Faltan el dominio, canonical, Open Graph, favicon y datos estructurados, y
-actualizar `next` (vulnerabilidades de producción, ver "Seguridad"). Ver
+Faltan el dominio, canonical, Open Graph, favicon y datos estructurados. Ver
 `docs/SEO-PENDIENTE.md`.
 
 ## Qué existe hoy
@@ -49,7 +48,8 @@ actualizar `next` (vulnerabilidades de producción, ver "Seguridad"). Ver
   tanto en la base de datos como a través de la API pública.
 - Configuración de proyecto (Next.js 16, Tailwind, TypeScript, Vitest) y
   variables de entorno documentadas con valores por defecto seguros.
-- 76 pruebas automatizadas (datos semilla y calidad del catálogo, registro
+- 77 pruebas automatizadas (renderizado dinámico de las páginas con datos,
+  datos semilla y calidad del catálogo, registro
   de rutas de navegación, configuración SEO e indexación (robots, sitemap), privacidad, bandas de estado, integración real de
   `POST /api/reports`, estadística robusta del motor, combinación ponderada
   de señales).
@@ -185,7 +185,7 @@ esta carpeta. Cómo llegó aquí el proyecto, qué falta resolver y qué se veri
 | `npm run dev` / `build` / `start` | Next.js (inicio, directorio, página de servicio y API reales). `build` necesita acceso a Google Fonts |
 | `bash scripts/dev-bootstrap.sh` | Entorno de desarrollo desde cero (ver "Instalación"); idempotente, nunca toca un `.env` existente |
 | `npm run typecheck` | `tsc --noEmit` |
-| `npm test` / `test:watch` | Vitest (76 pruebas; las de integración de reportes requieren Postgres real) |
+| `npm test` / `test:watch` | Vitest (77 pruebas; las de integración de reportes requieren Postgres real) |
 | `npm run db:generate` | Genera migración SQL a partir de `schema.ts` |
 | `npm run db:migrate` | `drizzle-kit push` (sincroniza esquema directo, sin historial — útil en dev) |
 | `npm run db:migrate:deploy` | Aplica las migraciones versionadas de `drizzle/` |
@@ -228,12 +228,15 @@ la consulta SQL, en la respuesta HTTP — ahora todas las rutas devuelven un
 `internal_error` genérico y registran el detalle solo en el log del
 servidor.
 
-> **Actualización 2026-10-11:** `npm audit` informa hoy **20** vulnerabilidades,
-> y **3 están en dependencias de producción**: `next` 16.0.0–16.3.7 (crítica:
-> varias ejecuciones remotas de código y envenenamiento de caché), `sharp`
-> (alta) y `source-map-js` (alta). Todas tienen arreglo disponible y no se han
-> aplicado todavía: hay que actualizar antes de publicar. El párrafo siguiente
-> describe la situación de etapas anteriores.
+> **Actualización 2026-10-18:** el 2026-10-11 `npm audit` informó **3
+> vulnerabilidades en dependencias de producción**: `next` 16.0.0–16.3.7
+> (crítica: varias ejecuciones remotas de código y envenenamiento de caché),
+> `sharp` (alta) y `source-map-js` (alta). **Corregidas** subiendo a `next`
+> 16.3.8 (parche de la misma serie; la 16.4 no hacía falta), `sharp` 0.35.5 y
+> `source-map-js` 1.2.2: `npm audit --omit=dev` → **0**. Quedan **17**, todas
+> de herramientas de desarrollo (`vitest`/`vite`/`esbuild` y dependencias),
+> para la Etapa 10. El párrafo siguiente describe la situación de etapas
+> anteriores.
 
 Quedaban 9 vulnerabilidades de severidad moderada/alta/crítica, **todas
 confinadas a herramientas de desarrollo** (`vitest`/`vite`/`esbuild` vía la
@@ -304,7 +307,10 @@ antes de cualquier despliegue con datos reales (sección 4.2 del brief).
   respaldo sin romperse. En Vercel, GitHub Actions o cualquier máquina con
   acceso normal a internet, `npm run build` compila sin cambios — se
   verificó aislando el problema (build limpio sin next/font) para
-  confirmar que no hay ningún otro error oculto detrás.
+  confirmar que no hay ningún otro error oculto detrás. **Verificado de
+  verdad el 2026-10-18** en una sesión de Claude Code con acceso a Google
+  Fonts: `npm run build` y `npm start` funcionan completos (ver
+  `docs/00-PLAN-MAESTRO.md`).
 
 ## Documentación
 
