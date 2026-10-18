@@ -31,3 +31,13 @@ export const ROUTE = {
 export function isRouteAvailable(route: RouteInfo): boolean {
   return route.available;
 }
+
+/** Página de una categoría (src/app/categorias/[slug]/page.tsx). */
+export function categoryHref(slug: string): string {
+  return `/categorias/${slug}`;
+}
+
+/** Página de un servicio (src/app/servicios/[slug]/page.tsx). */
+export function serviceHref(slug: string): string {
+  return `${ROUTE.services.href}/${slug}`;
+}

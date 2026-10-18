@@ -72,8 +72,9 @@ export const categoriesSeed = [
   {
     slug: 'apuestas-y-loterias',
     name: 'Apuestas y loterías',
-    description:
-      'Loterías y casas de apuestas en línea. PulsoVE solo informa disponibilidad técnica: no las promueve ni confirma que estén autorizadas.',
+    // El aviso legal no va aquí (texto editable): lo pone el código en la página y en
+    // su metadescripción (src/components/service/GamblingNotice.tsx).
+    description: 'Loterías y casas de apuestas en línea.',
     icon: 'dices',
     sortOrder: 8,
   },

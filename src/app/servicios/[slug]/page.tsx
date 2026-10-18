@@ -1,10 +1,12 @@
 import type { Metadata } from 'next';
+import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { getServiceDetailData } from '@/lib/queries/service-detail';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { ReportForm } from '@/components/service/ReportForm';
 import { pageMetadata } from '@/lib/seo/metadata';
-import { ROUTE } from '@/lib/nav';
+import { categoryHref, serviceHref } from '@/lib/nav';
+import { GamblingNotice, GAMBLING_CATEGORY_SLUG } from '@/components/service/GamblingNotice';
 
 // Datos en vivo: se renderiza en cada petición (si no, `next build` la congela).
 export const dynamic = 'force-dynamic';
@@ -39,7 +41,7 @@ export async function generateMetadata({
     title: `Estado de ${data.service.name} en Venezuela`,
     description: `Consulta reportes ciudadanos, incidentes y estado actual de ${data.service.name} (${data.service.category.name}) en Venezuela.`,
     // El slug de la base, no el de la URL pedida: es la forma canónica.
-    path: `${ROUTE.services.href}/${data.service.slug}`,
+    path: serviceHref(data.service.slug),
   });
 }
 
@@ -54,7 +56,11 @@ export default async function ServiceDetailPage({ params }: { params: Promise<{ 
     <div className="mx-auto max-w-4xl px-4 py-10 sm:px-6">
       {/* Cabecera */}
       <div className="border-b border-border pb-6">
-        <p className="text-sm text-ink-muted">{service.category.name}</p>
+        <p className="text-sm text-ink-muted">
+          <Link href={categoryHref(service.category.slug)} className="underline-offset-4 hover:text-ink hover:underline">
+            {service.category.name}
+          </Link>
+        </p>
         <div className="mt-1 flex flex-wrap items-center justify-between gap-3">
           <h1 className="font-display text-2xl font-semibold tracking-tight sm:text-3xl">{service.name}</h1>
           <StatusBadge status={statusDetail.status} />
@@ -97,14 +103,7 @@ export default async function ServiceDetailPage({ params }: { params: Promise<{ 
           </p>
         )}
 
-        {/* Apuestas y loterías: la revisión legal profesional está pendiente (CLAUDE.md,
-            docs/CATALOGO-SERVICIOS.md). Se aclara que PulsoVE no promueve ni valida. */}
-        {service.category.slug === 'apuestas-y-loterias' && (
-          <p className="mt-3 max-w-xl rounded border border-border bg-surface px-3 py-2 text-xs text-ink-muted">
-            PulsoVE solo informa la disponibilidad técnica de este servicio. Incluirlo aquí no es una promoción ni
-            confirma que esté autorizado.
-          </p>
-        )}
+        {service.category.slug === GAMBLING_CATEGORY_SLUG && <GamblingNotice subject="service" />}
       </div>
 
       {/* Reportar */}

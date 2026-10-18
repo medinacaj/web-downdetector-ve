@@ -4,7 +4,8 @@ import { ViewToggleProvider } from '@/components/directory/ViewToggle';
 import { ServiceGrid } from '@/components/directory/ServiceGrid';
 import type { OperationalStatus } from '@/lib/engine/status-bands';
 import { pageMetadata } from '@/lib/seo/metadata';
-import { ROUTE } from '@/lib/nav';
+import Link from 'next/link';
+import { ROUTE, categoryHref } from '@/lib/nav';
 
 // Datos en vivo: se renderiza en cada petición (si no, `next build` la congela).
 export const dynamic = 'force-dynamic';
@@ -50,6 +51,23 @@ export default async function ServicesDirectoryPage({
         <h1 className="font-display text-2xl font-semibold tracking-tight">Servicios</h1>
         <p className="font-mono text-sm text-ink-muted tabular-nums">{total} servicios</p>
       </div>
+
+      {/* Enlaces HTML a cada categoría: el <select> de abajo filtra, pero los buscadores no
+          siguen formularios, y las páginas de categoría deben poder descubrirse. */}
+      <nav aria-label="Categorías" className="mt-4">
+        <ul className="flex flex-wrap gap-2 text-sm">
+          {categoryList.map((c) => (
+            <li key={c.slug}>
+              <Link
+                href={categoryHref(c.slug)}
+                className="inline-block rounded-full border border-border px-3 py-1 text-ink-muted transition-colors hover:border-brand-400 hover:text-ink"
+              >
+                {c.name}
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </nav>
 
       <form className="mt-6 grid gap-3 sm:grid-cols-[2fr_1fr_1fr_1fr_auto]" action="/servicios">
         <label className="sr-only" htmlFor="q">

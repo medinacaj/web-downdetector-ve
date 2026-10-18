@@ -63,7 +63,7 @@ confirmación en decisiones menores y sin dejar nada a medias.
 ```bash
 bash scripts/dev-bootstrap.sh         # entorno desde cero: deps, Postgres, .env, migraciones, semillas
 npm run dev                           # http://localhost:3000 (PORT=3100 npm run dev para otro puerto)
-npm run typecheck && npm test         # 81 pruebas; las de API usan Postgres real
+npm run typecheck && npm test         # 82 pruebas; las de API usan Postgres real
 npm run db:seed                       # idempotente (ver "Semillas y catálogo")
 npm run aggregate:run -- --window=15  # un ciclo del motor (cron externo)
 npm run dev:synthetic-traffic         # tráfico sintético; añade -- --cleanup para limpiarlo
@@ -77,7 +77,7 @@ comandos con base de datos comprueba que Postgres esté arriba (`pg_isready`;
 
 ## Mapa del código
 
-- `src/app/` — `page.tsx` (inicio), `servicios/` y `servicios/[slug]`, `api/` (9
+- `src/app/` — `page.tsx` (inicio), `servicios/` y `servicios/[slug]`, `categorias/[slug]`, `api/` (9
   endpoints públicos), `robots.ts`, `sitemap.ts`, `not-found.tsx`, iconos (`favicon.ico`,
   `icon.svg`, `apple-icon.png`; se regeneran con `node scripts/generate-icons.mjs`) e
   imagen para compartir (`opengraph-image.tsx`, `twitter-image.tsx`). Las páginas de mapa, incidentes, estadísticas y metodología (Etapa 4d)
@@ -115,6 +115,12 @@ comandos con base de datos comprueba que Postgres esté arriba (`pg_isready`;
   path })` (canonical, Open Graph y Twitter coherentes, imagen incluida); lo exige
   `tests/seo.test.ts`. La metadata de Next se fusiona de forma superficial: no pongas
   `openGraph` suelto en una página.
+- Enlaces a servicios y categorías con `serviceHref(slug)` y `categoryHref(slug)` de
+  `src/lib/nav.ts`, no escritos a mano.
+- Apuestas y loterías: el aviso legal lo ponen `GamblingNotice` y
+  `GAMBLING_META_DISCLAIMER` (`src/components/service/GamblingNotice.tsx`) en la página
+  de cada servicio y en la de la categoría, incluida su metadescripción. No lo metas en
+  textos editables (descripciones de la semilla o del futuro panel).
 - Todo enlace a una página que puede no existir usa `ROUTE` + `isRouteAvailable` de
   `src/lib/nav.ts`; una página nueva se activa allí (`available: true`). `tests/nav.test.ts`
   falla si `available` no coincide con el archivo o si alguien escribe la ruta a mano.
@@ -167,11 +173,12 @@ SEO base, primer bloque (2026-10-11): política de indexación (opción A, noind
 `SITE_URL`/`metadataBase`, `robots.ts` y `sitemap.ts`. Dependencias de producción sin
 vulnerabilidades (2026-10-18: `next` 16.3.8, `sharp` 0.35.5, `source-map-js` 1.2.2);
 `npm run build` y `npm start` verificados; portada dinámica. SEO base, tercer bloque
-(2026-10-18): canonical, Open Graph y Twitter con imagen, favicon e iconos, 404 propia.
+(2026-10-18): canonical, Open Graph y Twitter con imagen, favicon e iconos, 404 propia;
+páginas de categoría en `/categorias/<slug>` (URL elegida por la persona propietaria).
 
-Pendiente, en orden: **resto del SEO base antes de publicar** (páginas de categoría
-—decidir antes la forma de la URL con la persona propietaria—, JSON-LD, descripciones
-propias por servicio; dominio cuando exista; ver `docs/SEO-PENDIENTE.md`) · **4d** (gráfico histórico con `recharts`, mapa, incidentes,
+Pendiente, en orden: **resto del SEO base antes de publicar** (JSON-LD —`WebSite`,
+`Organization`, `BreadcrumbList` en categorías—, descripciones propias por servicio;
+dominio cuando exista; ver `docs/SEO-PENDIENTE.md`) · **4d** (gráfico histórico con `recharts`, mapa, incidentes,
 estadísticas, metodología; al crearlas, activar en `nav.ts`) · **5** Turnstile y
 geolocalización aproximada · **6** panel admin y `create-admin` (los slugs no deben poder
 editarse sin redirección; `/admin` con noindex y autenticación) · **7** abuso avanzado ·
@@ -180,8 +187,8 @@ vulnerabilidades de herramientas de desarrollo (vitest/vite/esbuild; `npm audit 
 
 Brechas conocidas: señales técnica y oficial del motor sin fuente real (se excluyen y el
 resto se renormaliza); municipios sin sembrar; el directorio hace una consulta de estado
-por servicio (N+1; ~0,15 s con 71 servicios en local); sin páginas de categoría
-indexables (solo el filtro `?category=`); no hay dominio todavía y el SEO no se probó contra uno real ni en
+por servicio (N+1; ~0,15 s con 71 servicios en local; también en las páginas de
+categoría); no hay índice `/categorias` (404; el directorio cumple esa función); no hay dominio todavía y el SEO no se probó contra uno real ni en
 Google Search Console (no se usó); revisión legal profesional de apuestas y loterías
 pendiente.
 

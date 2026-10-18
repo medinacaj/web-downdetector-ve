@@ -149,3 +149,13 @@ describe('seed-data: calidad del catálogo', () => {
     expect(otro?.categorySlug).toBeNull();
   });
 });
+
+describe('categorías: textos de sus páginas', () => {
+  it('cada categoría tiene una descripción propia y distinta (es la metadescripción de su página)', () => {
+    const descriptions = categoriesSeed.map((c) => c.description?.trim() ?? '');
+    for (const [i, d] of descriptions.entries()) {
+      expect(d.length, categoriesSeed[i].slug).toBeGreaterThan(20);
+    }
+    expect(new Set(descriptions).size).toBe(descriptions.length);
+  });
+});

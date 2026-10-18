@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useView } from './ViewToggle';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import type { DirectoryService } from '@/lib/queries/directory';
+import { serviceHref } from '@/lib/nav';
 
 export function ServiceGrid({ services }: { services: DirectoryService[] }) {
   const view = useView();
@@ -22,7 +23,7 @@ export function ServiceGrid({ services }: { services: DirectoryService[] }) {
         {services.map((s) => (
           <li key={s.slug}>
             <Link
-              href={`/servicios/${s.slug}`}
+              href={serviceHref(s.slug)}
               className="flex items-center justify-between gap-4 px-4 py-3 hover:bg-surface"
             >
               <div className="min-w-0">
@@ -47,7 +48,7 @@ export function ServiceGrid({ services }: { services: DirectoryService[] }) {
       {services.map((s) => (
         <li key={s.slug}>
           <Link
-            href={`/servicios/${s.slug}`}
+            href={serviceHref(s.slug)}
             className="flex h-full flex-col gap-3 rounded-lg border border-border p-4 transition-colors hover:border-brand-400"
           >
             <div className="flex items-start justify-between gap-2">

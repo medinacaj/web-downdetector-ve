@@ -1,5 +1,5 @@
 import type { MetadataRoute } from 'next';
-import { ROUTE, isRouteAvailable } from '@/lib/nav';
+import { ROUTE, categoryHref, isRouteAvailable, serviceHref } from '@/lib/nav';
 import { absoluteUrl, type SiteConfig } from './site';
 
 /**
@@ -25,11 +25,15 @@ const STATIC_ROUTES = [ROUTE.home, ROUTE.services];
  * Sin `lastModified`: `services.updated_at` aún no se actualiza al editar y una
  * fecha inventada es peor que ninguna.
  */
-export function buildSitemap(site: SiteConfig, serviceSlugs: readonly string[]): MetadataRoute.Sitemap {
+export function buildSitemap(
+  site: SiteConfig,
+  slugs: { categories: readonly string[]; services: readonly string[] },
+): MetadataRoute.Sitemap {
   if (!site.indexable) return [];
   const paths = [
     ...STATIC_ROUTES.filter(isRouteAvailable).map((r) => r.href),
-    ...serviceSlugs.map((slug) => `${ROUTE.services.href}/${slug}`),
+    ...slugs.categories.map(categoryHref),
+    ...slugs.services.map(serviceHref),
   ];
   return [...new Set(paths)].map((path) => ({ url: absoluteUrl(site.origin, path) }));
 }

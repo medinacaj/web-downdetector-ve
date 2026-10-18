@@ -56,14 +56,18 @@ describe('seo: robots.txt', () => {
 
 describe('seo: sitemap.xml', () => {
   it('queda vacío mientras el sitio está en noindex', () => {
-    expect(buildSitemap(resolveSiteConfig({}), ['netflix'])).toEqual([]);
+    expect(buildSitemap(resolveSiteConfig({}), { categories: ['streaming'], services: ['netflix'] })).toEqual([]);
   });
 
-  it('con indexación abierta lista portada, directorio y servicios: absolutas, únicas y sin parámetros', () => {
-    const urls = buildSitemap(resolveSiteConfig(PROD), ['banesco', 'netflix', 'netflix']).map((e) => e.url);
+  it('con indexación abierta lista portada, directorio, categorías y servicios: absolutas, únicas y sin parámetros', () => {
+    const urls = buildSitemap(resolveSiteConfig(PROD), {
+      categories: ['streaming'],
+      services: ['banesco', 'netflix', 'netflix'],
+    }).map((e) => e.url);
     expect(urls).toEqual([
       'https://pulsove.example',
       'https://pulsove.example/servicios',
+      'https://pulsove.example/categorias/streaming',
       'https://pulsove.example/servicios/banesco',
       'https://pulsove.example/servicios/netflix',
     ]);
