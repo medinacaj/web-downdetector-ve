@@ -39,3 +39,12 @@ export async function getActiveServiceSlugs(): Promise<string[]> {
     .orderBy(asc(services.slug));
   return rows.map((r) => r.slug);
 }
+
+/** Servicios activos para un selector (nombre y slug), en orden alfabético. */
+export async function getActiveServiceOptions(): Promise<{ slug: string; name: string }[]> {
+  return db
+    .select({ slug: services.slug, name: services.name })
+    .from(services)
+    .where(eq(services.active, true))
+    .orderBy(asc(services.name));
+}

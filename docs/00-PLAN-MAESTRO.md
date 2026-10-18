@@ -186,7 +186,7 @@ reevaluar `@neondatabase/serverless` o un pool externo (PgBouncer).
 | 1 | Fundación de datos: esquema, migración, seeds, config, pruebas de integridad de datos | — | **Completada** |
 | 2 | API pública de lectura + `POST /api/reports` con validación/rate limiting básico | 1 | **Completada esta sesión** |
 | 3 | Motor de agregación y anomalías (`aggregate:run`), apertura/cierre de incidentes | 2 | **Completada** |
-| 4 | Frontend público: inicio, directorio, página de servicio, mapa, incidentes, estadísticas, metodología | 2, 3 | **En curso — 4a (layout + inicio), 4b (directorio), 4c (página de servicio con reporte) y la primera parte de 4d (incidentes y metodología) completadas; pendientes mapa, estadísticas y gráfico histórico** |
+| 4 | Frontend público: inicio, directorio, página de servicio, mapa, incidentes, estadísticas, metodología | 2, 3 | **En curso — 4a (layout + inicio), 4b (directorio), 4c (página de servicio con reporte) y de 4d: incidentes, metodología, mapa y estadísticas completados; pendiente el gráfico histórico** |
 | SEO | SEO técnico e indexación: dominio y `metadataBase`, `robots.ts`, `sitemap.ts`, canonical, Open Graph, favicon, datos estructurados y decisión de indexación. Regla permanente de la persona propietaria: forma parte de cada entrega web | 4a–4c | **En curso** — política de indexación decidida (opción A: noindex global mientras todo sea demostrativo), `robots.ts`, `sitemap.ts`, `SITE_URL` y `metadataBase` hechos (2026-10-11); canonical, Open Graph, favicon, 404 propia, páginas de categoría, JSON-LD y metadescripciones por servicio (2026-10-18). **Completo en local**; faltan dominio, hosting y Search Console. Ver `docs/SEO-PENDIENTE.md` |
 | 5 | Formulario de reporte conectado de extremo a extremo (UI + API + Turnstile + geolocalización aproximada) | 2, 4 | Pendiente |
 | 6 | Panel administrativo (auth, CRUD servicios/categorías, incidentes, moderación, auditoría, `create-admin`) | 1–3 | Pendiente |
@@ -234,7 +234,9 @@ web-downdetector-ve/
 │   │   │       ├── route.ts
 │   │   │       └── [slug]/       # route.ts + status/, reports/ e incidents/ (cada uno con route.ts)
 │   │   ├── categorias/[slug]/page.tsx   # página de categoría
+│   │   ├── estadisticas/page.tsx # indicadores, reportes por categoría, más reportados, métricas pendientes
 │   │   ├── incidentes/page.tsx   # incidentes activos y resueltos recientes
+│   │   ├── mapa/page.tsx         # cartograma por estado con filtros y vista de tabla
 │   │   ├── metodologia/page.tsx  # metodología con los parámetros reales del motor
 │   │   ├── servicios/
 │   │   │   ├── page.tsx          # directorio
@@ -249,6 +251,7 @@ web-downdetector-ve/
 │   │   └── sitemap.ts            # sitemap.xml dinámico (vacío mientras rija el noindex)
 │   ├── components/
 │   │   ├── directory/            # ServiceGrid, ViewToggle
+│   │   ├── map/                  # Cartogram
 │   │   ├── layout/               # Header, Footer, Breadcrumbs (miga visible + BreadcrumbList)
 │   │   ├── seo/                  # JsonLd
 │   │   ├── service/              # ReportForm
@@ -260,11 +263,12 @@ web-downdetector-ve/
 │       ├── nav.ts                # registro de rutas: enlaces solo a páginas que existen
 │       ├── privacy.ts
 │       ├── format.ts             # fechas y duraciones (es-VE, America/Caracas)
-│       ├── queries/              # directory, home, incidents, service-detail, services, status
+│       ├── map-scale.ts          # clases de color y abreviaturas del cartograma
+│       ├── queries/              # directory, home, incidents, map, service-detail, services, statistics, status
 │       ├── security/             # rate-limit, sanitize
 │       ├── seo/                  # site.ts (SITE_URL, SITE_INDEXING), crawl.ts (robots y sitemap), metadata.ts (pageMetadata), json-ld.ts, brand.ts, share-image.tsx
 │       └── validation/reports.ts
-├── tests/                        # 9 archivos de prueba + setup.ts; 88 pruebas
+├── tests/                        # 10 archivos de prueba + setup.ts; 93 pruebas
 ├── .env.example                  # .env no se versiona
 ├── .gitignore
 ├── drizzle.config.ts
@@ -278,8 +282,8 @@ web-downdetector-ve/
 ```
 
 Todavía no existen: contenido en `public/` (ni en `src/types/`; son carpetas
-vacías que git no versiona); las páginas de mapa y estadísticas y el gráfico
-histórico (Etapa 4d); `src/app/admin` (Etapa 6).
+vacías que git no versiona); el gráfico histórico (Etapa 4d); `src/app/admin`
+(Etapa 6).
 
 ---
 
@@ -826,3 +830,33 @@ esperados en `next dev`.
   que mover los parámetros no cambió el cálculo; `/incidentes` visto con un incidente
   activo y con uno resuelto; Chromium a 390 y 1280 px sin desbordes ni errores. Datos
   sintéticos y de prueba eliminados después.
+
+### Etapa 4d, segunda parte — 2026-10-18 (mapa y estadísticas)
+
+- **`/mapa`**: cartograma de cuadrícula (`src/components/map/Cartogram.tsx`) con los
+  `grid_row`/`grid_col` de la Etapa 1; filtros de período (24 h, 7 y 30 días) y
+  servicio en un formulario GET (sin JavaScript); resumen en texto, leyenda, tooltip
+  con ratón y teclado y vista de tabla equivalente. Escala (`src/lib/map-scale.ts`):
+  0 reportes es una clase neutra propia y el resto, 4 clases de una sola tonalidad
+  relativas al máximo. Rampas de marca **validadas con el script de la guía
+  `dataviz`** en claro (`#7aabc4→#173c53`) y oscuro (`#2c6483→#adccdd`; la primera
+  propuesta clara falló: 1,69:1 contra la superficie); texto de cada celda con
+  contraste ≥ 4,5:1. Abreviaturas legibles en las celdas (DC, MIR, ZUL…), únicas.
+- **`/estadisticas`**: fila de indicadores, barras de una sola serie por categoría,
+  servicios más reportados en 24 h y "lo que todavía no publicamos" con su motivo.
+- `src/lib/queries/map.ts` y `statistics.ts`: las consultas salen de las rutas de la
+  API, que ahora solo las envuelven (respuesta idéntica). Textos de métricas
+  pendientes corregidos: el motor existe; lo que falta son datos reales y mediciones
+  técnicas.
+- **Fallo previo corregido:** en tema oscuro, todas las páginas daban un aviso de
+  hidratación de React (el script de tema cambia la clase de `<html>` antes de
+  hidratar). `suppressHydrationWarning` en `<html>`.
+- **Fallo propio corregido antes de entregar:** los tooltips ocultos con `invisible`
+  ensanchaban la página a 390 px; ahora `hidden` y alineados hacia dentro.
+- `nav.ts`: `map` y `statistics` disponibles (ya no queda ninguna ruta pendiente);
+  sitemap con 85 URL con la indexación abierta.
+- Pruebas: 88 → **93**.
+- **Verificado:** `next dev` y `npm run build` + `npm start`; 61 reportes enviados por
+  la API pública repartidos en 7 estados para ver todas las clases; Chromium a 390 y
+  1280 px en claro y oscuro, sin desbordes ni errores de consola; tooltip por teclado.
+  Datos de prueba eliminados después.

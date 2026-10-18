@@ -53,7 +53,9 @@ const THEME_INIT_SCRIPT = `
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="es" className={`${display.variable} ${body.variable} ${mono.variable}`}>
+    // suppressHydrationWarning: THEME_INIT_SCRIPT añade `dark` a <html> antes de hidratar, así que
+    // su className difiere a propósito del HTML del servidor. Solo afecta a los atributos de <html>.
+    <html lang="es" className={`${display.variable} ${body.variable} ${mono.variable}`} suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
       </head>

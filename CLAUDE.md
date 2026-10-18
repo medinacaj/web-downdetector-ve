@@ -63,7 +63,7 @@ confirmación en decisiones menores y sin dejar nada a medias.
 ```bash
 bash scripts/dev-bootstrap.sh         # entorno desde cero: deps, Postgres, .env, migraciones, semillas
 npm run dev                           # http://localhost:3000 (PORT=3100 npm run dev para otro puerto)
-npm run typecheck && npm test         # 88 pruebas; las de API usan Postgres real
+npm run typecheck && npm test         # 93 pruebas; las de API usan Postgres real
 npm run db:seed                       # idempotente (ver "Semillas y catálogo")
 npm run aggregate:run -- --window=15  # un ciclo del motor (cron externo)
 npm run dev:synthetic-traffic         # tráfico sintético; añade -- --cleanup para limpiarlo
@@ -77,11 +77,11 @@ comandos con base de datos comprueba que Postgres esté arriba (`pg_isready`;
 
 ## Mapa del código
 
-- `src/app/` — `page.tsx` (inicio), `servicios/` y `servicios/[slug]`, `categorias/[slug]`, `incidentes/`, `metodologia/`, `api/` (9
+- `src/app/` — `page.tsx` (inicio), `servicios/` y `servicios/[slug]`, `categorias/[slug]`, `incidentes/`, `metodologia/`, `mapa/`, `estadisticas/`, `api/` (9
   endpoints públicos), `robots.ts`, `sitemap.ts`, `not-found.tsx`, iconos (`favicon.ico`,
   `icon.svg`, `apple-icon.png`; se regeneran con `node scripts/generate-icons.mjs`) e
-  imagen para compartir (`opengraph-image.tsx`, `twitter-image.tsx`). Las páginas de mapa y estadísticas (Etapa 4d)
-  no existen: sus enlaces pasan por `src/lib/nav.ts`.
+  imagen para compartir (`opengraph-image.tsx`, `twitter-image.tsx`). Todas las rutas de `src/lib/nav.ts` existen;
+  una página futura se registra allí con `available: false` hasta crearla.
 - `src/lib/db/` — `schema.ts` (17 tablas), `client.ts`, `seed-data/` (categorías, tipos
   de problema, estados, servicios). `scripts/seed.ts` las siembra.
 - `src/lib/engine/` — agregación, línea base, anomalías, ciclo de vida de incidentes;
@@ -91,8 +91,9 @@ comandos con base de datos comprueba que Postgres esté arriba (`pg_isready`;
   `validation/`, `nav.ts` (registro de rutas), `seo/` (`site.ts`: `SITE_URL` y política
   de indexación; `crawl.ts`: robots y sitemap; `metadata.ts`: `pageMetadata`; `json-ld.ts`; `brand.ts`;
   `share-image.tsx`).
-- `src/components/` — `layout/`, `directory/`, `service/`, `ui/`.
-- `tests/` — Vitest (9 archivos). `drizzle/` — migraciones 0000 y 0001.
+- `src/components/` — `layout/`, `directory/`, `map/` (`Cartogram`), `seo/`, `service/`, `ui/`.
+  `src/lib/map-scale.ts`: clases de color y abreviaturas del cartograma.
+- `tests/` — Vitest (10 archivos). `drizzle/` — migraciones 0000 y 0001.
 - `docs/` — plan maestro, catálogo de servicios, SEO pendiente, migración a Code.
 
 ## Convenciones
@@ -124,6 +125,12 @@ comandos con base de datos comprueba que Postgres esté arriba (`pg_isready`;
   `import 'dotenv/config'` va **antes** que cualquier módulo que lo importe.
 - Estado visible: sin incidente abierto y con menos de 3 ventanas de línea base en la
   franja → "Sin datos suficientes" (`windowStatus`), nunca "Normal".
+- Visualizaciones: sigue la guía `dataviz` (una tonalidad para magnitud, rampas
+  validadas con su script en claro **y** oscuro, texto ≥ 4,5:1 sobre cada relleno,
+  tooltip que realza pero no sustituye, vista de tabla). Tooltips ocultos con `hidden`,
+  no `invisible` (ensanchaban la página en móvil).
+- Las consultas que comparten API y página viven en `src/lib/queries/` (`map.ts`,
+  `statistics.ts`); la API solo las envuelve.
 - Enlaces a servicios y categorías con `serviceHref(slug)` y `categoryHref(slug)` de
   `src/lib/nav.ts`, no escritos a mano.
 - Apuestas y loterías: el aviso legal lo ponen `GamblingNotice` y
@@ -165,6 +172,8 @@ de problema propios o su formulario solo ofrecería "Otro" (lo comprueba una pru
 - La 404 de un **servicio** inexistente (`notFound()` en página dinámica) sale como
   documento `__next_error__` que pinta el cliente (código 404 correcto). Es de Next 16.3,
   ya pasaba antes; un `not-found.tsx` en el segmento no lo arregla.
+- `<html>` lleva `suppressHydrationWarning` a propósito: el script de tema añade `dark`
+  antes de hidratar (sin él, todas las páginas daban aviso de hidratación en tema oscuro).
 - `next build` reescribe `next-env.d.ts` (`.next/types` en vez de `.next/dev/types`) y
   `next dev` lo devuelve: no lo commitees (`git checkout next-env.d.ts`).
 - No borres `node_modules` con `next dev` en marcha: deja errores "Can't resolve
@@ -189,9 +198,10 @@ servicio. **El SEO base está completo en local**; falta lo que depende de terce
 
 Etapa 4d, primera parte (2026-10-18): `/incidentes` y `/metodologia`; corregido que un
 servicio sin historia saliera "Normal" y que la portada anunciara mediciones técnicas.
+Segunda parte (2026-10-18): `/mapa` (cartograma) y `/estadisticas`.
 
-Pendiente, en orden: **4d** (resto: `/mapa` y `/estadisticas`, luego el gráfico histórico
-con `recharts`; al crearlas, activar en `nav.ts`) · **5** Turnstile y
+Pendiente, en orden: **4d** (resto: el gráfico histórico de la página de servicio con
+`recharts`, cargado solo en esa página) · **5** Turnstile y
 geolocalización aproximada · **6** panel admin y `create-admin` (los slugs no deben poder
 editarse sin redirección; `/admin` con noindex y autenticación) · **7** abuso avanzado ·
 **8** tiempo real (SSE) · **9** observabilidad · **10** e2e/carga/Docker/CI, ESLint y las 17
@@ -201,7 +211,8 @@ Brechas conocidas: en los listados (inicio, directorio, categorías) el estado s
 refleja incidentes abiertos, mientras que la página de servicio también usa la última
 ventana con historia suficiente; los incidentes resueltos no guardan su confianza máxima
 (solo `peak_at`); señales técnica y oficial del motor sin fuente real (se excluyen y el
-resto se renormaliza); municipios sin sembrar; el directorio hace una consulta de estado
+resto se renormaliza); municipios sin sembrar; la cuadrícula del cartograma (`grid_row`/`grid_col`) es una
+primera aproximación por adyacencia, mejorable visualmente; el directorio hace una consulta de estado
 por servicio (N+1; ~0,15 s con 71 servicios en local; también en las páginas de
 categoría); no hay índice `/categorias` (404; el directorio cumple esa función); no hay dominio todavía (S3: dominio y redirecciones; S12: rendimiento en producción) y el SEO no se probó contra uno real ni en
 Google Search Console (no se usó); revisión legal profesional de apuestas y loterías

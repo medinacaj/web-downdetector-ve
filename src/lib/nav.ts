@@ -21,10 +21,10 @@ export interface RouteInfo {
 export const ROUTE = {
   home: { href: '/', label: 'Inicio', available: true },
   services: { href: '/servicios', label: 'Servicios', available: true },
-  // Etapa 4d: incidentes y metodología hechos; mapa y estadísticas pendientes.
-  map: { href: '/mapa', label: 'Mapa', available: false },
+  // Etapa 4d: las cuatro páginas existen.
+  map: { href: '/mapa', label: 'Mapa', available: true },
   incidents: { href: '/incidentes', label: 'Incidentes', available: true },
-  statistics: { href: '/estadisticas', label: 'Estadísticas', available: false },
+  statistics: { href: '/estadisticas', label: 'Estadísticas', available: true },
   methodology: { href: '/metodologia', label: 'Metodología', available: true },
 } as const satisfies Record<string, RouteInfo>;
 
