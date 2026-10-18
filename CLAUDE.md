@@ -63,7 +63,7 @@ confirmación en decisiones menores y sin dejar nada a medias.
 ```bash
 bash scripts/dev-bootstrap.sh         # entorno desde cero: deps, Postgres, .env, migraciones, semillas
 npm run dev                           # http://localhost:3000 (PORT=3100 npm run dev para otro puerto)
-npm run typecheck && npm test         # 93 pruebas; las de API usan Postgres real
+npm run typecheck && npm test         # 98 pruebas; las de API usan Postgres real
 npm run db:seed                       # idempotente (ver "Semillas y catálogo")
 npm run aggregate:run -- --window=15  # un ciclo del motor (cron externo)
 npm run dev:synthetic-traffic         # tráfico sintético; añade -- --cleanup para limpiarlo
@@ -92,8 +92,9 @@ comandos con base de datos comprueba que Postgres esté arriba (`pg_isready`;
   de indexación; `crawl.ts`: robots y sitemap; `metadata.ts`: `pageMetadata`; `json-ld.ts`; `brand.ts`;
   `share-image.tsx`).
 - `src/components/` — `layout/`, `directory/`, `map/` (`Cartogram`), `seo/`, `service/`, `ui/`.
-  `src/lib/map-scale.ts`: clases de color y abreviaturas del cartograma.
-- `tests/` — Vitest (10 archivos). `drizzle/` — migraciones 0000 y 0001.
+  `src/lib/map-scale.ts`: clases de color y abreviaturas del cartograma; `src/lib/history.ts`:
+  serie y eje del gráfico de 24 h (`HistoryChart`, cargado con `LazyHistoryChart`).
+- `tests/` — Vitest (11 archivos). `drizzle/` — migraciones 0000 y 0001.
 - `docs/` — plan maestro, catálogo de servicios, SEO pendiente, migración a Code.
 
 ## Convenciones
@@ -129,6 +130,8 @@ comandos con base de datos comprueba que Postgres esté arriba (`pg_isready`;
   validadas con su script en claro **y** oscuro, texto ≥ 4,5:1 sobre cada relleno,
   tooltip que realza pero no sustituye, vista de tabla). Tooltips ocultos con `hidden`,
   no `invisible` (ensanchaban la página en móvil).
+- `recharts` solo a través de `LazyHistoryChart` (`next/dynamic`, `ssr: false`): no debe
+  entrar en el JS de otras páginas ni en servicios sin gráfico (medido: 0 KB).
 - Las consultas que comparten API y página viven en `src/lib/queries/` (`map.ts`,
   `statistics.ts`); la API solo las envuelve.
 - Enlaces a servicios y categorías con `serviceHref(slug)` y `categoryHref(slug)` de
@@ -198,10 +201,10 @@ servicio. **El SEO base está completo en local**; falta lo que depende de terce
 
 Etapa 4d, primera parte (2026-10-18): `/incidentes` y `/metodologia`; corregido que un
 servicio sin historia saliera "Normal" y que la portada anunciara mediciones técnicas.
-Segunda parte (2026-10-18): `/mapa` (cartograma) y `/estadisticas`.
+Segunda parte (2026-10-18): `/mapa` (cartograma) y `/estadisticas`. Tercera parte
+(2026-10-18): gráfico de 24 h en la página de servicio. **Etapa 4 completa.**
 
-Pendiente, en orden: **4d** (resto: el gráfico histórico de la página de servicio con
-`recharts`, cargado solo en esa página) · **5** Turnstile y
+Pendiente, en orden: **5** Turnstile y
 geolocalización aproximada · **6** panel admin y `create-admin` (los slugs no deben poder
 editarse sin redirección; `/admin` con noindex y autenticación) · **7** abuso avanzado ·
 **8** tiempo real (SSE) · **9** observabilidad · **10** e2e/carga/Docker/CI, ESLint y las 17

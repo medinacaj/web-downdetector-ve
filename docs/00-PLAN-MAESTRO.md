@@ -186,7 +186,7 @@ reevaluar `@neondatabase/serverless` o un pool externo (PgBouncer).
 | 1 | Fundación de datos: esquema, migración, seeds, config, pruebas de integridad de datos | — | **Completada** |
 | 2 | API pública de lectura + `POST /api/reports` con validación/rate limiting básico | 1 | **Completada esta sesión** |
 | 3 | Motor de agregación y anomalías (`aggregate:run`), apertura/cierre de incidentes | 2 | **Completada** |
-| 4 | Frontend público: inicio, directorio, página de servicio, mapa, incidentes, estadísticas, metodología | 2, 3 | **En curso — 4a (layout + inicio), 4b (directorio), 4c (página de servicio con reporte) y de 4d: incidentes, metodología, mapa y estadísticas completados; pendiente el gráfico histórico** |
+| 4 | Frontend público: inicio, directorio, página de servicio, mapa, incidentes, estadísticas, metodología | 2, 3 | **Completada** — 4a (layout + inicio), 4b (directorio), 4c (página de servicio con reporte) y 4d (incidentes, metodología, mapa, estadísticas y gráfico de 24 h) |
 | SEO | SEO técnico e indexación: dominio y `metadataBase`, `robots.ts`, `sitemap.ts`, canonical, Open Graph, favicon, datos estructurados y decisión de indexación. Regla permanente de la persona propietaria: forma parte de cada entrega web | 4a–4c | **En curso** — política de indexación decidida (opción A: noindex global mientras todo sea demostrativo), `robots.ts`, `sitemap.ts`, `SITE_URL` y `metadataBase` hechos (2026-10-11); canonical, Open Graph, favicon, 404 propia, páginas de categoría, JSON-LD y metadescripciones por servicio (2026-10-18). **Completo en local**; faltan dominio, hosting y Search Console. Ver `docs/SEO-PENDIENTE.md` |
 | 5 | Formulario de reporte conectado de extremo a extremo (UI + API + Turnstile + geolocalización aproximada) | 2, 4 | Pendiente |
 | 6 | Panel administrativo (auth, CRUD servicios/categorías, incidentes, moderación, auditoría, `create-admin`) | 1–3 | Pendiente |
@@ -254,7 +254,7 @@ web-downdetector-ve/
 │   │   ├── map/                  # Cartogram
 │   │   ├── layout/               # Header, Footer, Breadcrumbs (miga visible + BreadcrumbList)
 │   │   ├── seo/                  # JsonLd
-│   │   ├── service/              # ReportForm
+│   │   ├── service/              # ReportForm, GamblingNotice, HistoryChart + LazyHistoryChart
 │   │   └── ui/                   # StatusBadge, ThemeToggle
 │   └── lib/
 │       ├── api/respond.ts        # sobre de respuesta { data, meta } / { error }
@@ -263,12 +263,13 @@ web-downdetector-ve/
 │       ├── nav.ts                # registro de rutas: enlaces solo a páginas que existen
 │       ├── privacy.ts
 │       ├── format.ts             # fechas y duraciones (es-VE, America/Caracas)
+│       ├── history.ts            # serie, incidentes y eje del gráfico de 24 h
 │       ├── map-scale.ts          # clases de color y abreviaturas del cartograma
-│       ├── queries/              # directory, home, incidents, map, service-detail, services, statistics, status
+│       ├── queries/              # directory, home, incidents, map, service-detail, service-history, services, statistics, status
 │       ├── security/             # rate-limit, sanitize
 │       ├── seo/                  # site.ts (SITE_URL, SITE_INDEXING), crawl.ts (robots y sitemap), metadata.ts (pageMetadata), json-ld.ts, brand.ts, share-image.tsx
 │       └── validation/reports.ts
-├── tests/                        # 10 archivos de prueba + setup.ts; 93 pruebas
+├── tests/                        # 11 archivos de prueba + setup.ts; 98 pruebas
 ├── .env.example                  # .env no se versiona
 ├── .gitignore
 ├── drizzle.config.ts
@@ -282,8 +283,7 @@ web-downdetector-ve/
 ```
 
 Todavía no existen: contenido en `public/` (ni en `src/types/`; son carpetas
-vacías que git no versiona); el gráfico histórico (Etapa 4d); `src/app/admin`
-(Etapa 6).
+vacías que git no versiona); `src/app/admin` (Etapa 6).
 
 ---
 
@@ -860,3 +860,29 @@ esperados en `next dev`.
   la API pública repartidos en 7 estados para ver todas las clases; Chromium a 390 y
   1280 px en claro y oscuro, sin desbordes ni errores de consola; tooltip por teclado.
   Datos de prueba eliminados después.
+
+### Etapa 4d, tercera parte — 2026-10-18 (gráfico de 24 horas). Etapa 4 completa
+
+- **Gráfico en la página de servicio** ("Últimas 24 horas"): reportes por ventana de
+  15 minutos —la resolución con la que el motor agrega y compara, sin inventar
+  agregaciones horarias—, línea de 2 px con relleno al 10 %, lineal (sin suavizado que
+  invente valores entre ventanas). "Lo habitual" es la mediana de la línea base de esa
+  franja día×hora, en gris discontinuo (no se distingue solo por color), y solo donde
+  la franja tiene al menos 3 ventanas (`MIN_BASELINE_SAMPLES_FOR_STATUS`, el mismo
+  umbral que el estado visible). Incidentes del periodo como franjas. Cursor vertical
+  con tooltip de todas las series (valor primero), navegable con teclado
+  (`accessibilityLayer`), leyenda HTML y tabla equivalente. Sin reportes no se dibuja
+  una línea plana: se dice "Sin reportes en las últimas 24 horas".
+- `src/lib/history.ts` (puro: serie de 96 ventanas, recorte de incidentes, marcas
+  redondas del eje Y) y `src/lib/queries/service-history.ts`. `formatWindow` en
+  `src/lib/format.ts`.
+- **Rendimiento:** `recharts` (406 KB sin comprimir) se carga con `next/dynamic` solo
+  cuando hay gráfico. Medido en producción con Chromium: portada 454 KB de JS y
+  servicio sin reportes 463 KB, ambos sin `recharts`; servicio con gráfico 870 KB.
+- Corregido antes de entregar: marcas del eje Y poco legibles (0, 7, 14, 21, 28) →
+  pasos de 1, 2 o 5 × 10^k (`niceTicks`, con pruebas).
+- Pruebas: 93 → **98**.
+- **Verificado:** `next dev` y `npm run build` + `npm start` con el escenario sintético
+  del motor (pico, línea base e incidente abierto) y con reportes enviados por la API;
+  Chromium a 390 y 1280 px en claro y oscuro, sin desbordes ni errores; tooltip con
+  ratón y con teclado. Datos de prueba eliminados después.

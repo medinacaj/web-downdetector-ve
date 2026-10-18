@@ -6,13 +6,12 @@ plataformas digitales, streaming, videojuegos, delivery y movilidad, y
 apuestas y loterías. No es una copia de Downdetector ni de ninguna plataforma
 existente: identidad visual, arquitectura, código y metodología propios.
 
-**Estado actual del proyecto: Etapa 4d de 10, en curso — ya hay inicio,
-directorio, categorías, página de servicio con reporte funcional, incidentes,
-metodología, mapa y estadísticas.**
+**Estado actual del proyecto: Etapa 4 de 10 completada — inicio,
+directorio, categorías, página de servicio con reporte funcional y gráfico
+de 24 horas, incidentes, metodología, mapa y estadísticas.** Siguiente: Etapa 5.
 Ver `docs/00-PLAN-MAESTRO.md` para la evaluación completa, la arquitectura y
 el plan de etapas. Ya se puede reportar una falla desde la interfaz, de
-verdad — no solo vía la API. Falta el gráfico histórico de la página de
-servicio.
+verdad — no solo vía la API.
 
 **Todavía no está listo para publicarse.** Ya hay `robots.txt`, `sitemap.xml`
 y política de indexación: **noindex global** mientras los datos sean
@@ -51,7 +50,7 @@ dominio, hosting y Search Console. Ver `docs/SEO-PENDIENTE.md`.
   tanto en la base de datos como a través de la API pública.
 - Configuración de proyecto (Next.js 16, Tailwind, TypeScript, Vitest) y
   variables de entorno documentadas con valores por defecto seguros.
-- 93 pruebas automatizadas (escala y abreviaturas del mapa, estado "Sin datos suficientes" sin historia,
+- 98 pruebas automatizadas (serie y eje del gráfico histórico, escala y abreviaturas del mapa, estado "Sin datos suficientes" sin historia,
   datos estructurados JSON-LD, metadata de página: canonical, Open Graph y Twitter,
   renderizado dinámico de las páginas con datos,
   datos semilla y calidad del catálogo, registro
@@ -62,6 +61,10 @@ dominio, hosting y Search Console. Ver `docs/SEO-PENDIENTE.md`.
   datos en vivo, incidentes activos, servicios, metodología resumida.
   Header, footer, modo oscuro con selector y tipografía (Space Grotesk +
   Inter + JetBrains Mono) ya están en su lugar para el resto del sitio.
+- **Gráfico de las últimas 24 horas** en cada servicio: reportes por ventana
+  de 15 minutos (la resolución del motor), "lo habitual" de esa franja solo
+  donde hay historia suficiente, incidentes sombreados, tooltip con ratón y
+  teclado, y tabla equivalente. `recharts` se descarga solo si hay gráfico.
 - **Mapa** (`/mapa`): cartograma por estado (esquema por adyacencia, no a
   escala) con filtros de período (24 h, 7 y 30 días) y servicio; escala de
   una tonalidad validada para daltonismo y contraste en los dos temas,
@@ -138,8 +141,7 @@ catálogo real — existe solo para ejercitar el motor (brief, sección 28).
 
 ## Qué NO existe todavía
 
-Del frontend: el gráfico principal de la página de servicio (`recharts`
-ya instalado, sin usar). Las
+Del frontend público no falta ninguna página prevista. Las
 mediciones técnicas automáticas no existen (la portada ya no las anuncia).
 El formulario de reporte
 funciona pero sin Turnstile ni geolocalización (Etapa 5).
@@ -206,7 +208,7 @@ esta carpeta. Cómo llegó aquí el proyecto, qué falta resolver y qué se veri
 | `npm run dev` / `build` / `start` | Next.js (inicio, directorio, página de servicio y API reales). `build` necesita acceso a Google Fonts |
 | `bash scripts/dev-bootstrap.sh` | Entorno de desarrollo desde cero (ver "Instalación"); idempotente, nunca toca un `.env` existente |
 | `npm run typecheck` | `tsc --noEmit` |
-| `npm test` / `test:watch` | Vitest (93 pruebas; las de integración de reportes requieren Postgres real) |
+| `npm test` / `test:watch` | Vitest (98 pruebas; las de integración de reportes requieren Postgres real) |
 | `npm run db:generate` | Genera migración SQL a partir de `schema.ts` |
 | `npm run db:migrate` | `drizzle-kit push` (sincroniza esquema directo, sin historial — útil en dev) |
 | `npm run db:migrate:deploy` | Aplica las migraciones versionadas de `drizzle/` |

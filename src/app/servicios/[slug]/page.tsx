@@ -3,7 +3,9 @@ import { notFound } from 'next/navigation';
 import { getServiceDetailData } from '@/lib/queries/service-detail';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { INCIDENT_STATUS_LABELS_ES } from '@/lib/engine/status-bands';
-import { formatDateTime } from '@/lib/format';
+import { formatDateTime, formatWindow } from '@/lib/format';
+import { getServiceHistory } from '@/lib/queries/service-history';
+import { LazyHistoryChart } from '@/components/service/LazyHistoryChart';
 import { ReportForm } from '@/components/service/ReportForm';
 import { pageMetadata } from '@/lib/seo/metadata';
 import { ROUTE, categoryHref, serviceHref } from '@/lib/nav';
@@ -49,6 +51,7 @@ export default async function ServiceDetailPage({ params }: { params: Promise<{ 
   if (!data) notFound();
 
   const { service, statusDetail, issueTypeOptions, issueBreakdown, recentIncidents, affectedStates, allStates } = data;
+  const history = await getServiceHistory(service.id);
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-10 sm:px-6">
@@ -113,6 +116,90 @@ export default async function ServiceDetailPage({ params }: { params: Promise<{ 
         <div className="mt-4">
           <ReportForm serviceSlug={service.slug} issueTypes={issueTypeOptions} states={allStates} />
         </div>
+      </section>
+
+      {/* Últimas 24 horas (Etapa 4d): gráfico + tabla equivalente */}
+      <section className="mt-10" aria-labelledby="ultimas-24h">
+        <h2 id="ultimas-24h" className="font-display text-lg font-semibold">
+          Últimas 24 horas
+        </h2>
+        {history.totalReports === 0 ? (
+          <p className="mt-3 text-sm text-ink-muted">
+            Sin reportes en las últimas 24 horas{history.incidents.length > 0 ? ', aunque hubo un incidente en este periodo' : ''}.
+          </p>
+        ) : (
+          <>
+            <p className="mt-1 text-sm text-ink-muted">
+              {history.totalReports} {history.totalReports === 1 ? 'reporte' : 'reportes'} en ventanas de 15 minutos
+              (hora de Caracas). Los valores también están en la tabla.
+            </p>
+            <ul className="mt-3 flex flex-wrap gap-x-5 gap-y-1 text-xs text-ink-muted" aria-label="Leyenda">
+              <li className="flex items-center gap-1.5">
+                <span aria-hidden="true" className="inline-block h-0.5 w-4 bg-brand-500 dark:bg-brand-300" />
+                Reportes
+              </li>
+              {history.hasExpected && (
+                <li className="flex items-center gap-1.5">
+                  <span aria-hidden="true" className="inline-block w-4 border-t-2 border-dashed border-ink-muted" />
+                  Lo habitual a esa hora
+                </li>
+              )}
+              {history.incidents.length > 0 && (
+                <li className="flex items-center gap-1.5">
+                  <span aria-hidden="true" className="inline-block h-3 w-3 rounded-[3px] bg-status-incident/20" />
+                  Incidente detectado
+                </li>
+              )}
+            </ul>
+            <div className="mt-3">
+              <LazyHistoryChart
+                points={history.points}
+                incidents={history.incidents}
+                rangeStart={history.rangeStart}
+                rangeEnd={history.rangeEnd}
+              />
+            </div>
+            {!history.hasExpected && (
+              <p className="mt-2 text-xs text-ink-muted">
+                Todavía no hay historia suficiente para mostrar lo habitual de este servicio a cada hora.
+              </p>
+            )}
+            <details className="mt-4 rounded-lg border border-border">
+              <summary className="cursor-pointer px-4 py-3 text-sm font-medium">Ver como tabla</summary>
+              <div className="overflow-x-auto border-t border-border">
+                <table className="w-full text-left text-sm">
+                  <thead className="text-ink-muted">
+                    <tr>
+                      <th scope="col" className="px-4 py-2 font-medium">
+                        Ventana
+                      </th>
+                      <th scope="col" className="px-4 py-2 text-right font-medium">
+                        Reportes
+                      </th>
+                      <th scope="col" className="px-4 py-2 text-right font-medium">
+                        Lo habitual
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-border">
+                    {history.points
+                      .filter((p) => p.reports > 0)
+                      .map((p) => (
+                        <tr key={p.t}>
+                          <td className="px-4 py-2">{formatWindow(p.t)}</td>
+                          <td className="px-4 py-2 text-right font-mono tabular-nums">{p.reports}</td>
+                          <td className="px-4 py-2 text-right font-mono tabular-nums">
+                            {p.expected === null ? '—' : Number.isInteger(p.expected) ? p.expected : p.expected.toFixed(1)}
+                          </td>
+                        </tr>
+                      ))}
+                  </tbody>
+                </table>
+                <p className="px-4 py-2 text-xs text-ink-muted">Las ventanas que no aparecen tuvieron 0 reportes.</p>
+              </div>
+            </details>
+          </>
+        )}
       </section>
 
       {/* Tipos de problema */}

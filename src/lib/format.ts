@@ -15,3 +15,18 @@ export function formatDuration(from: Date, to: Date): string {
   const days = Math.floor(hours / 24);
   return hours % 24 ? `${days} d ${hours % 24} h` : `${days} d`;
 }
+
+const windowFmt = new Intl.DateTimeFormat('es-VE', {
+  timeZone: TIME_ZONE,
+  day: '2-digit',
+  month: 'short',
+  hour: '2-digit',
+  minute: '2-digit',
+  hourCycle: 'h23',
+});
+const timeOnlyFmt = new Intl.DateTimeFormat('es-VE', { timeZone: TIME_ZONE, hour: '2-digit', minute: '2-digit', hourCycle: 'h23' });
+
+/** Ventana de 15 minutos: "18 oct., 14:15–14:30" (hora de Caracas). */
+export function formatWindow(startMs: number, minutes = 15): string {
+  return `${windowFmt.format(new Date(startMs))}–${timeOnlyFmt.format(new Date(startMs + minutes * 60_000))}`;
+}
