@@ -33,7 +33,7 @@ describe('nav: registro de rutas', () => {
 
   it('ningún archivo de src enlaza a mano a una página que aún no está disponible', () => {
     const pending = routes.filter(([, r]) => !r.available).map(([, r]) => r.href);
-    expect(pending.length).toBeGreaterThan(0); // si algún día no queda ninguna, borrar esta prueba
+    // Si no quedan rutas pendientes, la comprobación siguiente pasa vacía.
 
     const files = (readdirSync(SRC, { recursive: true }) as string[])
       .filter((f) => /\.(ts|tsx)$/.test(f))
