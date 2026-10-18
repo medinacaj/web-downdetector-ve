@@ -9,6 +9,8 @@ import { ok, apiError, withErrorHandling } from '@/lib/api/respond';
 
 const REPORT_LIMIT_PER_HASH = Number(process.env.RATE_LIMIT_REPORTS_MAX ?? 5);
 const REPORT_WINDOW_SECONDS = Number(process.env.RATE_LIMIT_REPORTS_WINDOW_SECONDS ?? 3600);
+const prefixLimitRaw = Number(process.env.RATE_LIMIT_PREFIX_MAX ?? 100);
+const REPORT_LIMIT_PER_PREFIX = Number.isInteger(prefixLimitRaw) && prefixLimitRaw > 0 ? prefixLimitRaw : 100;
 
 /**
  * Puntuación inicial básica (brief, sección 11.2). Es deliberadamente
@@ -108,6 +110,22 @@ async function handlePOST(request: Request) {
     return apiError('rate_limited', 'Demasiados reportes en poco tiempo. Intenta de nuevo más tarde.', {
       retryAt: new Date(rateLimit.resetAt).toISOString(),
     });
+  }
+
+  // Segundo límite, mucho más amplio, por prefijo de red truncado y
+  // anonimizado. Solo se aplica si el ingress verifica la IP: cabeceras
+  // reenviadas sin una cadena de confianza no sirven como antiabuso.
+  if (ip !== '0.0.0.0') {
+    const networkLimit = await checkRateLimit(
+      `report:network:${ipPrefixHash}`,
+      REPORT_LIMIT_PER_PREFIX,
+      REPORT_WINDOW_SECONDS,
+    );
+    if (!networkLimit.allowed) {
+      return apiError('rate_limited', 'Exceso de actividad desde esta red. Intenta más tarde.', {
+        retryAt: new Date(networkLimit.resetAt).toISOString(),
+      });
+    }
   }
 
   const { confidence, suspicious } = await scoreReport({
