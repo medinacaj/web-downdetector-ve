@@ -1,11 +1,10 @@
 import type { Metadata } from 'next';
-import { eq,sql,gte } from 'drizzle-orm';
+import { eq,sql } from 'drizzle-orm';
 import { db } from '@/lib/db/client';
 import { states,reports } from '@/lib/db/schema';
 export const dynamic='force-dynamic';
 export const metadata:Metadata={title:'Mapa esquemático',description:'Actividad ciudadana de reportes por estado, sin mostrar posiciones personales.',alternates:{canonical:'/mapa'}};
 export default async function MapPage(){
- const since=new Date(Date.now()-24*60*60*1000);
  const rows=await db.select({name:states.name,code:states.code,row:states.gridRow,col:states.gridCol,
    count:sql<number>`count(${reports.id})::int`})
    .from(states).leftJoin(reports,eq(reports.stateId,states.id))
