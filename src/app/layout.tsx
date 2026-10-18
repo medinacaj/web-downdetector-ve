@@ -24,7 +24,7 @@ const mono = JetBrains_Mono({
 export const metadata: Metadata = {
   metadataBase: siteUrl() ?? undefined,
   robots: { index: indexable(), follow: indexable() },
-  alternates: { canonical: '/' },
+  alternates: siteUrl() ? { canonical: '/' } : undefined,
   openGraph: { type: 'website', locale: 'es_VE', siteName: 'PulsoVE', title: 'PulsoVE — Estado de servicios en Venezuela', description: 'Observación ciudadana de disponibilidad de servicios en Venezuela. Datos insuficientes no equivalen a normalidad.' },
   title: {
     default: 'PulsoVE — Estado de servicios en Venezuela',
