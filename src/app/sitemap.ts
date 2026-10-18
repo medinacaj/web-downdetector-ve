@@ -9,7 +9,7 @@ export const dynamic = 'force-dynamic';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   if (!indexable()) return [];
-  const paths = Object.values(ROUTE).filter(isRouteAvailable).map(route => route.href);
+  const paths: string[] = Object.values(ROUTE).filter(isRouteAvailable).map(route => route.href);
   const rows = await db.select({ slug: services.slug, updatedAt: services.updatedAt })
     .from(services).where(eq(services.active, true));
   for (const item of rows) paths.push('/servicios/' + encodeURIComponent(item.slug));

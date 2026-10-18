@@ -1,0 +1,26 @@
+name: PulsoVE calidad de rutas
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - run: npm run typecheck
+      - name: Pruebas unitarias con variables ficticias solo de CI
+        run: npm test -- --exclude tests/api-reports.test.ts
+        env:
+          DATABASE_URL: postgresql://ci:ci@localhost:5432/pulsove_unit_only
+          ANONYMIZATION_SALT: CI_UNIT_TEST_ONLY_NOT_FOR_REAL_TRAFFIC_1234567890
