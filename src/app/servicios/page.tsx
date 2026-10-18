@@ -6,6 +6,7 @@ import type { OperationalStatus } from '@/lib/engine/status-bands';
 
 export const metadata: Metadata = {
   title: 'Servicios',
+  alternates: { canonical: '/servicios' },
   description: 'Directorio de servicios monitoreados en Venezuela: telecomunicaciones, banca, servicios públicos, plataformas, streaming, videojuegos, delivery y loterías.',
 };
 
