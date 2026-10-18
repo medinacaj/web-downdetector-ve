@@ -19,4 +19,8 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run typecheck
-      - run: npm test
+      - name: Pruebas unitarias con variables ficticias solo de CI
+        run: npm test
+        env:
+          DATABASE_URL: postgresql://ci:ci@localhost:5432/pulsove_unit_only
+          ANONYMIZATION_SALT: CI_UNIT_TEST_ONLY_NOT_FOR_REAL_TRAFFIC_1234567890
