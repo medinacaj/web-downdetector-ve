@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { scoreToStatus } from '../src/lib/engine/status-bands';
+import { scoreToStatus, windowStatus } from '../src/lib/engine/status-bands';
 
 describe('scoreToStatus (brief, sección 9.6)', () => {
   it.each([
@@ -22,5 +22,20 @@ describe('scoreToStatus (brief, sección 9.6)', () => {
   it('valores fuera de rango se acotan a 0-100 en vez de fallar', () => {
     expect(scoreToStatus(-10)).toBe('normal');
     expect(scoreToStatus(150)).toBe('outage_high_confidence');
+  });
+});
+
+describe('windowStatus: sin historia suficiente nunca es "normal"', () => {
+  it('con menos de 3 ventanas en la línea base devuelve insufficient_data, sea cual sea la confianza', () => {
+    for (const samples of [0, 1, 2]) {
+      for (const confidence of [0, 7, 50, 99]) {
+        expect(windowStatus(confidence, samples), `${samples} muestras, confianza ${confidence}`).toBe('insufficient_data');
+      }
+    }
+  });
+
+  it('con historia suficiente usa las bandas de siempre', () => {
+    expect(windowStatus(7, 3)).toBe('normal');
+    expect(windowStatus(60, 20)).toBe('possible_outage');
   });
 });

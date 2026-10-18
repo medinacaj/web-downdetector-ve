@@ -2,18 +2,17 @@ import { and, desc, eq, gte, isNull, ne } from 'drizzle-orm';
 import { db } from '@/lib/db/client';
 import { incidents, incidentRegions, aggregatedWindows } from '@/lib/db/schema';
 
-// Umbral de apertura = límite inferior de "posible interrupción" (sección
-// 9.6). Cierre una banda por debajo para evitar parpadeo en el límite.
-const OPEN_THRESHOLD = Number(process.env.INCIDENT_OPEN_CONFIDENCE ?? 55);
-const CLOSE_THRESHOLD = Number(process.env.INCIDENT_CLOSE_CONFIDENCE ?? 40);
-const MIN_CONSECUTIVE_WINDOWS = Number(process.env.INCIDENT_MIN_CONSECUTIVE_WINDOWS ?? 2);
-// Evita que un solo reportante (o un hash duplicado) abra un incidente por
-// sí solo (brief, sección 9.7: "diversidad de reportantes suficiente").
-const MIN_UNIQUE_REPORTERS = Number(process.env.INCIDENT_MIN_UNIQUE_REPORTERS ?? 2);
+import { INCIDENT_RULES } from './parameters';
+
+// Valores y su porqué en ./parameters.ts (también los muestra /metodologia).
+const OPEN_THRESHOLD = INCIDENT_RULES.openConfidence;
+const CLOSE_THRESHOLD = INCIDENT_RULES.closeConfidence;
+const MIN_CONSECUTIVE_WINDOWS = INCIDENT_RULES.minConsecutiveWindows;
+const MIN_UNIQUE_REPORTERS = INCIDENT_RULES.minUniqueReporters;
 
 function severityForConfidence(confidence: number): string {
-  if (confidence >= 85) return 'critical';
-  if (confidence >= 70) return 'major';
+  if (confidence >= INCIDENT_RULES.highConfidenceFrom) return 'critical';
+  if (confidence >= INCIDENT_RULES.detectedFrom) return 'major';
   return 'moderate'; // mismo valor que el default de la columna
 }
 
@@ -73,7 +72,12 @@ export async function updateIncidentLifecycle(
     recentWindows.every((w) => w.confidence >= OPEN_THRESHOLD);
 
   if (shouldOpenOrEscalate) {
-    const status = confidence >= 85 ? 'high_confidence' : confidence >= 70 ? 'detected' : 'possible';
+    const status =
+      confidence >= INCIDENT_RULES.highConfidenceFrom
+        ? 'high_confidence'
+        : confidence >= INCIDENT_RULES.detectedFrom
+          ? 'detected'
+          : 'possible';
 
     if (openIncident) {
       const isNewPeak = confidence > openIncident.confidence;

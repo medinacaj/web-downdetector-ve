@@ -1,7 +1,8 @@
-import { and, desc, eq, ne } from 'drizzle-orm';
+import { and, desc, eq, isNull, ne } from 'drizzle-orm';
 import { db } from '@/lib/db/client';
-import { incidents, aggregatedWindows } from '@/lib/db/schema';
-import { scoreToStatus, STATUS_LABELS_ES, type OperationalStatus } from '@/lib/engine/status-bands';
+import { incidents, aggregatedWindows, baselines } from '@/lib/db/schema';
+import { STATUS_LABELS_ES, windowStatus, type OperationalStatus } from '@/lib/engine/status-bands';
+import { getCaracasWeekdayHour } from '@/lib/engine/time-bucket';
 
 /**
  * Estado visible de un servicio cuando no se necesita el detalle completo
@@ -87,7 +88,8 @@ export async function getServiceStatusDetail(serviceId: string): Promise<Service
   const [latestWindow] = await db
     .select()
     .from(aggregatedWindows)
-    .where(eq(aggregatedWindows.serviceId, serviceId))
+    // Solo la ventana del servicio completo: las filas por estado no las puntúa el motor.
+    .where(and(eq(aggregatedWindows.serviceId, serviceId), isNull(aggregatedWindows.stateId)))
     .orderBy(desc(aggregatedWindows.windowStart))
     .limit(1);
 
@@ -103,11 +105,27 @@ export async function getServiceStatusDetail(serviceId: string): Promise<Service
     };
   }
 
-  const status = scoreToStatus(latestWindow.confidence);
+  // La ventana no guarda con cuánta historia se puntuó: se consulta la línea base de
+  // su franja (día×hora de Caracas). Sin historia suficiente, "Sin datos suficientes".
+  const { weekday, hour } = getCaracasWeekdayHour(latestWindow.windowStart);
+  const [baseline] = await db
+    .select({ sampleSize: baselines.sampleSize })
+    .from(baselines)
+    .where(
+      and(
+        eq(baselines.serviceId, serviceId),
+        isNull(baselines.stateId),
+        eq(baselines.weekday, weekday),
+        eq(baselines.hour, hour),
+      ),
+    )
+    .limit(1);
+  const status = windowStatus(latestWindow.confidence, baseline?.sampleSize ?? 0);
   return {
     status,
     label: STATUS_LABELS_ES[status],
-    confidence: latestWindow.confidence,
+    // Sin evidencia suficiente no se muestra una cifra de confianza que aparente precisión.
+    confidence: status === 'insufficient_data' ? null : latestWindow.confidence,
     officiallyConfirmed: false,
     incidentId: null,
     since: latestWindow.windowStart,

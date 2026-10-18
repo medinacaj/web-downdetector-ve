@@ -9,6 +9,7 @@
  * (ver docs/00-PLAN-MAESTRO.md, pendientes de la Etapa 3).
  */
 import 'dotenv/config';
+import { DEFAULT_WINDOW_MINUTES } from '../src/lib/engine/parameters';
 import { and, eq } from 'drizzle-orm';
 import { db } from '../src/lib/db/client';
 import { services, aggregatedWindows } from '../src/lib/db/schema';
@@ -22,7 +23,7 @@ function parseArgs() {
   const windowArg = args.find((a) => a.startsWith('--window='));
   const atArg = args.find((a) => a.startsWith('--at='));
   return {
-    windowMinutes: windowArg ? Number(windowArg.split('=')[1]) : 15,
+    windowMinutes: windowArg ? Number(windowArg.split('=')[1]) : DEFAULT_WINDOW_MINUTES,
     at: atArg ? new Date(atArg.split('=')[1]) : new Date(),
   };
 }

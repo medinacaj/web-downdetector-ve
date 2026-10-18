@@ -1,4 +1,5 @@
 import { and, eq, gt, sql } from 'drizzle-orm';
+import { REPORT_RATE_LIMIT } from '@/lib/engine/parameters';
 import { db } from '@/lib/db/client';
 import { reports, services, issueTypes, states } from '@/lib/db/schema';
 import { createReportSchema } from '@/lib/validation/reports';
@@ -7,8 +8,8 @@ import { hashAnonymousId, hashIpPrefix, getClientIp } from '@/lib/privacy';
 import { checkRateLimit } from '@/lib/security/rate-limit';
 import { ok, apiError, withErrorHandling } from '@/lib/api/respond';
 
-const REPORT_LIMIT_PER_HASH = Number(process.env.RATE_LIMIT_REPORTS_MAX ?? 5);
-const REPORT_WINDOW_SECONDS = Number(process.env.RATE_LIMIT_REPORTS_WINDOW_SECONDS ?? 3600);
+const REPORT_LIMIT_PER_HASH = REPORT_RATE_LIMIT.max;
+const REPORT_WINDOW_SECONDS = REPORT_RATE_LIMIT.windowSeconds;
 
 /**
  * Puntuación inicial básica (brief, sección 11.2). Es deliberadamente

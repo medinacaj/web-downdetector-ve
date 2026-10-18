@@ -17,7 +17,8 @@ export function buildRobots(site: SiteConfig): MetadataRoute.Robots {
 }
 
 /** Páginas fijas del sitemap: las públicas ya disponibles en `src/lib/nav.ts`. */
-const STATIC_ROUTES = [ROUTE.home, ROUTE.services];
+// Las de la Etapa 4d entran solas al activarse en nav.ts (isRouteAvailable).
+const STATIC_ROUTES = [ROUTE.home, ROUTE.services, ROUTE.incidents, ROUTE.statistics, ROUTE.methodology, ROUTE.map];
 
 /**
  * sitemap.xml: solo URLs indexables, absolutas y canónicas. Con el sitio en

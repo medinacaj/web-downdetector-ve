@@ -21,11 +21,11 @@ export interface RouteInfo {
 export const ROUTE = {
   home: { href: '/', label: 'Inicio', available: true },
   services: { href: '/servicios', label: 'Servicios', available: true },
-  // Etapa 4d (pendiente): mapa, incidentes, estadísticas y metodología.
+  // Etapa 4d: incidentes y metodología hechos; mapa y estadísticas pendientes.
   map: { href: '/mapa', label: 'Mapa', available: false },
-  incidents: { href: '/incidentes', label: 'Incidentes', available: false },
+  incidents: { href: '/incidentes', label: 'Incidentes', available: true },
   statistics: { href: '/estadisticas', label: 'Estadísticas', available: false },
-  methodology: { href: '/metodologia', label: 'Metodología', available: false },
+  methodology: { href: '/metodologia', label: 'Metodología', available: true },
 } as const satisfies Record<string, RouteInfo>;
 
 export function isRouteAvailable(route: RouteInfo): boolean {

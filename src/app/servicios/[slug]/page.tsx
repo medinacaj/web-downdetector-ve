@@ -2,6 +2,8 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { getServiceDetailData } from '@/lib/queries/service-detail';
 import { StatusBadge } from '@/components/ui/StatusBadge';
+import { INCIDENT_STATUS_LABELS_ES } from '@/lib/engine/status-bands';
+import { formatDateTime } from '@/lib/format';
 import { ReportForm } from '@/components/service/ReportForm';
 import { pageMetadata } from '@/lib/seo/metadata';
 import { ROUTE, categoryHref, serviceHref } from '@/lib/nav';
@@ -15,23 +17,7 @@ import { Breadcrumbs } from '@/components/layout/Breadcrumbs';
 // Datos en vivo: se renderiza en cada petición (si no, `next build` la congela).
 export const dynamic = 'force-dynamic';
 
-function formatDateTime(date: Date | null) {
-  if (!date) return null;
-  return new Intl.DateTimeFormat('es-VE', {
-    timeZone: 'America/Caracas',
-    dateStyle: 'medium',
-    timeStyle: 'short',
-  }).format(date);
-}
 
-const INCIDENT_STATUS_LABELS: Record<string, string> = {
-  possible: 'Posible interrupción',
-  detected: 'Interrupción detectada',
-  high_confidence: 'Interrupción de alta confianza',
-  confirmed: 'Confirmado por el proveedor',
-  recovering: 'En recuperación',
-  resolved: 'Resuelto',
-};
 
 export async function generateMetadata({
   params,
@@ -178,14 +164,17 @@ export default async function ServiceDetailPage({ params }: { params: Promise<{ 
             {recentIncidents.map((inc) => (
               <li key={inc.id} className="flex flex-wrap items-center justify-between gap-2 py-3 text-sm">
                 <div>
-                  <p className="font-medium">{INCIDENT_STATUS_LABELS[inc.status] ?? inc.status}</p>
+                  <p className="font-medium">{INCIDENT_STATUS_LABELS_ES[inc.status] ?? inc.status}</p>
                   <p className="text-ink-muted">
                     {formatDateTime(inc.startedAt)}
                     {inc.endedAt ? ` – ${formatDateTime(inc.endedAt)}` : ' – en curso'}
                   </p>
                 </div>
+                {/* Resuelto: la confianza guardada es la del último ciclo, no la del incidente. */}
                 <span className="font-mono text-xs text-ink-muted tabular-nums">
-                  confianza {Math.round(inc.confidence)}/100
+                  {inc.status === 'resolved'
+                    ? inc.peakAt && `máximo: ${formatDateTime(inc.peakAt)}`
+                    : `confianza ${Math.round(inc.confidence)}/100`}
                 </span>
               </li>
             ))}

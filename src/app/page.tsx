@@ -30,9 +30,10 @@ function formatUpdatedAt(date: Date) {
 }
 
 const METHODOLOGY_STEPS = [
-  { title: 'Recopilación', text: 'Reportes ciudadanos anónimos y mediciones técnicas automáticas.' },
+  // Sin mediciones técnicas: aún no están activas (ver /metodologia, sección 1).
+  { title: 'Recopilación', text: 'Reportes ciudadanos anónimos, sin datos personales.' },
   { title: 'Comparación', text: 'Cada ventana se compara contra el comportamiento habitual de ese servicio, no contra un umbral fijo.' },
-  { title: 'Validación', text: 'Diversidad de reportantes, persistencia y señales técnicas antes de confiar en una desviación.' },
+  { title: 'Validación', text: 'Diversidad de reportantes, persistencia y dispersión geográfica antes de confiar en una desviación.' },
   { title: 'Publicación del estado', text: 'Un estado prudente, nunca una afirmación categórica sin evidencia suficiente.' },
 ];
 
@@ -50,8 +51,8 @@ export default async function HomePage() {
               Consulta si un servicio está presentando problemas en Venezuela
             </h1>
             <p className="mt-4 max-w-md text-ink-muted">
-              Reportes ciudadanos anónimos y mediciones técnicas, combinados con un motor
-              estadístico explicable. Independiente de cualquier proveedor.
+              Reportes ciudadanos anónimos analizados por un motor estadístico explicable.
+              Independiente de cualquier proveedor.
             </p>
 
             <form action="/servicios" className="mt-7 flex max-w-md gap-2">

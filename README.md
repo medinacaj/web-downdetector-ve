@@ -6,12 +6,13 @@ plataformas digitales, streaming, videojuegos, delivery y movilidad, y
 apuestas y loterías. No es una copia de Downdetector ni de ninguna plataforma
 existente: identidad visual, arquitectura, código y metodología propios.
 
-**Estado actual del proyecto: Etapa 4c de 10 — inicio + directorio +
-página de servicio con reporte funcional.**
+**Estado actual del proyecto: Etapa 4d de 10, en curso — ya hay inicio,
+directorio, categorías, página de servicio con reporte funcional, incidentes
+y metodología.**
 Ver `docs/00-PLAN-MAESTRO.md` para la evaluación completa, la arquitectura y
 el plan de etapas. Ya se puede reportar una falla desde la interfaz, de
-verdad — no solo vía la API. Falta: mapa, incidentes, estadísticas,
-metodología, y el gráfico de la página de servicio.
+verdad — no solo vía la API. Falta: mapa, estadísticas y el gráfico de la
+página de servicio.
 
 **Todavía no está listo para publicarse.** Ya hay `robots.txt`, `sitemap.xml`
 y política de indexación: **noindex global** mientras los datos sean
@@ -50,7 +51,8 @@ dominio, hosting y Search Console. Ver `docs/SEO-PENDIENTE.md`.
   tanto en la base de datos como a través de la API pública.
 - Configuración de proyecto (Next.js 16, Tailwind, TypeScript, Vitest) y
   variables de entorno documentadas con valores por defecto seguros.
-- 85 pruebas automatizadas (datos estructurados JSON-LD, metadata de página: canonical, Open Graph y Twitter,
+- 88 pruebas automatizadas (estado "Sin datos suficientes" sin historia,
+  datos estructurados JSON-LD, metadata de página: canonical, Open Graph y Twitter,
   renderizado dinámico de las páginas con datos,
   datos semilla y calidad del catálogo, registro
   de rutas de navegación, configuración SEO e indexación (robots, sitemap), privacidad, bandas de estado, integración real de
@@ -60,6 +62,12 @@ dominio, hosting y Search Console. Ver `docs/SEO-PENDIENTE.md`.
   datos en vivo, incidentes activos, servicios, metodología resumida.
   Header, footer, modo oscuro con selector y tipografía (Space Grotesk +
   Inter + JetBrains Mono) ya están en su lugar para el resto del sitio.
+- **Incidentes** (`/incidentes`): los activos y los resueltos en los últimos
+  30 días que detecta el motor, con estado, duración y estados afectados.
+  En los resueltos se muestra cuándo fue el máximo, no la confianza final.
+- **Metodología** (`/metodologia`): cómo se calcula todo, con los mismos
+  parámetros que usa el motor (`src/lib/engine/parameters.ts`): si cambian,
+  la página se actualiza sola. Dice qué no está activo todavía.
 - **Páginas de categoría** (`/categorias/:slug`): una por categoría, con
   su introducción, sus servicios con estado y enlaces a las demás; el
   directorio y cada servicio enlazan a ellas. En apuestas y loterías, el
@@ -125,8 +133,9 @@ catálogo real — existe solo para ejercitar el motor (brief, sección 28).
 
 Del frontend: el gráfico principal de la página de servicio (`recharts`
 ya instalado, sin usar), mapa nacional (cartograma — los datos
-`grid_row`/`grid_col` ya existen desde la Etapa 1), página de incidentes
-global, estadísticas, metodología completa. El formulario de reporte
+`grid_row`/`grid_col` ya existen desde la Etapa 1) y estadísticas. Las
+mediciones técnicas automáticas no existen (la portada ya no las anuncia).
+El formulario de reporte
 funciona pero sin Turnstile ni geolocalización (Etapa 5).
 
 SEO técnico: solo lo que depende de terceros (dominio, hosting, Search
@@ -191,7 +200,7 @@ esta carpeta. Cómo llegó aquí el proyecto, qué falta resolver y qué se veri
 | `npm run dev` / `build` / `start` | Next.js (inicio, directorio, página de servicio y API reales). `build` necesita acceso a Google Fonts |
 | `bash scripts/dev-bootstrap.sh` | Entorno de desarrollo desde cero (ver "Instalación"); idempotente, nunca toca un `.env` existente |
 | `npm run typecheck` | `tsc --noEmit` |
-| `npm test` / `test:watch` | Vitest (85 pruebas; las de integración de reportes requieren Postgres real) |
+| `npm test` / `test:watch` | Vitest (88 pruebas; las de integración de reportes requieren Postgres real) |
 | `npm run db:generate` | Genera migración SQL a partir de `schema.ts` |
 | `npm run db:migrate` | `drizzle-kit push` (sincroniza esquema directo, sin historial — útil en dev) |
 | `npm run db:migrate:deploy` | Aplica las migraciones versionadas de `drizzle/` |

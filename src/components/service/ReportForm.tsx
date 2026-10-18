@@ -182,7 +182,7 @@ export function ReportForm({
           {isRouteAvailable(ROUTE.methodology) && (
             <>
               {' '}
-              <a href={ROUTE.methodology.href} className="underline underline-offset-2 hover:text-ink">
+              <a href={`${ROUTE.methodology.href}#privacidad`} className="underline underline-offset-2 hover:text-ink">
                 Cómo se protege la ubicación
               </a>
               .

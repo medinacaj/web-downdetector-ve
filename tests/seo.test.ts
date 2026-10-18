@@ -4,6 +4,7 @@ import { join } from 'node:path';
 import { LOCAL_ORIGIN, absoluteUrl, resolveSiteConfig } from '../src/lib/seo/site';
 import { buildRobots, buildSitemap } from '../src/lib/seo/crawl';
 import { pageMetadata } from '../src/lib/seo/metadata';
+import { ROUTE } from '../src/lib/nav';
 import { breadcrumbJsonLd, serializeJsonLd, siteJsonLd } from '../src/lib/seo/json-ld';
 
 const PROD = { SITE_URL: 'https://pulsove.example', SITE_INDEXING: 'true' };
@@ -68,11 +69,21 @@ describe('seo: sitemap.xml', () => {
     expect(urls).toEqual([
       'https://pulsove.example',
       'https://pulsove.example/servicios',
+      'https://pulsove.example/incidentes',
+      'https://pulsove.example/metodologia',
       'https://pulsove.example/categorias/streaming',
       'https://pulsove.example/servicios/banesco',
       'https://pulsove.example/servicios/netflix',
     ]);
     for (const url of urls) expect(url).toMatch(/^https:\/\/pulsove\.example(\/[a-z0-9-]+)*$/);
+  });
+
+  it('solo incluye páginas fijas disponibles según src/lib/nav.ts', () => {
+    const urls = buildSitemap(resolveSiteConfig(PROD), { categories: [], services: [] }).map((e) => e.url);
+    for (const route of Object.values(ROUTE)) {
+      const url = route.href === '/' ? 'https://pulsove.example' : `https://pulsove.example${route.href}`;
+      expect(urls.includes(url), route.href).toBe(route.available);
+    }
   });
 });
 

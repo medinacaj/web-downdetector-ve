@@ -17,7 +17,7 @@ export function Footer() {
               <span className="font-display text-sm font-semibold">PulsoVE</span>
             </div>
             <p className="mt-3 text-sm text-ink-muted">
-              Plataforma independiente de monitoreo ciudadano y técnico de servicios en
+              Plataforma independiente de monitoreo ciudadano de servicios en
               Venezuela. No está afiliada a ninguna de las empresas mencionadas en este
               sitio.
             </p>

@@ -63,7 +63,7 @@ confirmación en decisiones menores y sin dejar nada a medias.
 ```bash
 bash scripts/dev-bootstrap.sh         # entorno desde cero: deps, Postgres, .env, migraciones, semillas
 npm run dev                           # http://localhost:3000 (PORT=3100 npm run dev para otro puerto)
-npm run typecheck && npm test         # 85 pruebas; las de API usan Postgres real
+npm run typecheck && npm test         # 88 pruebas; las de API usan Postgres real
 npm run db:seed                       # idempotente (ver "Semillas y catálogo")
 npm run aggregate:run -- --window=15  # un ciclo del motor (cron externo)
 npm run dev:synthetic-traffic         # tráfico sintético; añade -- --cleanup para limpiarlo
@@ -77,14 +77,15 @@ comandos con base de datos comprueba que Postgres esté arriba (`pg_isready`;
 
 ## Mapa del código
 
-- `src/app/` — `page.tsx` (inicio), `servicios/` y `servicios/[slug]`, `categorias/[slug]`, `api/` (9
+- `src/app/` — `page.tsx` (inicio), `servicios/` y `servicios/[slug]`, `categorias/[slug]`, `incidentes/`, `metodologia/`, `api/` (9
   endpoints públicos), `robots.ts`, `sitemap.ts`, `not-found.tsx`, iconos (`favicon.ico`,
   `icon.svg`, `apple-icon.png`; se regeneran con `node scripts/generate-icons.mjs`) e
-  imagen para compartir (`opengraph-image.tsx`, `twitter-image.tsx`). Las páginas de mapa, incidentes, estadísticas y metodología (Etapa 4d)
+  imagen para compartir (`opengraph-image.tsx`, `twitter-image.tsx`). Las páginas de mapa y estadísticas (Etapa 4d)
   no existen: sus enlaces pasan por `src/lib/nav.ts`.
 - `src/lib/db/` — `schema.ts` (17 tablas), `client.ts`, `seed-data/` (categorías, tipos
   de problema, estados, servicios). `scripts/seed.ts` las siembra.
-- `src/lib/engine/` — agregación, línea base, anomalías, ciclo de vida de incidentes.
+- `src/lib/engine/` — agregación, línea base, anomalías, ciclo de vida de incidentes;
+  `parameters.ts` reúne pesos, umbrales y bandas (sin dependencias).
 - `src/lib/queries/` — lecturas compartidas por API y páginas (`status.ts` deriva el
   estado). `src/lib/api/respond.ts` (sobre de respuesta), `security/`, `privacy.ts`,
   `validation/`, `nav.ts` (registro de rutas), `seo/` (`site.ts`: `SITE_URL` y política
@@ -118,6 +119,11 @@ comandos con base de datos comprueba que Postgres esté arriba (`pg_isready`;
 - JSON-LD solo con datos reales y visibles (`src/lib/seo/json-ld.ts`, `<JsonLd>`). Las
   migas de pan van con `<Breadcrumbs>` (`src/components/layout/`): pinta la visible y su
   `BreadcrumbList` desde la misma lista. Nada de `Rating`, `Service` ni contactos.
+- Parámetros del motor solo en `src/lib/engine/parameters.ts`: los usa el motor y los
+  muestra `/metodologia`, así la explicación pública nunca se desincroniza. En scripts,
+  `import 'dotenv/config'` va **antes** que cualquier módulo que lo importe.
+- Estado visible: sin incidente abierto y con menos de 3 ventanas de línea base en la
+  franja → "Sin datos suficientes" (`windowStatus`), nunca "Normal".
 - Enlaces a servicios y categorías con `serviceHref(slug)` y `categoryHref(slug)` de
   `src/lib/nav.ts`, no escritos a mano.
 - Apuestas y loterías: el aviso legal lo ponen `GamblingNotice` y
@@ -181,14 +187,20 @@ páginas de categoría en `/categorias/<slug>` (URL elegida por la persona propi
 JSON-LD (`WebSite`, `Organization`, `BreadcrumbList`) y metadescripciones propias por
 servicio. **El SEO base está completo en local**; falta lo que depende de terceros.
 
-Pendiente, en orden: **4d** (gráfico histórico con `recharts`, mapa, incidentes,
-estadísticas, metodología; al crearlas, activar en `nav.ts`) · **5** Turnstile y
+Etapa 4d, primera parte (2026-10-18): `/incidentes` y `/metodologia`; corregido que un
+servicio sin historia saliera "Normal" y que la portada anunciara mediciones técnicas.
+
+Pendiente, en orden: **4d** (resto: `/mapa` y `/estadisticas`, luego el gráfico histórico
+con `recharts`; al crearlas, activar en `nav.ts`) · **5** Turnstile y
 geolocalización aproximada · **6** panel admin y `create-admin` (los slugs no deben poder
 editarse sin redirección; `/admin` con noindex y autenticación) · **7** abuso avanzado ·
 **8** tiempo real (SSE) · **9** observabilidad · **10** e2e/carga/Docker/CI, ESLint y las 17
 vulnerabilidades de herramientas de desarrollo (vitest/vite/esbuild; `npm audit --omit=dev` = 0).
 
-Brechas conocidas: señales técnica y oficial del motor sin fuente real (se excluyen y el
+Brechas conocidas: en los listados (inicio, directorio, categorías) el estado solo
+refleja incidentes abiertos, mientras que la página de servicio también usa la última
+ventana con historia suficiente; los incidentes resueltos no guardan su confianza máxima
+(solo `peak_at`); señales técnica y oficial del motor sin fuente real (se excluyen y el
 resto se renormaliza); municipios sin sembrar; el directorio hace una consulta de estado
 por servicio (N+1; ~0,15 s con 71 servicios en local; también en las páginas de
 categoría); no hay índice `/categorias` (404; el directorio cumple esa función); no hay dominio todavía (S3: dominio y redirecciones; S12: rendimiento en producción) y el SEO no se probó contra uno real ni en

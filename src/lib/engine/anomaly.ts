@@ -3,20 +3,14 @@ import { db } from '@/lib/db/client';
 import { aggregatedWindows, baselines, officialUpdates } from '@/lib/db/schema';
 import { modifiedZScore } from './robust-stats';
 import { getCaracasWeekdayHour } from './time-bucket';
+import { RELIABILITY_BANDS, RELIABILITY_FULL, SIGNAL_WEIGHTS } from './parameters';
 
 /**
  * Pesos de la sección 9.4 del brief, vía .env (decisión ya tomada en
  * sesiones anteriores de este proyecto — no se mueve a tabla aquí, ver
  * docs/00-PLAN-MAESTRO.md sobre esa tensión sin resolver).
  */
-const WEIGHTS = {
-  deviation: Number(process.env.WEIGHT_DEVIATION ?? 0.4),
-  uniqueSources: Number(process.env.WEIGHT_UNIQUE_SOURCES ?? 0.2),
-  persistence: Number(process.env.WEIGHT_PERSISTENCE ?? 0.15),
-  geoDispersion: Number(process.env.WEIGHT_GEO_DISPERSION ?? 0.1),
-  technical: Number(process.env.WEIGHT_TECHNICAL ?? 0.1),
-  official: Number(process.env.WEIGHT_OFFICIAL ?? 0.05),
-};
+const WEIGHTS = SIGNAL_WEIGHTS; // valores en ./parameters.ts (también los muestra /metodologia)
 
 function clamp(v: number, min = 0, max = 100): number {
   return Math.max(min, Math.min(max, v));
@@ -50,10 +44,7 @@ export function combineWeightedSignals(signals: WeightedSignal[]): number {
  * Exportada (antes privada) para poder probarla sin BD.
  */
 export function reliabilityFactor(sampleSize: number): number {
-  if (sampleSize < 3) return 0.25;
-  if (sampleSize < 8) return 0.55;
-  if (sampleSize < 15) return 0.8;
-  return 1.0;
+  return RELIABILITY_BANDS.find((b) => sampleSize < b.belowSamples)?.factor ?? RELIABILITY_FULL;
 }
 
 export interface ScoreResult {
