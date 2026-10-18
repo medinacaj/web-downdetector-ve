@@ -31,22 +31,31 @@ function hmac(value: string): string {
  * individual.
  */
 export function hashIpPrefix(rawIp: string): string {
-  const ip = rawIp.trim();
+  const ip = rawIp.trim().toLowerCase();
 
-  if (ip.includes(':')) {
-    // IPv6: primeros 3 grupos hextet (/48)
-    const groups = ip.split(':').filter(Boolean).slice(0, 3);
-    return hmac(`v6:${groups.join(':')}`);
+  // Normalizar IPv4 embebido en IPv6 para evitar identidades diferentes
+  // de un mismo prefijo de red por su representación textual.
+  const mapped = /^::ffff:(\d{1,3}(?:\.\d{1,3}){3})$/.exec(ip);
+  if (mapped && isIP(mapped[1]) === 4) return hashIpPrefix(mapped[1]);
+
+  if (isIP(ip) === 6) {
+    const parts = ip.split('::');
+    const left = parts[0] ? parts[0].split(':') : [];
+    const right = parts.length === 2 && parts[1] ? parts[1].split(':') : [];
+    const groups = parts.length === 2
+      ? [...left, ...Array(Math.max(0, 8 - left.length - right.length)).fill('0'), ...right]
+      : ip.split(':');
+    if (groups.length === 8) {
+      return hmac('v6:' + groups.slice(0, 3).map(x => parseInt(x, 16).toString(16)).join(':'));
+    }
+    return hmac('v6:unknown');
   }
 
-  // IPv4: primeros 3 octetos (/24)
-  const octets = ip.split('.').slice(0, 3);
-  if (octets.length < 3) {
-    // Dirección no reconocible (proxy raro, IP local, etc.) — se agrupa
-    // bajo un cubo fijo en vez de fallar el reporte completo.
-    return hmac('v4:unknown');
+  if (isIP(ip) === 4) {
+    return hmac('v4:' + ip.split('.').slice(0, 3).map(x => Number(x)).join('.'));
   }
-  return hmac(`v4:${octets.join('.')}`);
+
+  return hmac('ip:unknown');
 }
 
 /**
