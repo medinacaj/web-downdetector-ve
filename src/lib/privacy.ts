@@ -1,4 +1,5 @@
 import { createHmac } from 'node:crypto';
+import { isIP } from 'node:net';
 
 /**
  * Nunca se almacena una IP completa ni un identificador permanente de
@@ -64,14 +65,15 @@ export function hashAnonymousId(deviceSeed: string): string {
  * un Route Handler de Next.js.
  */
 export function getClientIp(request: Request): string {
-  const xff = request.headers.get('x-forwarded-for');
-  if (xff) return xff.split(',')[0].trim();
-
-  const cfIp = request.headers.get('cf-connecting-ip');
-  if (cfIp) return cfIp.trim();
-
-  const realIp = request.headers.get('x-real-ip');
-  if (realIp) return realIp.trim();
-
-  return '0.0.0.0'; // sin proxy delante (dev local) — se agrupa como IP desconocida
+  // Solo confiar en la cabecera que el proxy/CDN autenticado y administrado
+  // SOBRESCRIBE. No aceptar X-Forwarded-For aportado libremente por el cliente.
+  const configured = process.env.TRUSTED_CLIENT_IP_HEADER?.toLowerCase().trim();
+  const trusted = ['x-forwarded-for', 'cf-connecting-ip', 'x-real-ip'];
+  if (!configured || !trusted.includes(configured)) return '0.0.0.0';
+  const raw = request.headers.get(configured);
+  if (!raw) return '0.0.0.0';
+  // X-Forwarded-For puede contener cadena de proxies; configurar únicamente
+  // si el ingress garantiza que reemplaza/elimina aportaciones del cliente.
+  const candidate = raw.split(',')[0].trim();
+  return isIP(candidate) ? candidate : '0.0.0.0';
 }
