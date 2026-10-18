@@ -32,6 +32,7 @@ export async function generateMetadata({
   if (!data) return { title: 'Servicio no encontrado' };
   return {
     title: `Estado de ${data.service.name} en Venezuela`,
+    alternates: { canonical: `/servicios/${encodeURIComponent(data.service.slug)}` },
     description: `Consulta reportes ciudadanos, incidentes y estado actual de ${data.service.name} (${data.service.category.name}) en Venezuela.`,
   };
 }
