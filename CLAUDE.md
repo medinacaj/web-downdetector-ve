@@ -63,7 +63,7 @@ confirmación en decisiones menores y sin dejar nada a medias.
 ```bash
 bash scripts/dev-bootstrap.sh         # entorno desde cero: deps, Postgres, .env, migraciones, semillas
 npm run dev                           # http://localhost:3000 (PORT=3100 npm run dev para otro puerto)
-npm run typecheck && npm test         # 98 pruebas; las de API usan Postgres real
+npm run typecheck && npm test         # 111 pruebas; las de API usan Postgres real
 npm run db:seed                       # idempotente (ver "Semillas y catálogo")
 npm run aggregate:run -- --window=15  # un ciclo del motor (cron externo)
 npm run dev:synthetic-traffic         # tráfico sintético; añade -- --cleanup para limpiarlo
@@ -87,14 +87,15 @@ comandos con base de datos comprueba que Postgres esté arriba (`pg_isready`;
 - `src/lib/engine/` — agregación, línea base, anomalías, ciclo de vida de incidentes;
   `parameters.ts` reúne pesos, umbrales y bandas (sin dependencias).
 - `src/lib/queries/` — lecturas compartidas por API y páginas (`status.ts` deriva el
-  estado). `src/lib/api/respond.ts` (sobre de respuesta), `security/`, `privacy.ts`,
+  estado). `src/lib/api/respond.ts` (sobre de respuesta), `security/` (rate limit,
+  `turnstile.ts`), `privacy.ts`, `geo.ts` (estado sugerido por cabeceras del hosting),
   `validation/`, `nav.ts` (registro de rutas), `seo/` (`site.ts`: `SITE_URL` y política
   de indexación; `crawl.ts`: robots y sitemap; `metadata.ts`: `pageMetadata`; `json-ld.ts`; `brand.ts`;
   `share-image.tsx`).
 - `src/components/` — `layout/`, `directory/`, `map/` (`Cartogram`), `seo/`, `service/`, `ui/`.
   `src/lib/map-scale.ts`: clases de color y abreviaturas del cartograma; `src/lib/history.ts`:
   serie y eje del gráfico de 24 h (`HistoryChart`, cargado con `LazyHistoryChart`).
-- `tests/` — Vitest (11 archivos). `drizzle/` — migraciones 0000 y 0001.
+- `tests/` — Vitest (13 archivos). `drizzle/` — migraciones 0000 y 0001.
 - `docs/` — plan maestro, catálogo de servicios, SEO pendiente, migración a Code.
 
 ## Convenciones
@@ -136,6 +137,13 @@ comandos con base de datos comprueba que Postgres esté arriba (`pg_isready`;
   `statistics.ts`); la API solo las envuelve.
 - Enlaces a servicios y categorías con `serviceHref(slug)` y `categoryHref(slug)` de
   `src/lib/nav.ts`, no escritos a mano.
+- Turnstile (`src/lib/security/turnstile.ts`): desactivado por defecto; activado, **falla
+  cerrada** (sin claves o sin respuesta de Cloudflare → 503) y nunca envía la IP. Su
+  widget solo se carga si el servidor pasa la clave pública. Probado con `fetch`
+  simulado; **no** contra Cloudflare (la red del sandbox bloquea challenges.cloudflare.com).
+- Formulario de reporte: problema y estado empiezan vacíos ("Elige…") salvo estado
+  sugerido por `suggestStateCode` (cabeceras de Vercel/Cloudflare): no preseleccionar
+  nunca el primero de la lista (sesgaba los datos hacia Amazonas).
 - Apuestas y loterías: el aviso legal lo ponen `GamblingNotice` y
   `GAMBLING_META_DISCLAIMER` (`src/components/service/GamblingNotice.tsx`) en la página
   de cada servicio y en la de la categoría, incluida su metadescripción. No lo metas en
@@ -204,13 +212,16 @@ servicio sin historia saliera "Normal" y que la portada anunciara mediciones té
 Segunda parte (2026-10-18): `/mapa` (cartograma) y `/estadisticas`. Tercera parte
 (2026-10-18): gráfico de 24 h en la página de servicio. **Etapa 4 completa.**
 
-Pendiente, en orden: **5** Turnstile y
-geolocalización aproximada · **6** panel admin y `create-admin` (los slugs no deben poder
+Etapa 5 (2026-10-19): Turnstile (desactivado, falla cerrada, sin probar con Cloudflare
+real) y estado sugerido por cabeceras del hosting (sin probar en un hosting real).
+
+Pendiente, en orden: **6** panel admin y `create-admin` (los slugs no deben poder
 editarse sin redirección; `/admin` con noindex y autenticación) · **7** abuso avanzado ·
 **8** tiempo real (SSE) · **9** observabilidad · **10** e2e/carga/Docker/CI, ESLint y las 17
 vulnerabilidades de herramientas de desarrollo (vitest/vite/esbuild; `npm audit --omit=dev` = 0).
 
-Brechas conocidas: en los listados (inicio, directorio, categorías) el estado solo
+Brechas conocidas: Turnstile y el estado sugerido no se han probado contra Cloudflare ni
+en un hosting real; en los listados (inicio, directorio, categorías) el estado solo
 refleja incidentes abiertos, mientras que la página de servicio también usa la última
 ventana con historia suficiente; los incidentes resueltos no guardan su confianza máxima
 (solo `peak_at`); señales técnica y oficial del motor sin fuente real (se excluyen y el

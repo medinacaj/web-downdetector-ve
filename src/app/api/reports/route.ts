@@ -1,5 +1,6 @@
 import { and, eq, gt, sql } from 'drizzle-orm';
 import { REPORT_RATE_LIMIT } from '@/lib/engine/parameters';
+import { getTurnstileConfig, verifyTurnstileToken } from '@/lib/security/turnstile';
 import { db } from '@/lib/db/client';
 import { reports, services, issueTypes, states } from '@/lib/db/schema';
 import { createReportSchema } from '@/lib/validation/reports';
@@ -74,6 +75,23 @@ async function handlePOST(request: Request) {
     });
   }
   const input = parsed.data;
+
+  // Turnstile (Etapa 5), antes de tocar la base: falla cerrada si está activado.
+  const turnstile = getTurnstileConfig();
+  if (turnstile.enabled) {
+    if ('misconfigured' in turnstile) {
+      console.error(`[turnstile] ${turnstile.misconfigured}`);
+      return apiError('service_unavailable', 'No pudimos verificar el reporte en este momento. Intenta de nuevo más tarde.');
+    }
+    const check = await verifyTurnstileToken(input.turnstileToken, turnstile.secretKey);
+    if (!check.ok) {
+      if (check.reason === 'unavailable') {
+        console.error(`[turnstile] verificación no disponible: ${check.detail}`);
+        return apiError('service_unavailable', 'No pudimos verificar el reporte en este momento. Intenta de nuevo más tarde.');
+      }
+      return apiError('verification_failed', 'No pudimos confirmar que el reporte lo envía una persona. Vuelve a intentarlo.');
+    }
+  }
 
   // Resolver referencias por slug/código a id — 404 explícito si no existen,
   // nunca insertar con una referencia adivinada.

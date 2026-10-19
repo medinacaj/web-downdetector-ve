@@ -12,6 +12,7 @@ import {
 } from '@/lib/engine/parameters';
 import { STATUS_BANDS, STATUS_LABELS_ES } from '@/lib/engine/status-bands';
 import { pageMetadata } from '@/lib/seo/metadata';
+import { getTurnstileSiteKey } from '@/lib/security/turnstile';
 import { ROUTE, isRouteAvailable } from '@/lib/nav';
 
 // Las cifras salen de los mismos parámetros que usa el motor (src/lib/engine/parameters.ts),
@@ -289,6 +290,16 @@ export default function MethodologyPage() {
             La ubicación es solo el estado (y la ciudad, si la escribes). Nunca coordenadas. Las cifras por región
             se muestran siempre agregadas, nunca como reportes individuales.
           </li>
+          <li>
+            El estado puede aparecer ya elegido según la región que el proveedor de red del sitio asocia a tu conexión.
+            Es solo una sugerencia que puedes cambiar; no se usa GPS ni se guarda nada aparte del estado que envíes.
+          </li>
+          {getTurnstileSiteKey() && (
+            <li>
+              Para frenar envíos automáticos, el formulario usa Cloudflare Turnstile. PulsoVE no le envía tu dirección
+              IP; el propio widget se comunica con Cloudflare desde tu navegador.
+            </li>
+          )}
         </ul>
       </Section>
 

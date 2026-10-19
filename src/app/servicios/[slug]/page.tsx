@@ -1,5 +1,8 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
+import { headers } from 'next/headers';
+import { suggestStateCode } from '@/lib/geo';
+import { getTurnstileSiteKey, TURNSTILE_SCRIPT_URL } from '@/lib/security/turnstile';
 import { getServiceDetailData } from '@/lib/queries/service-detail';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { INCIDENT_STATUS_LABELS_ES } from '@/lib/engine/status-bands';
@@ -52,6 +55,7 @@ export default async function ServiceDetailPage({ params }: { params: Promise<{ 
 
   const { service, statusDetail, issueTypeOptions, issueBreakdown, recentIncidents, affectedStates, allStates } = data;
   const history = await getServiceHistory(service.id);
+  const turnstileSiteKey = getTurnstileSiteKey();
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-10 sm:px-6">
@@ -114,7 +118,13 @@ export default async function ServiceDetailPage({ params }: { params: Promise<{ 
         <h2 className="font-display text-lg font-semibold">Reportar un problema</h2>
         <p className="mt-1 text-sm text-ink-muted">Toma menos de 20 segundos y es anónimo.</p>
         <div className="mt-4">
-          <ReportForm serviceSlug={service.slug} issueTypes={issueTypeOptions} states={allStates} />
+          <ReportForm
+            serviceSlug={service.slug}
+            issueTypes={issueTypeOptions}
+            states={allStates}
+            suggestedStateCode={suggestStateCode(await headers(), new Set(allStates.map((s) => s.code)))}
+            turnstile={turnstileSiteKey ? { siteKey: turnstileSiteKey, scriptUrl: TURNSTILE_SCRIPT_URL } : null}
+          />
         </div>
       </section>
 

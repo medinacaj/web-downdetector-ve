@@ -12,6 +12,8 @@ export type ApiErrorCode =
   | 'not_found'
   | 'rate_limited'
   | 'suspicious_activity'
+  | 'verification_failed'
+  | 'service_unavailable'
   | 'internal_error';
 
 const STATUS_BY_CODE: Record<ApiErrorCode, number> = {
@@ -19,6 +21,9 @@ const STATUS_BY_CODE: Record<ApiErrorCode, number> = {
   not_found: 404,
   rate_limited: 429,
   suspicious_activity: 422,
+  // Turnstile (Etapa 5): el token no superó la verificación / no se pudo verificar.
+  verification_failed: 400,
+  service_unavailable: 503,
   internal_error: 500,
 };
 

@@ -19,6 +19,8 @@ export const createReportSchema = z.object({
   // Generado y persistido por el cliente (p. ej. UUID en localStorage).
   // Nunca es un dato personal; ver src/lib/privacy.ts.
   deviceSeed: z.string().min(8).max(128),
+  // Token del widget de Turnstile; solo se exige si ENABLE_TURNSTILE="true" (Etapa 5).
+  turnstileToken: z.string().max(2048).optional(),
 });
 
 export type CreateReportInput = z.infer<typeof createReportSchema>;

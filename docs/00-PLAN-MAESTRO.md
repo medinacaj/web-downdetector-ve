@@ -188,7 +188,7 @@ reevaluar `@neondatabase/serverless` o un pool externo (PgBouncer).
 | 3 | Motor de agregación y anomalías (`aggregate:run`), apertura/cierre de incidentes | 2 | **Completada** |
 | 4 | Frontend público: inicio, directorio, página de servicio, mapa, incidentes, estadísticas, metodología | 2, 3 | **Completada** — 4a (layout + inicio), 4b (directorio), 4c (página de servicio con reporte) y 4d (incidentes, metodología, mapa, estadísticas y gráfico de 24 h) |
 | SEO | SEO técnico e indexación: dominio y `metadataBase`, `robots.ts`, `sitemap.ts`, canonical, Open Graph, favicon, datos estructurados y decisión de indexación. Regla permanente de la persona propietaria: forma parte de cada entrega web | 4a–4c | **En curso** — política de indexación decidida (opción A: noindex global mientras todo sea demostrativo), `robots.ts`, `sitemap.ts`, `SITE_URL` y `metadataBase` hechos (2026-10-11); canonical, Open Graph, favicon, 404 propia, páginas de categoría, JSON-LD y metadescripciones por servicio (2026-10-18). **Completo en local**; faltan dominio, hosting y Search Console. Ver `docs/SEO-PENDIENTE.md` |
-| 5 | Formulario de reporte conectado de extremo a extremo (UI + API + Turnstile + geolocalización aproximada) | 2, 4 | Pendiente |
+| 5 | Formulario de reporte conectado de extremo a extremo (UI + API + Turnstile + geolocalización aproximada) | 2, 4 | **Hecha en código (2026-10-19)** — Turnstile desactivado por defecto y sin probar contra Cloudflare real; estado sugerido sin probar en un hosting real |
 | 6 | Panel administrativo (auth, CRUD servicios/categorías, incidentes, moderación, auditoría, `create-admin`) | 1–3 | Pendiente |
 | 7 | Prevención de abuso avanzada: puntuación de confianza, detección de campañas coordinadas | 2, 3 | Pendiente |
 | 8 | Tiempo real (SSE) con reconexión y degradación a polling | 2, 3 | Pendiente |
@@ -254,7 +254,7 @@ web-downdetector-ve/
 │   │   ├── map/                  # Cartogram
 │   │   ├── layout/               # Header, Footer, Breadcrumbs (miga visible + BreadcrumbList)
 │   │   ├── seo/                  # JsonLd
-│   │   ├── service/              # ReportForm, GamblingNotice, HistoryChart + LazyHistoryChart
+│   │   ├── service/              # ReportForm, TurnstileWidget, GamblingNotice, HistoryChart + LazyHistoryChart
 │   │   └── ui/                   # StatusBadge, ThemeToggle
 │   └── lib/
 │       ├── api/respond.ts        # sobre de respuesta { data, meta } / { error }
@@ -266,10 +266,11 @@ web-downdetector-ve/
 │       ├── history.ts            # serie, incidentes y eje del gráfico de 24 h
 │       ├── map-scale.ts          # clases de color y abreviaturas del cartograma
 │       ├── queries/              # directory, home, incidents, map, service-detail, service-history, services, statistics, status
-│       ├── security/             # rate-limit, sanitize
+│       ├── security/             # rate-limit, sanitize, turnstile
+│       ├── geo.ts                # estado sugerido por cabeceras del hosting
 │       ├── seo/                  # site.ts (SITE_URL, SITE_INDEXING), crawl.ts (robots y sitemap), metadata.ts (pageMetadata), json-ld.ts, brand.ts, share-image.tsx
 │       └── validation/reports.ts
-├── tests/                        # 11 archivos de prueba + setup.ts; 98 pruebas
+├── tests/                        # 13 archivos de prueba + setup.ts; 111 pruebas
 ├── .env.example                  # .env no se versiona
 ├── .gitignore
 ├── drizzle.config.ts
@@ -886,3 +887,42 @@ esperados en `next dev`.
   del motor (pico, línea base e incidente abierto) y con reportes enviados por la API;
   Chromium a 390 y 1280 px en claro y oscuro, sin desbordes ni errores; tooltip con
   ratón y con teclado. Datos de prueba eliminados después.
+
+### Etapa 5 — 2026-10-19 (Turnstile y ubicación aproximada)
+
+- **Turnstile** (`src/lib/security/turnstile.ts`, `TurnstileWidget`): desactivado por
+  defecto. Con `ENABLE_TURNSTILE="true"`, `POST /api/reports` valida el token con la
+  API siteverify antes de tocar la base. **Falla cerrada**: sin token o rechazado → 400
+  `verification_failed`; sin claves, Cloudflare caído, error HTTP, respuesta extraña o
+  secreto rechazado → 503 `service_unavailable` (con el motivo en el log). No se envía
+  la IP del usuario (`remoteip` es opcional). Tiempo de espera de 5 s. El widget
+  (render explícito, español, tema automático) solo se carga si el servidor pasa la
+  clave pública, pide un token nuevo tras cada envío y, si su script no carga, lo
+  explica en el formulario.
+- **Ubicación aproximada** (`src/lib/geo.ts`): preselecciona el **estado** a partir de
+  las cabeceras de país y región de Vercel (`x-vercel-ip-country`/`-region`) o
+  Cloudflare (`cf-ipcountry`/`cf-region-code`), solo si el país es VE y el código
+  corresponde a un estado sembrado; la persona puede cambiarlo. Sin GPS, sin servicios
+  de terceros, sin bajar de estado y sin guardar nada aparte. La metodología lo cuenta.
+- **Fallo previo corregido (calidad de datos):** los desplegables de problema y estado
+  arrancaban en el primer elemento, así que quien no los tocaba reportaba "Amazonas" y
+  el primer tipo de problema. Ahora empiezan en "Elige…" y `required` impide enviar sin
+  elegir (salvo un estado sugerido).
+- Códigos de error nuevos en la API: `verification_failed` (400) y
+  `service_unavailable` (503).
+- Pruebas: 98 → **111** (`tests/turnstile.test.ts`, `tests/geo.test.ts`).
+- **Verificado:** `next dev` y `npm run build` + `npm start`. Formulario en Chromium:
+  sin elegir no hay envío; cabeceras de Vercel (VE/M) y de Cloudflare (VE/V) →
+  Miranda y Zulia preseleccionados y guardados; país CO o sin cabeceras → sin
+  sugerencia. Turnstile activado contra el Cloudflare **real**, inalcanzable desde el
+  sandbox: API sin token → 400, con token → 503, formulario con aviso y botón
+  desactivado. Desactivado: 0 peticiones a Cloudflare.
+- **No verificado:** Turnstile contra Cloudflare con claves reales (la red del entorno
+  bloquea `challenges.cloudflare.com` y su documentación); las cabeceras de ubicación en
+  un hosting real (aún no hay despliegue). Las pruebas de Turnstile inyectan las
+  respuestas de siteverify: prueban nuestro código, no a Cloudflare.
+- **Para activarlo (persona propietaria):** crear un widget de Turnstile en el panel de
+  Cloudflare con el dominio definitivo, poner `TURNSTILE_SITE_KEY` y
+  `TURNSTILE_SECRET_KEY` en el entorno del hosting (nunca en el repositorio),
+  `ENABLE_TURNSTILE="true"`, y comprobar un envío real. En Cloudflare como CDN, activar
+  la transformación de cabeceras de ubicación del visitante para la sugerencia de estado.

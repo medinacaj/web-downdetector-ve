@@ -8,7 +8,9 @@ existente: identidad visual, arquitectura, código y metodología propios.
 
 **Estado actual del proyecto: Etapa 4 de 10 completada — inicio,
 directorio, categorías, página de servicio con reporte funcional y gráfico
-de 24 horas, incidentes, metodología, mapa y estadísticas.** Siguiente: Etapa 5.
+de 24 horas, incidentes, metodología, mapa y estadísticas. Etapa 5 hecha en el
+código (Turnstile y estado sugerido), con Turnstile desactivado y pendiente de
+probar con claves reales.** Siguiente: Etapa 6 (panel de administración).
 Ver `docs/00-PLAN-MAESTRO.md` para la evaluación completa, la arquitectura y
 el plan de etapas. Ya se puede reportar una falla desde la interfaz, de
 verdad — no solo vía la API.
@@ -50,7 +52,8 @@ dominio, hosting y Search Console. Ver `docs/SEO-PENDIENTE.md`.
   tanto en la base de datos como a través de la API pública.
 - Configuración de proyecto (Next.js 16, Tailwind, TypeScript, Vitest) y
   variables de entorno documentadas con valores por defecto seguros.
-- 98 pruebas automatizadas (serie y eje del gráfico histórico, escala y abreviaturas del mapa, estado "Sin datos suficientes" sin historia,
+- 111 pruebas automatizadas (Turnstile ante cada respuesta posible de
+  Cloudflare, estado sugerido por cabeceras, serie y eje del gráfico histórico, escala y abreviaturas del mapa, estado "Sin datos suficientes" sin historia,
   datos estructurados JSON-LD, metadata de página: canonical, Open Graph y Twitter,
   renderizado dinámico de las páginas con datos,
   datos semilla y calidad del catálogo, registro
@@ -88,7 +91,7 @@ dominio, hosting y Search Console. Ver `docs/SEO-PENDIENTE.md`.
 - **Página de servicio con reporte funcional** (`/servicios/:slug`):
   estado real, confianza, desglose de problemas, actividad geográfica,
   incidentes recientes — y un formulario de reporte que de verdad
-  funciona (sin Turnstile ni geolocalización todavía, eso es la Etapa 5).
+  funciona; desde la Etapa 5, con Turnstile opcional y estado sugerido.
 
 ## Endpoints disponibles
 
@@ -144,7 +147,8 @@ catálogo real — existe solo para ejercitar el motor (brief, sección 28).
 Del frontend público no falta ninguna página prevista. Las
 mediciones técnicas automáticas no existen (la portada ya no las anuncia).
 El formulario de reporte
-funciona pero sin Turnstile ni geolocalización (Etapa 5).
+usa Turnstile solo si se activa con claves reales (Etapa 5, sin probar
+contra Cloudflare: la red del entorno de desarrollo lo bloquea).
 
 SEO técnico: solo lo que depende de terceros (dominio, hosting, Search
 Console; `docs/SEO-PENDIENTE.md`).
@@ -208,7 +212,7 @@ esta carpeta. Cómo llegó aquí el proyecto, qué falta resolver y qué se veri
 | `npm run dev` / `build` / `start` | Next.js (inicio, directorio, página de servicio y API reales). `build` necesita acceso a Google Fonts |
 | `bash scripts/dev-bootstrap.sh` | Entorno de desarrollo desde cero (ver "Instalación"); idempotente, nunca toca un `.env` existente |
 | `npm run typecheck` | `tsc --noEmit` |
-| `npm test` / `test:watch` | Vitest (98 pruebas; las de integración de reportes requieren Postgres real) |
+| `npm test` / `test:watch` | Vitest (111 pruebas; las de integración de reportes requieren Postgres real) |
 | `npm run db:generate` | Genera migración SQL a partir de `schema.ts` |
 | `npm run db:migrate` | `drizzle-kit push` (sincroniza esquema directo, sin historial — útil en dev) |
 | `npm run db:migrate:deploy` | Aplica las migraciones versionadas de `drizzle/` |
