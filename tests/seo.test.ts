@@ -97,7 +97,8 @@ describe('seo: la política de indexación vive solo en el layout raíz', () => 
     const appDir = join(process.cwd(), 'src', 'app');
     const offenders = (readdirSync(appDir, { recursive: true }) as string[])
       .map((f) => f.replace(/\\/g, '/'))
-      .filter((f) => /(^|\/)(page|layout)\.tsx$/.test(f) && f !== 'layout.tsx')
+      // El panel (/admin) es la única excepción: privado y siempre en noindex (prueba aparte).
+      .filter((f) => /(^|\/)(page|layout)\.tsx$/.test(f) && f !== 'layout.tsx' && !f.startsWith('admin/'))
       .filter((f) => /\brobots\s*:/.test(readFileSync(join(appDir, f), 'utf8')));
     expect(offenders).toEqual([]);
   });
@@ -135,7 +136,7 @@ describe('seo: metadata de página', () => {
     const appDir = join(process.cwd(), 'src', 'app');
     const pages = (readdirSync(appDir, { recursive: true }) as string[])
       .map((f) => f.replace(/\\/g, '/'))
-      .filter((f) => /(^|\/)page\.tsx$/.test(f) && !f.startsWith('api/'));
+      .filter((f) => /(^|\/)page\.tsx$/.test(f) && !f.startsWith('api/') && !f.startsWith('admin/'));
     expect(pages.length).toBeGreaterThan(0);
     const missing = pages.filter((f) => !/pageMetadata\(/.test(readFileSync(join(appDir, f), 'utf8')));
     expect(missing).toEqual([]);
@@ -174,5 +175,21 @@ describe('seo: datos estructurados (JSON-LD)', () => {
     const out = serializeJsonLd({ name: '</script><script>alert(1)</script>' });
     expect(out).not.toContain('<');
     expect(JSON.parse(out)).toEqual({ name: '</script><script>alert(1)</script>' });
+  });
+});
+
+describe('seo: el panel de administración nunca es indexable', () => {
+  const appDir = join(process.cwd(), 'src', 'app');
+  it('src/app/admin/layout.tsx declara noindex y nofollow', () => {
+    const layout = readFileSync(join(appDir, 'admin', 'layout.tsx'), 'utf8');
+    expect(layout).toMatch(/robots:\s*\{\s*index:\s*false,\s*follow:\s*false\s*\}/);
+  });
+  it('next.config.mjs envía X-Robots-Tag: noindex en /admin', () => {
+    expect(readFileSync(join(process.cwd(), 'next.config.mjs'), 'utf8')).toMatch(/\/admin\/:path\*[\s\S]*X-Robots-Tag[\s\S]*noindex, nofollow/);
+  });
+  it('robots.txt y el sitemap no mencionan /admin', () => {
+    expect(JSON.stringify(buildRobots(resolveSiteConfig(PROD)))).not.toContain('admin');
+    const urls = buildSitemap(resolveSiteConfig(PROD), { categories: [], services: [] }).map((e) => e.url);
+    expect(urls.some((u) => u.includes('/admin'))).toBe(false);
   });
 });

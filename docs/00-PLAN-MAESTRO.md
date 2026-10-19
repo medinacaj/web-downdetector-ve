@@ -158,7 +158,7 @@ incidents + incident_regions + services.status (a añadir: Etapa 3)
 ### Datos
 
 Ver Parte 6 (en el propio `schema.ts`, que ya es la fuente de verdad) —
-17 tablas, descritas con su propósito en los comentarios del archivo.
+18 tablas (17 desde la Etapa 1 más `admin_sessions` de la Etapa 6), descritas con su propósito en los comentarios del archivo.
 
 ### Seguridad
 
@@ -189,7 +189,7 @@ reevaluar `@neondatabase/serverless` o un pool externo (PgBouncer).
 | 4 | Frontend público: inicio, directorio, página de servicio, mapa, incidentes, estadísticas, metodología | 2, 3 | **Completada** — 4a (layout + inicio), 4b (directorio), 4c (página de servicio con reporte) y 4d (incidentes, metodología, mapa, estadísticas y gráfico de 24 h) |
 | SEO | SEO técnico e indexación: dominio y `metadataBase`, `robots.ts`, `sitemap.ts`, canonical, Open Graph, favicon, datos estructurados y decisión de indexación. Regla permanente de la persona propietaria: forma parte de cada entrega web | 4a–4c | **En curso** — política de indexación decidida (opción A: noindex global mientras todo sea demostrativo), `robots.ts`, `sitemap.ts`, `SITE_URL` y `metadataBase` hechos (2026-10-11); canonical, Open Graph, favicon, 404 propia, páginas de categoría, JSON-LD y metadescripciones por servicio (2026-10-18). **Completo en local**; faltan dominio, hosting y Search Console. Ver `docs/SEO-PENDIENTE.md` |
 | 5 | Formulario de reporte conectado de extremo a extremo (UI + API + Turnstile + geolocalización aproximada) | 2, 4 | **Hecha en código (2026-10-19)** — Turnstile desactivado por defecto y sin probar contra Cloudflare real; estado sugerido sin probar en un hosting real |
-| 6 | Panel administrativo (auth, CRUD servicios/categorías, incidentes, moderación, auditoría, `create-admin`) | 1–3 | Pendiente |
+| 6 | Panel administrativo (auth, CRUD servicios/categorías, incidentes, moderación, auditoría, `create-admin`) | 1–3 | **En curso** — 6a (acceso: contraseña + TOTP obligatorio, sesiones en BD, `create-admin`, auditoría) hecha el 2026-10-19; 6b (gestión de contenidos) pendiente |
 | 7 | Prevención de abuso avanzada: puntuación de confianza, detección de campañas coordinadas | 2, 3 | Pendiente |
 | 8 | Tiempo real (SSE) con reconexión y degradación a polling | 2, 3 | Pendiente |
 | 9 | Observabilidad: logs estructurados, página de salud del sistema | 2–8 | Pendiente |
@@ -258,7 +258,7 @@ web-downdetector-ve/
 │   │   └── ui/                   # StatusBadge, ThemeToggle
 │   └── lib/
 │       ├── api/respond.ts        # sobre de respuesta { data, meta } / { error }
-│       ├── db/                   # client.ts, schema.ts (17 tablas), seed-data/ (categorías, tipos de problema, estados, servicios)
+│       ├── db/                   # client.ts, schema.ts (18 tablas), seed-data/ (categorías, tipos de problema, estados, servicios)
 │       ├── engine/               # aggregate, anomaly, baseline, incident-lifecycle, parameters, robust-stats, status-bands, time-bucket
 │       ├── nav.ts                # registro de rutas: enlaces solo a páginas que existen
 │       ├── privacy.ts
@@ -270,7 +270,7 @@ web-downdetector-ve/
 │       ├── geo.ts                # estado sugerido por cabeceras del hosting
 │       ├── seo/                  # site.ts (SITE_URL, SITE_INDEXING), crawl.ts (robots y sitemap), metadata.ts (pageMetadata), json-ld.ts, brand.ts, share-image.tsx
 │       └── validation/reports.ts
-├── tests/                        # 13 archivos de prueba + setup.ts; 111 pruebas
+├── tests/                        # 15 archivos de prueba + setup.ts; 125 pruebas
 ├── .env.example                  # .env no se versiona
 ├── .gitignore
 ├── drizzle.config.ts
@@ -926,3 +926,49 @@ esperados en `next dev`.
   `TURNSTILE_SECRET_KEY` en el entorno del hosting (nunca en el repositorio),
   `ENABLE_TURNSTILE="true"`, y comprobar un envío real. En Cloudflare como CDN, activar
   la transformación de cabeceras de ubicación del visitante para la sugerencia de estado.
+
+### Etapa 6a — 2026-10-19 (acceso al panel de administración)
+
+**Decisiones de la persona propietaria:** correo + contraseña con sesión guardada en la
+base (frente a JWT o enlace mágico) y segundo factor TOTP obligatorio.
+
+- **Cuentas:** `npm run create-admin` (contraseña por stdin o `ADMIN_PASSWORD`, nunca
+  por argumento; mínimo 12 caracteres; bcrypt coste 12). `--reset` pone contraseña
+  nueva, borra el TOTP y cierra todas las sesiones (recuperación de quien pierde el
+  teléfono). No hay registro público.
+- **Acceso** (`/admin/acceso` → `/verificar` o `/configurar-2fa` → `/admin`): contraseña
+  y luego código TOTP. TOTP propio (RFC 6238, `node:crypto`), probado con los vectores
+  oficiales de RFC 4226 y RFC 6238; ventana de ±1 paso; un código ya aceptado no vale
+  otra vez (`users.totp_last_step`). Secreto cifrado con AES-256-GCM
+  (`ADMIN_ENCRYPTION_KEY`), generado en la acción de acceso (un GET nunca escribe) y
+  mostrado con QR (`qrcode`) solo durante el alta.
+- **Sesiones** (`admin_sessions`, migraciones 0002 y 0003): token aleatorio de 256 bits
+  en cookie `httpOnly`, `Secure` en producción, `SameSite=Strict`, `path=/admin`; en la
+  base solo su SHA-256. Pendientes de segundo factor: 10 min; activas: 12 h o 2 h sin
+  uso. Token nuevo al completar el segundo factor (evita fijación). El panel lista las
+  sesiones abiertas y permite cerrar una o todas las demás.
+- **Autorización:** `requireAdmin()`/`requireStage()` en cada página y en cada Server
+  Action (guía de autenticación de Next 16: el layout no basta).
+- **Abuso:** mensaje genérico ("Correo o contraseña incorrectos"), comparación bcrypt
+  de relleno cuando el correo no existe (mismo tiempo de respuesta), 5 fallos por correo
+  y 20 por prefijo de IP cada 15 min, 5 códigos fallidos por sesión pendiente. Solo
+  cuentan los fallos (`peekRateLimit`/`resetRateLimit` nuevos).
+- **Auditoría:** cada intento y acción en `audit_logs` con hash del prefijo de IP.
+- **Indexación:** `noindex, nofollow` (meta y `X-Robots-Tag`), fuera de sitemap y de
+  robots.txt; con pruebas.
+- **Fallos propios corregidos antes de entregar:** el hash de relleno escrito a mano no
+  era un hash bcrypt válido (no igualaba tiempos); el límite contaba también los accesos
+  correctos (5 entradas legítimas bloqueaban la cuenta); tras un error se borraba el
+  correo escrito.
+- Dependencias nuevas: `qrcode` 1.5.4 y `server-only`; `npm audit --omit=dev` = 0.
+- Pruebas: 111 → **125**.
+- **Verificado:** `next dev` y `npm run build` + `npm start`; en Chromium, alta con QR,
+  código malo/bueno, código reutilizado rechazado, segundo navegador, cierre remoto de
+  sesión con efecto inmediato, cierre de sesión, bloqueo al sexto fallo incluso con la
+  contraseña buena; cookie con `Secure` en producción; en la base, secreto cifrado y
+  solo hashes de tokens. Los códigos de la prueba se calcularon con una implementación
+  TOTP independiente escrita en el script (comprobación cruzada). Cuenta y datos de
+  prueba borrados después.
+- **No verificado:** con Redis (los límites probados son los de memoria), detrás de un
+  proxy/CDN real (la IP sale de `x-forwarded-for`), apps autenticadoras reales escaneando
+  el QR (el código se calculó en el script).

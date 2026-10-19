@@ -10,7 +10,9 @@ existente: identidad visual, arquitectura, código y metodología propios.
 directorio, categorías, página de servicio con reporte funcional y gráfico
 de 24 horas, incidentes, metodología, mapa y estadísticas. Etapa 5 hecha en el
 código (Turnstile y estado sugerido), con Turnstile desactivado y pendiente de
-probar con claves reales.** Siguiente: Etapa 6 (panel de administración).
+probar con claves reales. Etapa 6 en curso: acceso al panel hecho (contraseña +
+segundo factor TOTP, sesiones revocables, auditoría); falta la gestión de
+contenidos.**
 Ver `docs/00-PLAN-MAESTRO.md` para la evaluación completa, la arquitectura y
 el plan de etapas. Ya se puede reportar una falla desde la interfaz, de
 verdad — no solo vía la API.
@@ -25,7 +27,7 @@ dominio, hosting y Search Console. Ver `docs/SEO-PENDIENTE.md`.
 
 ## Qué existe hoy
 
-- Esquema completo de base de datos (17 tablas) en Drizzle ORM, con
+- Esquema completo de base de datos (18 tablas; `admin_sessions` desde la Etapa 6) en Drizzle ORM, con
   migraciones generadas y verificadas contra PostgreSQL 16 real (incluida
   una segunda migración aditiva: `reports.network_carrier`).
 - Datos semilla verificados: 24 estados (códigos ISO 3166-2:VE reales), 8
@@ -52,7 +54,8 @@ dominio, hosting y Search Console. Ver `docs/SEO-PENDIENTE.md`.
   tanto en la base de datos como a través de la API pública.
 - Configuración de proyecto (Next.js 16, Tailwind, TypeScript, Vitest) y
   variables de entorno documentadas con valores por defecto seguros.
-- 111 pruebas automatizadas (Turnstile ante cada respuesta posible de
+- 125 pruebas automatizadas (TOTP con los vectores oficiales de RFC 4226 y
+  RFC 6238, cifrado del secreto, contraseñas, límite de intentos, Turnstile ante cada respuesta posible de
   Cloudflare, estado sugerido por cabeceras, serie y eje del gráfico histórico, escala y abreviaturas del mapa, estado "Sin datos suficientes" sin historia,
   datos estructurados JSON-LD, metadata de página: canonical, Open Graph y Twitter,
   renderizado dinámico de las páginas con datos,
@@ -153,10 +156,29 @@ contra Cloudflare: la red del entorno de desarrollo lo bloquea).
 SEO técnico: solo lo que depende de terceros (dominio, hosting, Search
 Console; `docs/SEO-PENDIENTE.md`).
 
-Panel administrativo, autenticación, tiempo real, mediciones técnicas
-activas (sección 10 del brief), moderación — Etapas 5 en adelante. Las
-carpetas para esto ya están planificadas en `src/app` pero sin
-implementar.
+Del panel de administración: la gestión de servicios y categorías,
+incidentes, comunicados oficiales, moderación de reportes y la consulta de la
+auditoría (Etapa 6b). Tiempo real, mediciones técnicas activas y abuso
+avanzado: Etapas 7 en adelante.
+
+## Panel de administración (`/admin`)
+
+Privado: `noindex, nofollow` (meta y cabecera `X-Robots-Tag`), fuera del
+sitemap y sin mencionarse en `robots.txt`. No hay registro público; las
+cuentas se crean desde el servidor:
+
+```bash
+printf '%s' 'contraseña-de-al-menos-12' | npm run create-admin -- --email persona@dominio.org
+printf '%s' 'contraseña-nueva' | npm run create-admin -- --email persona@dominio.org --reset   # perdió el teléfono
+```
+
+Acceso en dos pasos: contraseña (bcrypt) y código de una app autenticadora
+(TOTP, obligatorio; el alta se hace en el primer acceso, con QR). Sesiones
+guardadas en la base (en ella solo el hash del token), con cookie `httpOnly`,
+`Secure` en producción, `SameSite=Strict` y limitada a `/admin`; caducan a las
+12 h o tras 2 h sin uso y se pueden cerrar desde el panel. Solo cuentan los
+intentos fallidos: 5 por correo cada 15 min. Todo queda en `audit_logs`.
+Requiere `ADMIN_ENCRYPTION_KEY` (cifra los secretos TOTP).
 
 ## Requisitos
 
@@ -212,13 +234,13 @@ esta carpeta. Cómo llegó aquí el proyecto, qué falta resolver y qué se veri
 | `npm run dev` / `build` / `start` | Next.js (inicio, directorio, página de servicio y API reales). `build` necesita acceso a Google Fonts |
 | `bash scripts/dev-bootstrap.sh` | Entorno de desarrollo desde cero (ver "Instalación"); idempotente, nunca toca un `.env` existente |
 | `npm run typecheck` | `tsc --noEmit` |
-| `npm test` / `test:watch` | Vitest (111 pruebas; las de integración de reportes requieren Postgres real) |
+| `npm test` / `test:watch` | Vitest (125 pruebas; las de integración de reportes requieren Postgres real) |
 | `npm run db:generate` | Genera migración SQL a partir de `schema.ts` |
 | `npm run db:migrate` | `drizzle-kit push` (sincroniza esquema directo, sin historial — útil en dev) |
 | `npm run db:migrate:deploy` | Aplica las migraciones versionadas de `drizzle/` |
 | `npm run db:seed` | Carga los datos semilla (idempotente): sincroniza categorías y tipos de problema; inserta los estados y servicios que falten |
 | `npm run db:studio` | Explorador visual de la base de datos |
-| `npm run create-admin` | **Pendiente de implementar** (Etapa 6 — panel admin) |
+| `npm run create-admin` | Crea una cuenta del panel o, con `--reset`, restablece su acceso (contraseña por stdin) |
 | `npm run aggregate:run -- [--window=N] [--at=ISO]` | Un ciclo del motor: agregación + línea base + anomalías + incidentes |
 | `npm run dev:synthetic-traffic -- [--cleanup]` | Genera/limpia tráfico sintético para probar el motor (ver sección dedicada) |
 

@@ -30,14 +30,18 @@ fi
 # 2. .env (nunca se commitea; los secretos se generan aquí) ----------------
 if [ -f .env ]; then
   say '.env: ya existe, no se toca'
+  grep -qE '^ADMIN_ENCRYPTION_KEY="?[0-9a-fA-F]{64}"?$' .env ||
+    printf '⚠ .env sin ADMIN_ENCRYPTION_KEY válida (panel, Etapa 6). Añádela: echo "ADMIN_ENCRYPTION_KEY=\"$(openssl rand -hex 32)\"" >> .env\n'
 else
   command -v openssl >/dev/null || fail 'Falta openssl para generar los secretos de .env.'
   say '.env: creándolo desde .env.example con secretos nuevos'
   cp .env.example .env
   jwt=$(openssl rand -hex 32)
   salt=$(openssl rand -hex 32)
+  adminkey=$(openssl rand -hex 32)
   sed -i.bak -e "s|^JWT_SECRET=.*|JWT_SECRET=\"$jwt\"|" \
-    -e "s|^ANONYMIZATION_SALT=.*|ANONYMIZATION_SALT=\"$salt\"|" .env
+    -e "s|^ANONYMIZATION_SALT=.*|ANONYMIZATION_SALT=\"$salt\"|" \
+    -e "s|^ADMIN_ENCRYPTION_KEY=.*|ADMIN_ENCRYPTION_KEY=\"$adminkey\"|" .env
   rm -f .env.bak
 fi
 

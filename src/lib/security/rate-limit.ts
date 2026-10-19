@@ -94,3 +94,24 @@ export async function checkRateLimit(
 export function _resetMemoryRateLimits() {
   memoryBuckets.clear();
 }
+
+/**
+ * ¿Está ya agotado el límite de `key`? Consulta sin consumir un intento (el acceso al
+ * panel solo cuenta los fallos: un administrador que entra bien no gasta intentos).
+ */
+export async function peekRateLimit(key: string, limit: number): Promise<boolean> {
+  const redis = await getRedis();
+  if (redis) {
+    const count = Number((await redis.get(`ratelimit:${key}`)) ?? 0);
+    return count >= limit;
+  }
+  const bucket = memoryBuckets.get(key);
+  return Boolean(bucket && bucket.resetAt > Date.now() && bucket.count >= limit);
+}
+
+/** Pone a cero el contador de `key` (p. ej. tras un acceso correcto). */
+export async function resetRateLimit(key: string): Promise<void> {
+  const redis = await getRedis();
+  if (redis) await redis.del(`ratelimit:${key}`);
+  else memoryBuckets.delete(key);
+}

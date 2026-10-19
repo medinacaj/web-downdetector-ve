@@ -63,9 +63,10 @@ confirmación en decisiones menores y sin dejar nada a medias.
 ```bash
 bash scripts/dev-bootstrap.sh         # entorno desde cero: deps, Postgres, .env, migraciones, semillas
 npm run dev                           # http://localhost:3000 (PORT=3100 npm run dev para otro puerto)
-npm run typecheck && npm test         # 111 pruebas; las de API usan Postgres real
+npm run typecheck && npm test         # 125 pruebas; las de API usan Postgres real
 npm run db:seed                       # idempotente (ver "Semillas y catálogo")
 npm run aggregate:run -- --window=15  # un ciclo del motor (cron externo)
+printf '%s' 'contraseña' | npm run create-admin -- --email a@b.org [--reset]  # cuentas del panel
 npm run dev:synthetic-traffic         # tráfico sintético; añade -- --cleanup para limpiarlo
 npm run build && npm start            # producción; necesita acceso a Google Fonts (verificado el 2026-10-18)
 ```
@@ -77,12 +78,12 @@ comandos con base de datos comprueba que Postgres esté arriba (`pg_isready`;
 
 ## Mapa del código
 
-- `src/app/` — `page.tsx` (inicio), `servicios/` y `servicios/[slug]`, `categorias/[slug]`, `incidentes/`, `metodologia/`, `mapa/`, `estadisticas/`, `api/` (9
+- `src/app/` — `page.tsx` (inicio), `servicios/` y `servicios/[slug]`, `categorias/[slug]`, `incidentes/`, `metodologia/`, `mapa/`, `estadisticas/`, `admin/` (panel privado: `acceso/`, `actions.ts`), `api/` (9
   endpoints públicos), `robots.ts`, `sitemap.ts`, `not-found.tsx`, iconos (`favicon.ico`,
   `icon.svg`, `apple-icon.png`; se regeneran con `node scripts/generate-icons.mjs`) e
   imagen para compartir (`opengraph-image.tsx`, `twitter-image.tsx`). Todas las rutas de `src/lib/nav.ts` existen;
   una página futura se registra allí con `available: false` hasta crearla.
-- `src/lib/db/` — `schema.ts` (17 tablas), `client.ts`, `seed-data/` (categorías, tipos
+- `src/lib/db/` — `schema.ts` (18 tablas), `client.ts`, `seed-data/` (categorías, tipos
   de problema, estados, servicios). `scripts/seed.ts` las siembra.
 - `src/lib/engine/` — agregación, línea base, anomalías, ciclo de vida de incidentes;
   `parameters.ts` reúne pesos, umbrales y bandas (sin dependencias).
@@ -95,7 +96,9 @@ comandos con base de datos comprueba que Postgres esté arriba (`pg_isready`;
 - `src/components/` — `layout/`, `directory/`, `map/` (`Cartogram`), `seo/`, `service/`, `ui/`.
   `src/lib/map-scale.ts`: clases de color y abreviaturas del cartograma; `src/lib/history.ts`:
   serie y eje del gráfico de 24 h (`HistoryChart`, cargado con `LazyHistoryChart`).
-- `tests/` — Vitest (13 archivos). `drizzle/` — migraciones 0000 y 0001.
+- `src/lib/auth/` — `session.ts`, `dal.ts` (`requireAdmin`), `totp.ts`, `crypto.ts`, `password.ts`;
+  `src/lib/audit.ts`.
+- `tests/` — Vitest (15 archivos). `drizzle/` — migraciones 0000 a 0003.
 - `docs/` — plan maestro, catálogo de servicios, SEO pendiente, migración a Code.
 
 ## Convenciones
@@ -137,6 +140,13 @@ comandos con base de datos comprueba que Postgres esté arriba (`pg_isready`;
   `statistics.ts`); la API solo las envuelve.
 - Enlaces a servicios y categorías con `serviceHref(slug)` y `categoryHref(slug)` de
   `src/lib/nav.ts`, no escritos a mano.
+- Panel `/admin`: **toda** página y Server Action llama a `requireAdmin()` /
+  `requireStage()` (`src/lib/auth/dal.ts`); el layout no basta (no se re-ejecuta al
+  navegar y las acciones admiten POST directos). Única excepción permitida a la política
+  de indexación y a `pageMetadata` (lo comprueba `tests/seo.test.ts`): siempre
+  `noindex, nofollow`, nunca en sitemap ni en robots.txt. Cada acción del panel deja
+  una fila en `audit_logs` (`logAudit`). Mensajes de acceso genéricos (no revelar qué
+  correos existen); solo cuentan los fallos (`peekRateLimit` + `checkRateLimit`).
 - Turnstile (`src/lib/security/turnstile.ts`): desactivado por defecto; activado, **falla
   cerrada** (sin claves o sin respuesta de Cloudflare → 503) y nunca envía la IP. Su
   widget solo se carga si el servidor pasa la clave pública. Probado con `fetch`
@@ -185,6 +195,11 @@ de problema propios o su formulario solo ofrecería "Otro" (lo comprueba una pru
   ya pasaba antes; un `not-found.tsx` en el segmento no lo arregla.
 - `<html>` lleva `suppressHydrationWarning` a propósito: el script de tema añade `dark`
   antes de hidratar (sin él, todas las páginas daban aviso de hidratación en tema oscuro).
+- `ADMIN_ENCRYPTION_KEY` (64 hex) es obligatoria para el panel; el bootstrap solo la
+  genera en un `.env` nuevo y avisa si falta en uno existente. Si se pierde, todos deben
+  rehacer el alta TOTP (`create-admin --reset`).
+- React 19 vacía el formulario al terminar una Server Action: en pruebas e2e espera la
+  respuesta (o el mensaje de error) antes de volver a escribir.
 - `next build` reescribe `next-env.d.ts` (`.next/types` en vez de `.next/dev/types`) y
   `next dev` lo devuelve: no lo commitees (`git checkout next-env.d.ts`).
 - No borres `node_modules` con `next dev` en marcha: deja errores "Can't resolve
@@ -215,8 +230,13 @@ Segunda parte (2026-10-18): `/mapa` (cartograma) y `/estadisticas`. Tercera part
 Etapa 5 (2026-10-19): Turnstile (desactivado, falla cerrada, sin probar con Cloudflare
 real) y estado sugerido por cabeceras del hosting (sin probar en un hosting real).
 
-Pendiente, en orden: **6** panel admin y `create-admin` (los slugs no deben poder
-editarse sin redirección; `/admin` con noindex y autenticación) · **7** abuso avanzado ·
+Etapa 6a (2026-10-19): acceso al panel —decisión de la persona propietaria: correo +
+contraseña con sesión en la base y segundo factor TOTP obligatorio—, `create-admin`,
+sesiones revocables, límite de intentos y auditoría.
+
+Pendiente, en orden: **6b** gestión desde el panel (servicios y categorías —un slug no
+puede cambiarse sin redirección 308—, incidentes, comunicados oficiales, moderación de
+reportes, consulta de auditoría) · **7** abuso avanzado ·
 **8** tiempo real (SSE) · **9** observabilidad · **10** e2e/carga/Docker/CI, ESLint y las 17
 vulnerabilidades de herramientas de desarrollo (vitest/vite/esbuild; `npm audit --omit=dev` = 0).
 

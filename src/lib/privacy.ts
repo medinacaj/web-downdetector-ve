@@ -63,7 +63,7 @@ export function hashAnonymousId(deviceSeed: string): string {
  * (Vercel, Cloudflare, Nginx). No hay IP directa de socket disponible en
  * un Route Handler de Next.js.
  */
-export function getClientIp(request: Request): string {
+export function getClientIp(request: { headers: Pick<Headers, 'get'> }): string {
   const xff = request.headers.get('x-forwarded-for');
   if (xff) return xff.split(',')[0].trim();
 
