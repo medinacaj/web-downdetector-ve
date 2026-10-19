@@ -1,0 +1,60 @@
+# Prepara la base de datos de producción sin necesidad de una computadora:
+# aplica las migraciones de drizzle/ y siembra el catálogo (idempotente).
+# Opcionalmente crea o reinicia una cuenta del panel.
+#
+# Secretos (Settings → Secrets and variables → Actions):
+#   - DATABASE_URL: cadena de conexión de la base de producción (Neon)
+#   - Solo para la cuenta del panel: ADMIN_EMAIL y ADMIN_PASSWORD (mínimo 12
+#     caracteres). Bórralos al terminar; el segundo factor se configura al entrar.
+# El correo y la contraseña van como secretos y no como campos del formulario:
+# los registros de Actions de un repositorio público los ve cualquiera.
+name: Base de datos (migrar y sembrar)
+
+on:
+  workflow_dispatch:
+    inputs:
+      admin:
+        description: 'Cuenta del panel (usa los secretos ADMIN_*)'
+        type: choice
+        default: ninguna
+        options: [ninguna, crear, reiniciar]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: db-setup
+  cancel-in-progress: false
+
+jobs:
+  setup:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Comprobar el secreto DATABASE_URL
+        run: test -n "$DATABASE_URL" || { echo "::error::Falta el secreto DATABASE_URL"; exit 1; }
+      - name: Aplicar migraciones
+        run: npm run db:migrate:deploy
+      - name: Sembrar catálogo
+        run: npm run db:seed
+      - name: Cuenta del panel
+        if: inputs.admin != 'ninguna'
+        env:
+          ADMIN_EMAIL: ${{ secrets.ADMIN_EMAIL }}
+          ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+          MODE: ${{ inputs.admin }}
+        run: |
+          test -n "$ADMIN_EMAIL" && test -n "$ADMIN_PASSWORD" || { echo "::error::Faltan ADMIN_EMAIL o ADMIN_PASSWORD"; exit 1; }
+          if [ "$MODE" = "reiniciar" ]; then
+            npm run create-admin -- --email "$ADMIN_EMAIL" --reset
+          else
+            npm run create-admin -- --email "$ADMIN_EMAIL"
+          fi

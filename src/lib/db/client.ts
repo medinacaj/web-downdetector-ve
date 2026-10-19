@@ -8,15 +8,16 @@ if (!databaseUrl) {
   throw new Error('DATABASE_URL no está definida. Copia .env.example a .env y configúrala.');
 }
 
-// Una sola conexión pooled por proceso. En serverless (Vercel) esto se
-// reinstancia por invocación fría; para el MVP y para Railway/Render con
-// proceso persistente esto es suficiente. Si se despliega en edge/serverless
-// con alta concurrencia, evaluar @neondatabase/serverless o un pool externo
-// (PgBouncer) — ver docs/00-PLAN-MAESTRO.md, sección de escalabilidad.
+// Un pool por proceso. En Vercel cada instancia de función tiene el suyo y
+// puede haber muchas a la vez: pocas conexiones por instancia y, con Neon, la
+// URL "-pooler" (PgBouncer en modo transacción, que no admite sentencias
+// preparadas con nombre: de ahí `prepare: false`). Ver docs/DESPLIEGUE-VERCEL.md.
+const pooled = /-pooler\./.test(databaseUrl);
 const client = postgres(databaseUrl, {
-  max: process.env.NODE_ENV === 'production' ? 10 : 5,
+  max: process.env.VERCEL ? 3 : process.env.NODE_ENV === 'production' ? 10 : 5,
   idle_timeout: 20,
   connect_timeout: 10,
+  prepare: !pooled,
 });
 
 export const db = drizzle(client, { schema });

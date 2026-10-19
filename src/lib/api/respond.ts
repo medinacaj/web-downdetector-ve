@@ -9,6 +9,7 @@ import { NextResponse } from 'next/server';
 
 export type ApiErrorCode =
   | 'validation_error'
+  | 'unauthorized'
   | 'not_found'
   | 'rate_limited'
   | 'suspicious_activity'
@@ -18,6 +19,8 @@ export type ApiErrorCode =
 
 const STATUS_BY_CODE: Record<ApiErrorCode, number> = {
   validation_error: 400,
+  // Tarea programada del motor (/api/cron/engine) sin la clave correcta.
+  unauthorized: 401,
   not_found: 404,
   rate_limited: 429,
   suspicious_activity: 422,

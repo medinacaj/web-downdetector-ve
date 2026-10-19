@@ -109,6 +109,7 @@ dominio, hosting y Search Console. Ver `docs/SEO-PENDIENTE.md`.
 | GET | `/api/map` | Reportes agregados por estado (24 estados, nunca ubicaciones individuales) |
 | GET | `/api/statistics` | Métricas realmente calculables hoy; lo que depende del motor se declara en `meta.pendingMetrics`, no se inventa |
 | POST | `/api/reports` | Crea un reporte — ver payload abajo |
+| GET/POST | `/api/cron/engine` | **No pública:** un ciclo del motor sobre la última ventana cerrada. Exige `Authorization: Bearer <CRON_SECRET>` (401 sin ella; 503 si `CRON_SECRET` no está configurada). La llama GitHub Actions cada 15 min |
 
 `POST /api/reports` espera:
 ```json
@@ -234,7 +235,7 @@ esta carpeta. Cómo llegó aquí el proyecto, qué falta resolver y qué se veri
 | `npm run dev` / `build` / `start` | Next.js (inicio, directorio, página de servicio y API reales). `build` necesita acceso a Google Fonts |
 | `bash scripts/dev-bootstrap.sh` | Entorno de desarrollo desde cero (ver "Instalación"); idempotente, nunca toca un `.env` existente |
 | `npm run typecheck` | `tsc --noEmit` |
-| `npm test` / `test:watch` | Vitest (125 pruebas; las de integración de reportes requieren Postgres real) |
+| `npm test` / `test:watch` | Vitest (130 pruebas; las de integración de reportes requieren Postgres real) |
 | `npm run db:generate` | Genera migración SQL a partir de `schema.ts` |
 | `npm run db:migrate` | `drizzle-kit push` (sincroniza esquema directo, sin historial — útil en dev) |
 | `npm run db:migrate:deploy` | Aplica las migraciones versionadas de `drizzle/` |
@@ -257,6 +258,9 @@ configuren credenciales explícitamente). Esta etapa añadió
 por defecto = noindex global y sitemap vacío; `"true"` solo surte efecto con
 un `SITE_URL` público en `https`). Se leen al arrancar el servidor **y**
 durante `npm run build` (la 404 se genera en el build): defínelas en ambos.
+
+`CRON_SECRET` (solo producción, mínimo 32 caracteres) protege `/api/cron/engine`.
+Despliegue en Vercel + Neon y todas las variables de producción: `docs/DESPLIEGUE-VERCEL.md`.
 
 ## Seguridad — hallazgos de esta etapa
 
@@ -375,4 +379,6 @@ antes de cualquier despliegue con datos reales (sección 4.2 del brief).
 - `docs/MIGRACION-CLAUDE-CODE.md` — migración del chat a este repositorio, cómo
   abrirlo en Claude Code, pregunta abierta sobre una versión más avanzada y qué
   se verificó.
+- `docs/DESPLIEGUE-VERCEL.md` — publicar en Vercel con base Neon, motor por GitHub
+  Actions, secretos y comprobaciones (preparado, aún no desplegado).
 - `CLAUDE.md` y `.claude/rules/` — instrucciones para Claude Code.

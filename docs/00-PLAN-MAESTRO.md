@@ -972,3 +972,27 @@ base (frente a JWT o enlace mágico) y segundo factor TOTP obligatorio.
 - **No verificado:** con Redis (los límites probados son los de memoria), detrás de un
   proxy/CDN real (la IP sale de `x-forwarded-for`), apps autenticadoras reales escaneando
   el QR (el código se calculó en el script).
+
+### Preparación del despliegue en Vercel — 2026-10-19
+
+Decisión de la persona propietaria: publicar en su cuenta de Vercel (plan Hobby).
+- **Motor programado:** `src/lib/engine/cycle.ts` reúne el ciclo (lo usan
+  `npm run aggregate:run` y el nuevo `/api/cron/engine`). El endpoint procesa la
+  última ventana **cerrada**, exige `Authorization: Bearer <CRON_SECRET>` comparada en
+  tiempo constante y falla cerrado sin `CRON_SECRET` (503). Lo dispara
+  `.github/workflows/engine-cron.yml` cada 15 min, porque en Hobby Vercel Cron solo
+  se ejecuta una vez al día.
+- **Base sin computadora:** `.github/workflows/db-setup.yml` (manual) aplica
+  migraciones, siembra y opcionalmente crea o reinicia una cuenta del panel con
+  correo y contraseña como secretos (los registros de Actions son públicos).
+- **Conexión:** pool de 3 conexiones por instancia en Vercel y `prepare: false` con
+  la URL `-pooler` de Neon.
+- Código de error nuevo `unauthorized` (401). Pruebas: 125 → **130**.
+- **Verificado en local:** `npm run build` + `npm start`; el endpoint responde 401
+  sin clave o con una errónea y 200 con la buena (71 servicios puntuados); el paso del
+  flujo de GitHub simulado con bash: sin configurar termina en 0 sin hacer nada, con
+  clave buena 200, con clave mala falla. robots.txt sin cambios.
+- **No verificado:** nada se ha desplegado. El conector de Vercel lee la cuenta pero
+  recibe 403 al listar o crear proyectos; los flujos de GitHub Actions no se han
+  ejecutado en GitHub; Neon, el pooler y las cabeceras de Vercel siguen sin probarse
+  en real. Pasos para la persona propietaria: `docs/DESPLIEGUE-VERCEL.md`.

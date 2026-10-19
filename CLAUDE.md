@@ -63,7 +63,7 @@ confirmación en decisiones menores y sin dejar nada a medias.
 ```bash
 bash scripts/dev-bootstrap.sh         # entorno desde cero: deps, Postgres, .env, migraciones, semillas
 npm run dev                           # http://localhost:3000 (PORT=3100 npm run dev para otro puerto)
-npm run typecheck && npm test         # 125 pruebas; las de API usan Postgres real
+npm run typecheck && npm test         # 130 pruebas; las de API usan Postgres real
 npm run db:seed                       # idempotente (ver "Semillas y catálogo")
 npm run aggregate:run -- --window=15  # un ciclo del motor (cron externo)
 printf '%s' 'contraseña' | npm run create-admin -- --email a@b.org [--reset]  # cuentas del panel
@@ -79,14 +79,15 @@ comandos con base de datos comprueba que Postgres esté arriba (`pg_isready`;
 ## Mapa del código
 
 - `src/app/` — `page.tsx` (inicio), `servicios/` y `servicios/[slug]`, `categorias/[slug]`, `incidentes/`, `metodologia/`, `mapa/`, `estadisticas/`, `admin/` (panel privado: `acceso/`, `actions.ts`), `api/` (9
-  endpoints públicos), `robots.ts`, `sitemap.ts`, `not-found.tsx`, iconos (`favicon.ico`,
+  endpoints públicos y `cron/engine`, protegido con `CRON_SECRET`), `robots.ts`, `sitemap.ts`, `not-found.tsx`, iconos (`favicon.ico`,
   `icon.svg`, `apple-icon.png`; se regeneran con `node scripts/generate-icons.mjs`) e
   imagen para compartir (`opengraph-image.tsx`, `twitter-image.tsx`). Todas las rutas de `src/lib/nav.ts` existen;
   una página futura se registra allí con `available: false` hasta crearla.
 - `src/lib/db/` — `schema.ts` (18 tablas), `client.ts`, `seed-data/` (categorías, tipos
   de problema, estados, servicios). `scripts/seed.ts` las siembra.
 - `src/lib/engine/` — agregación, línea base, anomalías, ciclo de vida de incidentes;
-  `parameters.ts` reúne pesos, umbrales y bandas (sin dependencias).
+  `parameters.ts` reúne pesos, umbrales y bandas (sin dependencias); `cycle.ts` es el ciclo
+  completo que comparten `aggregate:run` y `/api/cron/engine`.
 - `src/lib/queries/` — lecturas compartidas por API y páginas (`status.ts` deriva el
   estado). `src/lib/api/respond.ts` (sobre de respuesta), `security/` (rate limit,
   `turnstile.ts`), `privacy.ts`, `geo.ts` (estado sugerido por cabeceras del hosting),
@@ -98,7 +99,8 @@ comandos con base de datos comprueba que Postgres esté arriba (`pg_isready`;
   serie y eje del gráfico de 24 h (`HistoryChart`, cargado con `LazyHistoryChart`).
 - `src/lib/auth/` — `session.ts`, `dal.ts` (`requireAdmin`), `totp.ts`, `crypto.ts`, `password.ts`;
   `src/lib/audit.ts`.
-- `tests/` — Vitest (15 archivos). `drizzle/` — migraciones 0000 a 0003.
+- `tests/` — Vitest (16 archivos). `.github/workflows/`: `engine-cron.yml` (motor cada
+  15 min contra el sitio publicado) y `db-setup.yml` (migrar, sembrar, cuenta del panel). `drizzle/` — migraciones 0000 a 0003.
 - `docs/` — plan maestro, catálogo de servicios, SEO pendiente, migración a Code.
 
 ## Convenciones
@@ -181,7 +183,7 @@ de problema propios o su formulario solo ofrecería "Otro" (lo comprueba una pru
 - Los arrays `as const` de las semillas hay que expandirlos (`[...arr]`) al insertar.
 - Un `Date` crudo dentro de una plantilla `sql` de Drizzle necesita `.toISOString()`.
 - `aggregated_windows` no tiene índice UNIQUE: se hace delete-then-insert por ventana.
-- Las pruebas de API **insertan filas reales** (8) en la base de desarrollo: límpialas
+- Las pruebas de API (y la del motor programado) **insertan filas reales** en la base de desarrollo: límpialas
   (`delete from reports; delete from aggregated_windows; delete from baselines;`) o la
   portada mostrará cifras de prueba.
 - El rate limit en memoria (sin `REDIS_URL`) se reinicia con el proceso.
@@ -234,6 +236,10 @@ Etapa 6a (2026-10-19): acceso al panel —decisión de la persona propietaria: c
 contraseña con sesión en la base y segundo factor TOTP obligatorio—, `create-admin`,
 sesiones revocables, límite de intentos y auditoría.
 
+Despliegue (2026-10-19): **preparado, no desplegado** para Vercel (Hobby) + Neon, con el
+motor disparado por GitHub Actions; pasos de la persona propietaria en
+`docs/DESPLIEGUE-VERCEL.md`. El conector de Vercel de la sesión da 403 al crear proyectos.
+
 Pendiente, en orden: **6b** gestión desde el panel (servicios y categorías —un slug no
 puede cambiarse sin redirección 308—, incidentes, comunicados oficiales, moderación de
 reportes, consulta de auditoría) · **7** abuso avanzado ·
@@ -255,6 +261,6 @@ pendiente.
 ## Documentos (léelos por ruta cuando el trabajo los toque)
 
 `docs/00-PLAN-MAESTRO.md` (arquitectura, etapas, registro de cambios) ·
-`docs/CATALOGO-SERVICIOS.md` · `docs/SEO-PENDIENTE.md` · `docs/MIGRACION-CLAUDE-CODE.md` ·
+`docs/CATALOGO-SERVICIOS.md` · `docs/SEO-PENDIENTE.md` · `docs/DESPLIEGUE-VERCEL.md` · `docs/MIGRACION-CLAUDE-CODE.md` ·
 `README.md`. Las reglas por área viven en `.claude/rules/` y se cargan al tocar esos
 archivos.
