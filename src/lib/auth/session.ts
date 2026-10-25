@@ -4,7 +4,7 @@ import { cookies, headers } from 'next/headers';
 import { and, eq, gt, lt } from 'drizzle-orm';
 import { db } from '@/lib/db/client';
 import { adminSessions, users } from '@/lib/db/schema';
-import { getClientIp, hashIpPrefix } from '@/lib/privacy';
+import { getClientIp, hashIpPrefix, UNKNOWN_IP } from '@/lib/privacy';
 import { sha256 } from './crypto';
 
 /**
@@ -29,7 +29,17 @@ export interface AdminSession {
 }
 
 export async function requestIpHash(): Promise<string> {
-  return hashIpPrefix(getClientIp({ headers: await headers() }));
+  return (await requestIp()).hash;
+}
+
+/**
+ * Hash del prefijo de IP y si la IP es atribuible. Sin TRUSTED_CLIENT_IP_HEADER todas
+ * las peticiones comparten el mismo hash "desconocido": sirve para la auditoría, pero
+ * no como clave de un límite (sería un único cubo para todo el mundo).
+ */
+export async function requestIp(): Promise<{ hash: string; known: boolean }> {
+  const ip = getClientIp({ headers: await headers() });
+  return { hash: hashIpPrefix(ip), known: ip !== UNKNOWN_IP };
 }
 
 async function setCookie(token: string, expiresAt: Date) {

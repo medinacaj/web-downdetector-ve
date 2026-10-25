@@ -5,12 +5,13 @@ import { db } from '@/lib/db/client';
 import { reports, services, issueTypes, states } from '@/lib/db/schema';
 import { createReportSchema } from '@/lib/validation/reports';
 import { sanitizeFreeText } from '@/lib/security/sanitize';
-import { hashAnonymousId, hashIpPrefix, getClientIp } from '@/lib/privacy';
+import { hashAnonymousId, hashIpPrefix, getClientIp, UNKNOWN_IP } from '@/lib/privacy';
 import { checkRateLimit } from '@/lib/security/rate-limit';
 import { ok, apiError, withErrorHandling } from '@/lib/api/respond';
 
 const REPORT_LIMIT_PER_HASH = REPORT_RATE_LIMIT.max;
 const REPORT_WINDOW_SECONDS = REPORT_RATE_LIMIT.windowSeconds;
+const REPORT_LIMIT_PER_PREFIX = REPORT_RATE_LIMIT.prefixMax;
 
 /**
  * Puntuación inicial básica (brief, sección 11.2). Es deliberadamente
@@ -127,6 +128,22 @@ async function handlePOST(request: Request) {
     return apiError('rate_limited', 'Demasiados reportes en poco tiempo. Intenta de nuevo más tarde.', {
       retryAt: new Date(rateLimit.resetAt).toISOString(),
     });
+  }
+
+  // Segundo límite, mucho más amplio, por prefijo de red truncado y
+  // anonimizado. Solo se aplica si el ingress verifica la IP: cabeceras
+  // reenviadas sin una cadena de confianza no sirven como antiabuso.
+  if (ip !== UNKNOWN_IP) {
+    const networkLimit = await checkRateLimit(
+      `report:network:${ipPrefixHash}`,
+      REPORT_LIMIT_PER_PREFIX,
+      REPORT_WINDOW_SECONDS,
+    );
+    if (!networkLimit.allowed) {
+      return apiError('rate_limited', 'Exceso de actividad desde esta red. Intenta más tarde.', {
+        retryAt: new Date(networkLimit.resetAt).toISOString(),
+      });
+    }
   }
 
   const { confidence, suspicious } = await scoreReport({

@@ -56,10 +56,18 @@ export const RELIABILITY_FULL = 1.0;
  */
 export const MIN_BASELINE_SAMPLES_FOR_STATUS = RELIABILITY_BANDS[0].belowSamples;
 
-/** Límite básico de reportes por dispositivo (anti-abuso de la Etapa 2). */
+/**
+ * Límite de reportes por dispositivo (anti-abuso de la Etapa 2) y, en la misma
+ * ventana, uno mucho más amplio por prefijo de red (/24 o /48, como hash). El de red
+ * solo se aplica con TRUSTED_CLIENT_IP_HEADER (src/lib/privacy.ts): sin una cabecera
+ * que el proxy sobrescriba, la IP no es atribuible. Es amplio porque muchas personas
+ * comparten la salida de una misma red (NAT de operadoras y empresas).
+ */
+const prefixMax = num(process.env.RATE_LIMIT_PREFIX_MAX, 100);
 export const REPORT_RATE_LIMIT = {
   max: num(process.env.RATE_LIMIT_REPORTS_MAX, 5),
   windowSeconds: num(process.env.RATE_LIMIT_REPORTS_WINDOW_SECONDS, 3600),
+  prefixMax: Number.isInteger(prefixMax) && prefixMax > 0 ? prefixMax : 100,
 };
 
 /** Duración de ventana con la que se ejecuta el motor por defecto (`aggregate:run`). */

@@ -1049,3 +1049,48 @@ constante muestra que comprobar desde un solo centro de datos no informa de nada
   motor: la primera llamada recuperó 7 ventanas en orden (5,1 s) y la segunda respondió
   `processed: []`.
 - **No verificado:** en Vercel o Neon reales (sigue sin desplegarse).
+
+### Fusión con `main` — 2026-10-25
+
+El PR #19 entró en conflicto con `main` (14 archivos). Entre el 18 y el 19/10, `main`
+había recibido otros seis cambios de la persona propietaria, trabajados con otra IA
+(PR #1, #2, #3, #4 y #17, más un commit directo): versiones más simples de lo que esta
+rama ya tenía, y algunas piezas nuevas. Se fusionó `main` en la rama sin reescribir
+historia.
+
+- **Se conservó lo de esta rama** en SEO (`robots.ts`, `sitemap.ts`, layout, metadata)
+  y en `/mapa`, `/incidentes`, `/estadisticas`, `/metodologia`: superconjuntos ya
+  verificados.
+  - El `robots.ts` de `main` respondía `Disallow: /` sin indexación. Google no podría
+    rastrear las páginas ni leer su `noindex`, y una URL enlazada desde fuera podría
+    indexarse sin contenido: lo contrario de la opción A. Además listaba `/admin/`,
+    que CLAUDE.md prohíbe.
+  - `src/lib/seo.ts` y la variable `PUBLIC_INDEXABLE` se retiraron (duplicaban
+    `SITE_INDEXING`). También se quitó un `alternates` que la fusión automática dejó en
+    `/servicios`.
+- **Se adoptó de `main`:**
+  - `getClientIp` solo confía en la cabecera de `TRUSTED_CLIENT_IP_HEADER`.
+  - Normalización de IPv6 e IPv4 mapeada antes del hash.
+  - Límite amplio por prefijo de red en reportes (`REPORT_RATE_LIMIT.prefixMax`,
+    `RATE_LIMIT_PREFIX_MAX`).
+  - Redis que falla cerrado si está configurado y cae.
+  - `tests/security-network.test.ts`.
+  - CI (`p1-quality.yml`: typecheck + `test:unit`), `dependency-audit.yml`, Dependabot.
+  - `docs/ASESOR_LEGAL_TECNOLOGICO.md` y `docs/agent-workflow.md`, con sus secciones en
+    AGENTS.md y CLAUDE.md.
+- **Fallo que la fusión habría introducido, corregido:** con la IP desconocida por
+  defecto, el límite de 20 fallos por IP del acceso al panel (Etapa 6a) pasaba a ser
+  un cubo común, y 20 fallos de cualquiera bloqueaban el acceso de todos. Ahora ese
+  límite solo se aplica con IP atribuible (`requestIp()` en `src/lib/auth/session.ts`);
+  el de 5 fallos por correo sigue siempre.
+- **CI sin base de datos:** las pruebas que escriben en Postgres pasan a
+  `tests/api-*.test.ts` (`api-turnstile`, `api-cron-engine`, junto a `api-reports`);
+  `test:unit` las excluye por patrón.
+- Pruebas: 139 → **144** (134 unitarias + 10 de integración).
+- **Verificado:** `npm run test:unit` con la base ficticia del CI (134 en verde),
+  `test:integration` y `npm test` en local. En Chromium contra `next dev`: 21 accesos
+  fallidos con correos distintos y después el acceso correcto entra (pasa al alta del
+  segundo factor); 5 fallos con el mismo correo bloquean ese correo. Cuenta de prueba
+  borrada.
+- **No verificado:** el workflow `p1-quality.yml` en GitHub (correrá en este PR) y la
+  cabecera `x-forwarded-for` en un despliegue real de Vercel.

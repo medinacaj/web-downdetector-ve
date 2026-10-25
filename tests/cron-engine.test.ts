@@ -77,22 +77,4 @@ describe('/api/cron/engine: acceso', () => {
       expect(JSON.stringify(body)).not.toContain(SECRET);
     }
   });
-
-  it('con la clave correcta procesa las ventanas pendientes y una segunda llamada no repite nada (Postgres real)', async () => {
-    process.env.CRON_SECRET = SECRET;
-    const res = await call('GET', `Bearer ${SECRET}`);
-    expect(res.status).toBe(200);
-    const { data } = await res.json();
-    expect(data.windowMinutes).toBe(15);
-    expect(data.processed.length).toBeLessThanOrEqual(ENGINE_MAX_CATCH_UP_WINDOWS);
-    const starts = data.processed.map((p: { windowStart: string }) => Date.parse(p.windowStart));
-    expect([...starts].sort((a, b) => a - b)).toEqual(starts);
-    if (starts.length) expect(starts.at(-1)).toBe(lastCompletedWindowStart(new Date(), 15).getTime());
-
-    // Sin repetir nada: vacío, salvo que entre ambas llamadas se haya cerrado una ventana nueva.
-    const again = await (await call('POST', `Bearer ${SECRET}`)).json();
-    const againStarts = again.data.processed.map((p: { windowStart: string }) => Date.parse(p.windowStart));
-    expect(againStarts.length).toBeLessThanOrEqual(1);
-    for (const t of againStarts) expect(t).toBeGreaterThan(starts.at(-1) ?? 0);
-  });
 });

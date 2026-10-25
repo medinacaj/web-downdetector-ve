@@ -42,6 +42,7 @@ producción desde `main`.
    | `ADMIN_ENCRYPTION_KEY` | otro `openssl rand -hex 32` (64 caracteres hex). Si se pierde, cada administrador debe rehacer su segundo factor |
    | `CRON_SECRET` | otro `openssl rand -hex 32` |
    | `ENABLE_TURNSTILE` | `false` (hasta tener las claves de Cloudflare) |
+   | `TRUSTED_CLIENT_IP_HEADER` | `x-forwarded-for` (Vercel la sobrescribe para impedir falsificarla, según su documentación). Sin ella no hay límite por red en los reportes ni por IP en el acceso al panel. Si algún día se pone Cloudflare delante, cambiar a `cf-connecting-ip` |
 
    Genera cada valor por separado y guárdalos en un gestor de contraseñas. **Nunca**
    los pongas en el repositorio (es público). Si no tienes terminal, cualquier

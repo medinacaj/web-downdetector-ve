@@ -1,6 +1,6 @@
 /**
  * Rate limiting por ventana fija. Si REDIS_URL está configurada, los
- * contadores viven en Redis (correcto con varias instancias). Si no, caen
+ * contadores viven en Redis (correcto con varias instancias). Si no hay REDIS_URL, caen
  * a un Map en memoria del proceso — documentado en .env.example y en el
  * README como válido solo para una sola instancia (sección "Limitaciones").
  *
@@ -21,14 +21,17 @@ async function getRedis(): Promise<Redis | null> {
   }
 
   const { default: IORedis } = await import('ioredis');
-  redisClient = new IORedis(url, { maxRetriesPerRequest: 1, lazyConnect: true });
+  const candidate = new IORedis(url, { maxRetriesPerRequest: 1, lazyConnect: true, connectTimeout: 3000 });
   try {
-    await redisClient.connect();
-  } catch (err) {
-    console.error('No se pudo conectar a Redis, cayendo a rate limit en memoria:', err);
-    redisClient = null;
+    await candidate.connect();
+    redisClient = candidate;
+    return candidate;
+  } catch {
+    candidate.disconnect();
+    // Si hay Redis configurado NO degradar silenciosamente a memoria:
+    // en varias instancias una caída dejaría sin control real el antiabuso.
+    throw new Error('Límite compartido temporalmente no disponible');
   }
-  return redisClient;
 }
 
 type MemoryBucket = { count: number; resetAt: number };

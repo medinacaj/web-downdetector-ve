@@ -63,7 +63,8 @@ confirmación en decisiones menores y sin dejar nada a medias.
 ```bash
 bash scripts/dev-bootstrap.sh         # entorno desde cero: deps, Postgres, .env, migraciones, semillas
 npm run dev                           # http://localhost:3000 (PORT=3100 npm run dev para otro puerto)
-npm run typecheck && npm test         # 139 pruebas; las de API usan Postgres real
+npm run typecheck && npm test         # 144 pruebas; tests/api-*.test.ts usan Postgres real
+npm run test:unit                     # sin base (lo que corre el CI); test:integration = solo api-*
 npm run db:seed                       # idempotente (ver "Semillas y catálogo")
 npm run aggregate:run -- --window=15  # un ciclo del motor (cron externo)
 printf '%s' 'contraseña' | npm run create-admin -- --email a@b.org [--reset]  # cuentas del panel
@@ -100,8 +101,10 @@ comandos con base de datos comprueba que Postgres esté arriba (`pg_isready`;
   serie y eje del gráfico de 24 h (`HistoryChart`, cargado con `LazyHistoryChart`).
 - `src/lib/auth/` — `session.ts`, `dal.ts` (`requireAdmin`), `totp.ts`, `crypto.ts`, `password.ts`;
   `src/lib/audit.ts`.
-- `tests/` — Vitest (17 archivos). `.github/workflows/`: `engine-cron.yml` (motor cada
-  15 min contra el sitio publicado) y `db-setup.yml` (migrar, sembrar, cuenta del panel). `drizzle/` — migraciones 0000 a 0004.
+- `tests/` — Vitest (20 archivos; `api-*.test.ts` son de integración con Postgres, el resto
+  no toca la base). `.github/workflows/`: `engine-cron.yml` (motor cada 15 min contra el
+  sitio publicado), `db-setup.yml` (migrar, sembrar, cuenta del panel), `p1-quality.yml`
+  (typecheck + `test:unit` en cada PR), `dependency-audit.yml`; `.github/dependabot.yml`. `drizzle/` — migraciones 0000 a 0004.
 - `docs/` — plan maestro, catálogo de servicios, SEO pendiente, migración a Code.
 
 ## Convenciones
@@ -155,6 +158,12 @@ comandos con base de datos comprueba que Postgres esté arriba (`pg_isready`;
   `noindex, nofollow`, nunca en sitemap ni en robots.txt. Cada acción del panel deja
   una fila en `audit_logs` (`logAudit`). Mensajes de acceso genéricos (no revelar qué
   correos existen); solo cuentan los fallos (`peekRateLimit` + `checkRateLimit`).
+- IP del cliente (`getClientIp`, `src/lib/privacy.ts`): solo desde la cabecera de
+  `TRUSTED_CLIENT_IP_HEADER` (en Vercel, `x-forwarded-for`, que Vercel sobrescribe);
+  sin ella es `UNKNOWN_IP` y **no** se usa como clave de ningún límite (sería un cubo
+  común: 20 fallos de cualquiera bloquearían el panel a todos). Si `REDIS_URL` está
+  configurada y Redis cae, los límites fallan cerrados (no degradan a memoria).
+  Una prueba nueva que toque la base va en `tests/api-*.test.ts` (el CI no tiene base).
 - Turnstile (`src/lib/security/turnstile.ts`): desactivado por defecto; activado, **falla
   cerrada** (sin claves o sin respuesta de Cloudflare → 503) y nunca envía la IP. Su
   widget solo se carga si el servidor pasa la clave pública. Probado con `fetch`
@@ -252,6 +261,13 @@ historial mostró que GitHub Actions omite muchas ejecuciones programadas); su r
 clasificación prudente queda como decisión para la futura señal técnica
 (`docs/00-PLAN-MAESTRO.md`).
 
+Fusión con `main` (2026-10-25): `main` había recibido en paralelo (PR #1–#17, otra IA)
+versiones más simples de SEO y de las páginas de la 4d; se conservaron las de esta rama
+(su `robots.ts` ponía `Disallow: /` —Google no leería el noindex de la opción A— y
+listaba `/admin/`; su `PUBLIC_INDEXABLE` se descartó: la variable es `SITE_INDEXING`).
+Se adoptaron de `main` el antiabuso de red, el CI, Dependabot y `docs/ASESOR_LEGAL_TECNOLOGICO.md`
+/ `docs/agent-workflow.md`.
+
 Pendiente, en orden: **6b** gestión desde el panel (servicios y categorías —un slug no
 puede cambiarse sin redirección 308—, incidentes, comunicados oficiales, moderación de
 reportes, consulta de auditoría) · **7** abuso avanzado ·
@@ -276,3 +292,6 @@ pendiente.
 `docs/CATALOGO-SERVICIOS.md` · `docs/SEO-PENDIENTE.md` · `docs/DESPLIEGUE-VERCEL.md` · `docs/MIGRACION-CLAUDE-CODE.md` ·
 `README.md`. Las reglas por área viven en `.claude/rules/` y se cargan al tocar esos
 archivos.
+
+## Marco legal-tecnológico
+Leer `docs/ASESOR_LEGAL_TECNOLOGICO.md` en tareas con implicaciones legales, datos, IA, derechos de contenido, seguridad, proveedores, contratos o continuidad. Aplicar solo los controles pertinentes y distinguir requisitos jurídicos verificados de buenas prácticas; registrar evidencia, jurisdicción, riesgo y validación pendiente. Coordinar con `AGENTS.md`.

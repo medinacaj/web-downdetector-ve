@@ -18,7 +18,9 @@
     "create-admin": "tsx scripts/create-admin.ts",
     "aggregate:run": "tsx scripts/aggregate-cron.ts",
     "dev:synthetic-traffic": "tsx scripts/dev-synthetic-traffic.ts",
-    "db:generate": "drizzle-kit generate"
+    "db:generate": "drizzle-kit generate",
+    "test:unit": "vitest run --exclude 'tests/api-*.test.ts'",
+    "test:integration": "vitest run tests/api-"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",

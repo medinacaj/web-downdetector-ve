@@ -235,7 +235,8 @@ esta carpeta. Cómo llegó aquí el proyecto, qué falta resolver y qué se veri
 | `npm run dev` / `build` / `start` | Next.js (inicio, directorio, página de servicio y API reales). `build` necesita acceso a Google Fonts |
 | `bash scripts/dev-bootstrap.sh` | Entorno de desarrollo desde cero (ver "Instalación"); idempotente, nunca toca un `.env` existente |
 | `npm run typecheck` | `tsc --noEmit` |
-| `npm test` / `test:watch` | Vitest (139 pruebas; las de integración de reportes requieren Postgres real) |
+| `npm test` / `test:watch` | Vitest (144 pruebas; las de `tests/api-*.test.ts` requieren Postgres real) |
+| `npm run test:unit` / `test:integration` | Solo las que no tocan la base (las del CI) / solo las de integración |
 | `npm run db:generate` | Genera migración SQL a partir de `schema.ts` |
 | `npm run db:migrate` | `drizzle-kit push` (sincroniza esquema directo, sin historial — útil en dev) |
 | `npm run db:migrate:deploy` | Aplica las migraciones versionadas de `drizzle/` |
@@ -382,3 +383,22 @@ antes de cualquier despliegue con datos reales (sección 4.2 del brief).
 - `docs/DESPLIEGUE-VERCEL.md` — publicar en Vercel con base Neon, motor por GitHub
   Actions, secretos y comprobaciones (preparado, aún no desplegado).
 - `CLAUDE.md` y `.claude/rules/` — instrucciones para Claude Code.
+
+## Control de dependencias y pruebas (P1 · octubre de 2026)
+
+Se configuran PRs de actualización semanales con Dependabot y una auditoría programada de dependencias de producción con reporte descargable desde GitHub Actions. La auditoría de npm en CI del 18-10 detectó avisos de varias severidades: **no acredita explotación efectiva** ni sustituye estudiar el aviso y actualizar con pruebas.
+
+- `npm run test:unit`: pruebas aisladas; utiliza variables ficticias de CI solo para operaciones criptográficas. No llama a una base real. Lo ejecuta `.github/workflows/p1-quality.yml` en cada PR.
+- `npm run test:integration`: las pruebas que escriben en Postgres (`api-reports` y `api-cron-engine`); requiere una instancia **independiente de PostgreSQL de pruebas**, migrada y sembrada con datos ficticios; no ejecutar contra producción. `npm test` ejecuta ambas.
+- `npm run typecheck`: comprobación de tipos.
+- Las páginas de 4d leen la base en tiempo de ejecución: su fusión no prueba disponibilidad de la instancia desplegada.
+
+Nunca guardar `DATABASE_URL` ni `ANONYMIZATION_SALT` de producción en Git o en archivos públicos.
+
+## Protección P1 de recepción de reportes (18-10-2026)
+
+- Cabeceras de IP **no son confiables por defecto**. En un despliegue con proxy verificado, configurar `TRUSTED_CLIENT_IP_HEADER` únicamente si ese proxy sobrescribe y limpia la cabecera; de otro modo todos los reportes quedan bajo prefijo desconocido y no se les aplica una cuota por red.
+- Cuando se conoce un prefijo de red confiable, se añade una cuota amplia por prefijo **truncado y cifrado con HMAC** además de la cuota por identificador anónimo. No se guarda IP sin procesar. Los prefijos IPv6 comprimidos se normalizan antes del hash.
+- Para operar en varias instancias, configurar Redis. Si Redis está configurado pero se pierde, la recepción de reportes falla de forma restrictiva: **no se degrada a contadores aislados por proceso**. Solo una instalación de una instancia puede utilizar el límite en memoria.
+- El límite por red puede afectar a usuarios legítimos que comparten NAT; se debe ajustar con métricas anonimizadas y pruebas autorizadas. Sin proxy verificado, la cuota por red permanece sin activar y ese riesgo debe constar en el despliegue.
+- `npm run test:unit` comprueba la procedencia de IP, normalización y cuota. Antes del lanzamiento quedan pendientes despliegue real, abuso distribuido y pruebas de privacidad por un responsable.

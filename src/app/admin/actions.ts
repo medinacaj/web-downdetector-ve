@@ -10,7 +10,7 @@ import { checkRateLimit, peekRateLimit, resetRateLimit } from '@/lib/security/ra
 import { verifyPassword } from '@/lib/auth/password';
 import { generateTotpSecret, verifyTotp } from '@/lib/auth/totp';
 import { decryptSecret, encryptSecret, sha256 } from '@/lib/auth/crypto';
-import { createSession, destroyCurrentSession, promoteToActive, requestIpHash, revokeSession } from '@/lib/auth/session';
+import { createSession, destroyCurrentSession, promoteToActive, requestIp, requestIpHash, revokeSession } from '@/lib/auth/session';
 import { currentSession, requireAdmin, requireStage } from '@/lib/auth/dal';
 
 /**
@@ -39,14 +39,16 @@ export async function loginAction(_prev: FormState, form: FormData): Promise<For
   const typedEmail = String(form.get('email') ?? '').slice(0, 255);
   if (!parsed.success) return { error: BAD_CREDENTIALS, email: typedEmail };
   const { email, password } = parsed.data;
-  const ipHash = await requestIpHash();
+  const { hash: ipHash, known: ipKnown } = await requestIp();
 
   // Límites por correo y por prefijo de IP (frenan la fuerza bruta contra una cuenta y el
   // barrido de muchas cuentas desde una red). Solo cuentan los fallos; mientras el límite
-  // esté agotado ni siquiera se comprueba la contraseña.
+  // esté agotado ni siquiera se comprueba la contraseña. El de IP solo con una IP
+  // atribuible (TRUSTED_CLIENT_IP_HEADER): sin ella sería un cubo común y 20 fallos de
+  // cualquiera bloquearían el acceso de todos.
   const emailKey = `admin-login:email:${sha256(email)}`;
-  const ipKey = `admin-login:ip:${ipHash}`;
-  if ((await peekRateLimit(emailKey, ATTEMPTS)) || (await peekRateLimit(ipKey, ATTEMPTS * 4))) {
+  const ipKey = ipKnown ? `admin-login:ip:${ipHash}` : null;
+  if ((await peekRateLimit(emailKey, ATTEMPTS)) || (ipKey && (await peekRateLimit(ipKey, ATTEMPTS * 4)))) {
     await logAudit({ userId: null, action: 'login_rate_limited', entity: 'admin_session', ipHash });
     return { error: TOO_MANY, email: typedEmail };
   }
@@ -59,7 +61,10 @@ export async function loginAction(_prev: FormState, form: FormData): Promise<For
 
   const ok = await verifyPassword(password, user?.passwordHash ?? null);
   if (!user || !ok) {
-    await Promise.all([checkRateLimit(emailKey, ATTEMPTS, LOGIN_WINDOW_S), checkRateLimit(ipKey, ATTEMPTS * 4, LOGIN_WINDOW_S)]);
+    await Promise.all([
+      checkRateLimit(emailKey, ATTEMPTS, LOGIN_WINDOW_S),
+      ipKey ? checkRateLimit(ipKey, ATTEMPTS * 4, LOGIN_WINDOW_S) : null,
+    ]);
     await logAudit({ userId: user?.id ?? null, action: 'login_failed', entity: 'admin_session', ipHash });
     return { error: BAD_CREDENTIALS, email: typedEmail };
   }
