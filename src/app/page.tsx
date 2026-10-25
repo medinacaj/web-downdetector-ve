@@ -7,6 +7,8 @@ import { ROUTE, isRouteAvailable } from '@/lib/nav';
 import { JsonLd } from '@/components/seo/JsonLd';
 import { siteJsonLd } from '@/lib/seo/json-ld';
 import { getSiteConfig } from '@/lib/seo/site';
+import { EngineFreshnessNotice } from '@/components/ui/EngineFreshnessNotice';
+import { getEngineFreshness } from '@/lib/queries/engine';
 
 export const metadata: Metadata = pageMetadata({
   title: `${SITE_NAME} — Estado de servicios en Venezuela`,
@@ -38,11 +40,16 @@ const METHODOLOGY_STEPS = [
 ];
 
 export default async function HomePage() {
-  const data = await getHomeData();
+  const [data, freshness] = await Promise.all([getHomeData(), getEngineFreshness()]);
 
   return (
     <>
       <JsonLd data={siteJsonLd(getSiteConfig().origin)} />
+      {freshness.state !== 'fresh' && (
+        <div className="mx-auto max-w-6xl px-4 pt-6 sm:px-6">
+          <EngineFreshnessNotice freshness={freshness} className="" />
+        </div>
+      )}
       {/* Hero — izquierda: el trabajo real (buscar); derecha: pulso nacional en vivo */}
       <section className="border-b border-border">
         <div className="mx-auto grid max-w-6xl gap-10 px-4 py-14 sm:px-6 lg:grid-cols-[1.1fr_0.9fr] lg:items-center lg:py-20">
@@ -80,7 +87,8 @@ export default async function HomePage() {
               </Link>
               <span className="text-ink-muted">·</span>
               <span className="text-ink-muted">
-                Actualizado {formatUpdatedAt(data.generatedAt)}
+                {/* Hora del último ciclo del motor, no la de esta petición: con el motor detenido, la otra engañaría. */}
+                {freshness.lastRunAt ? `Último análisis ${formatUpdatedAt(freshness.lastRunAt)}` : 'Sin análisis todavía'}
               </span>
             </div>
           </div>
@@ -116,7 +124,9 @@ export default async function HomePage() {
 
             {data.totals.incidentsOpen === 0 && (
               <p className="mt-5 border-t border-border pt-4 text-sm text-ink-muted">
-                Sin incidentes activos en este momento.
+                {freshness.state === 'fresh'
+                  ? 'Sin incidentes activos en este momento.'
+                  : 'Sin incidentes activos registrados (datos sin actualizar: ver aviso).'}
               </p>
             )}
           </div>

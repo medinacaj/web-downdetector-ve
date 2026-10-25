@@ -3,6 +3,7 @@ import Link from 'next/link';
 import {
   BASELINE_LOOKBACK_DAYS,
   DEFAULT_WINDOW_MINUTES,
+  ENGINE_STALE_AFTER_MINUTES,
   INCIDENT_RULES,
   MIN_BASELINE_SAMPLES_FOR_STATUS,
   RELIABILITY_BANDS,
@@ -145,6 +146,11 @@ export default function MethodologyPage() {
           <strong className="text-ink">línea base</strong>, calculada con la mediana y la desviación absoluta
           mediana de los últimos {BASELINE_LOOKBACK_DAYS} días. Son medidas robustas: un pico aislado no la
           deforma.
+        </p>
+        <p>
+          Si el motor lleva {ENGINE_STALE_AFTER_MINUTES} minutos o más sin analizar reportes, las páginas con estados
+          e incidentes muestran el aviso <strong className="text-ink">«Datos desactualizados»</strong>: un incidente
+          no puede cerrarse mientras el motor está detenido, y no se presenta como si fuera actual.
         </p>
         <p>Con eso se calculan seis señales, de 0 a 100, que se combinan con estos pesos:</p>
         <div className="overflow-x-auto">

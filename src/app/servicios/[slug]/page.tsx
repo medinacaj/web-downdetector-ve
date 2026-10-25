@@ -18,6 +18,8 @@ import {
   GAMBLING_META_DISCLAIMER_SERVICE,
 } from '@/components/service/GamblingNotice';
 import { Breadcrumbs } from '@/components/layout/Breadcrumbs';
+import { EngineFreshnessNotice } from '@/components/ui/EngineFreshnessNotice';
+import { getEngineFreshness } from '@/lib/queries/engine';
 
 // Datos en vivo: se renderiza en cada petición (si no, `next build` la congela).
 export const dynamic = 'force-dynamic';
@@ -57,8 +59,11 @@ export default async function ServiceDetailPage({ params }: { params: Promise<{ 
   const history = await getServiceHistory(service.id);
   const turnstileSiteKey = getTurnstileSiteKey();
 
+  const freshness = await getEngineFreshness();
+
   return (
     <div className="mx-auto max-w-4xl px-4 py-10 sm:px-6">
+      <EngineFreshnessNotice freshness={freshness} />
       {/* Cabecera */}
       <div className="border-b border-border pb-6">
         <Breadcrumbs

@@ -4,6 +4,8 @@ import { getStatistics } from '@/lib/queries/statistics';
 import { formatDateTime } from '@/lib/format';
 import { pageMetadata } from '@/lib/seo/metadata';
 import { ROUTE, categoryHref, isRouteAvailable, serviceHref } from '@/lib/nav';
+import { EngineFreshnessNotice } from '@/components/ui/EngineFreshnessNotice';
+import { getEngineFreshness } from '@/lib/queries/engine';
 
 // Datos en vivo: se renderiza en cada petición (si no, `next build` la congela).
 export const dynamic = 'force-dynamic';
@@ -42,8 +44,11 @@ export default async function StatisticsPage() {
   const categoryMax = Math.max(0, ...reportsByCategory.map((c) => c.count));
   const active24h = mostActiveServices24h.filter((s) => s.reportsLast24h > 0);
 
+  const freshness = await getEngineFreshness();
+
   return (
     <div className="mx-auto max-w-4xl px-4 py-10 sm:px-6">
+      <EngineFreshnessNotice freshness={freshness} />
       <h1 className="font-display text-2xl font-semibold tracking-tight sm:text-3xl">Estadísticas</h1>
       <p className="mt-2 max-w-2xl text-ink-muted">
         Cifras calculadas en vivo a partir de los reportes y de los incidentes que detecta el motor. Los servicios del

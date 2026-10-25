@@ -102,14 +102,14 @@ dominio, hosting y Search Console. Ver `docs/SEO-PENDIENTE.md`.
 |---|---|---|
 | GET | `/api/services` | Lista servicios activos (filtros: `category`, `q`; paginación `limit`/`offset`) |
 | GET | `/api/services/:slug` | Detalle de un servicio |
-| GET | `/api/services/:slug/status` | Estado operativo derivado en vivo de incidentes/ventanas agregadas (sin actividad aún: `insufficient_data`, nunca "normal" por defecto) |
+| GET | `/api/services/:slug/status` | Estado operativo derivado en vivo de incidentes/ventanas agregadas (sin actividad aún: `insufficient_data`, nunca "normal" por defecto); `meta.engine` dice si el motor está al día (`fresh`), detenido (`stale`) o sin ejecutar (`never`) |
 | GET | `/api/services/:slug/reports` | Reportes recientes, solo campos no identificantes |
 | GET | `/api/services/:slug/incidents` | Incidentes de ese servicio |
 | GET | `/api/incidents` | Incidentes globales (filtros: `service`, `category`, `status`) |
 | GET | `/api/map` | Reportes agregados por estado (24 estados, nunca ubicaciones individuales) |
 | GET | `/api/statistics` | Métricas realmente calculables hoy; lo que depende del motor se declara en `meta.pendingMetrics`, no se inventa |
 | POST | `/api/reports` | Crea un reporte — ver payload abajo |
-| GET/POST | `/api/cron/engine` | **No pública:** un ciclo del motor sobre la última ventana cerrada. Exige `Authorization: Bearer <CRON_SECRET>` (401 sin ella; 503 si `CRON_SECRET` no está configurada). La llama GitHub Actions cada 15 min |
+| GET/POST | `/api/cron/engine` | **No pública:** un ciclo del motor sobre la última ventana cerrada, recuperando en orden las pendientes si se perdieron ejecuciones (máx. 8). Exige `Authorization: Bearer <CRON_SECRET>` (401 sin ella; 503 si `CRON_SECRET` no está configurada). La llama GitHub Actions cada 15 min |
 
 `POST /api/reports` espera:
 ```json
@@ -235,7 +235,7 @@ esta carpeta. Cómo llegó aquí el proyecto, qué falta resolver y qué se veri
 | `npm run dev` / `build` / `start` | Next.js (inicio, directorio, página de servicio y API reales). `build` necesita acceso a Google Fonts |
 | `bash scripts/dev-bootstrap.sh` | Entorno de desarrollo desde cero (ver "Instalación"); idempotente, nunca toca un `.env` existente |
 | `npm run typecheck` | `tsc --noEmit` |
-| `npm test` / `test:watch` | Vitest (130 pruebas; las de integración de reportes requieren Postgres real) |
+| `npm test` / `test:watch` | Vitest (139 pruebas; las de integración de reportes requieren Postgres real) |
 | `npm run db:generate` | Genera migración SQL a partir de `schema.ts` |
 | `npm run db:migrate` | `drizzle-kit push` (sincroniza esquema directo, sin historial — útil en dev) |
 | `npm run db:migrate:deploy` | Aplica las migraciones versionadas de `drizzle/` |

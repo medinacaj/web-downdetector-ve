@@ -5,6 +5,8 @@ import { INCIDENT_STATUS_LABELS_ES } from '@/lib/engine/status-bands';
 import { formatDateTime, formatDuration } from '@/lib/format';
 import { pageMetadata } from '@/lib/seo/metadata';
 import { ROUTE, categoryHref, isRouteAvailable, serviceHref } from '@/lib/nav';
+import { EngineFreshnessNotice } from '@/components/ui/EngineFreshnessNotice';
+import { getEngineFreshness } from '@/lib/queries/engine';
 
 // Datos en vivo: se renderiza en cada petición (si no, `next build` la congela).
 export const dynamic = 'force-dynamic';
@@ -62,8 +64,11 @@ export default async function IncidentsPage() {
   const now = new Date();
   const { active, resolved } = await getIncidentsOverview(now);
 
+  const freshness = await getEngineFreshness();
+
   return (
     <div className="mx-auto max-w-4xl px-4 py-10 sm:px-6">
+      <EngineFreshnessNotice freshness={freshness} />
       <h1 className="font-display text-2xl font-semibold tracking-tight sm:text-3xl">Incidentes detectados</h1>
       <p className="mt-2 max-w-2xl text-ink-muted">
         Los abre y cierra el motor estadístico cuando los reportes ciudadanos se desvían de lo habitual para cada

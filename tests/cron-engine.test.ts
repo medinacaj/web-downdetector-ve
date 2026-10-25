@@ -1,5 +1,6 @@
 import { describe, it, expect, afterEach } from 'vitest';
-import { lastCompletedWindowStart, windowStartFor } from '../src/lib/engine/cycle';
+import { lastCompletedWindowStart, windowStartFor, windowsToProcess } from '../src/lib/engine/cycle';
+import { ENGINE_MAX_CATCH_UP_WINDOWS } from '../src/lib/engine/parameters';
 import { GET, POST } from '../src/app/api/cron/engine/route';
 
 const SECRET = 'x'.repeat(40);
@@ -32,6 +33,32 @@ describe('motor: ventanas de la tarea programada', () => {
   });
 });
 
+describe('motor: recuperación de ventanas perdidas', () => {
+  const NOW = new Date('2026-10-19T12:05:00Z'); // última ventana cerrada: 11:45
+  const iso = (ds: Date[]) => ds.map((d) => d.toISOString().slice(11, 16));
+
+  it('sin historia procesa solo la última ventana cerrada', () => {
+    expect(iso(windowsToProcess(null, NOW, 15))).toEqual(['11:45']);
+  });
+
+  it('al día, o con la última ya procesada (ejecución duplicada), no hace nada', () => {
+    expect(windowsToProcess(new Date('2026-10-19T11:45:00Z'), NOW, 15)).toEqual([]);
+    // La ventana en curso procesada a mano (aggregate:run) tampoco provoca reprocesar una anterior.
+    expect(windowsToProcess(new Date('2026-10-19T12:00:00Z'), NOW, 15)).toEqual([]);
+  });
+
+  it('tras ejecuciones perdidas recupera las pendientes en orden cronológico', () => {
+    expect(iso(windowsToProcess(new Date('2026-10-19T11:00:00Z'), NOW, 15))).toEqual(['11:15', '11:30', '11:45']);
+  });
+
+  it('tras una parada larga recupera como mucho las más recientes', () => {
+    const out = windowsToProcess(new Date('2026-10-18T00:00:00Z'), NOW, 15);
+    expect(out).toHaveLength(ENGINE_MAX_CATCH_UP_WINDOWS);
+    expect(out.at(-1)!.toISOString()).toBe('2026-10-19T11:45:00.000Z');
+    expect(out[1].getTime() - out[0].getTime()).toBe(15 * 60_000);
+  });
+});
+
 describe('/api/cron/engine: acceso', () => {
   it('sin CRON_SECRET (o demasiado corta) falla cerrada con 503', async () => {
     delete process.env.CRON_SECRET;
@@ -51,13 +78,21 @@ describe('/api/cron/engine: acceso', () => {
     }
   });
 
-  it('con la clave correcta ejecuta un ciclo sobre la última ventana cerrada (Postgres real)', async () => {
+  it('con la clave correcta procesa las ventanas pendientes y una segunda llamada no repite nada (Postgres real)', async () => {
     process.env.CRON_SECRET = SECRET;
     const res = await call('GET', `Bearer ${SECRET}`);
     expect(res.status).toBe(200);
     const { data } = await res.json();
     expect(data.windowMinutes).toBe(15);
-    expect(new Date(data.windowStart).getTime()).toBe(lastCompletedWindowStart(new Date(), 15).getTime());
-    expect(typeof data.servicesScored).toBe('number');
+    expect(data.processed.length).toBeLessThanOrEqual(ENGINE_MAX_CATCH_UP_WINDOWS);
+    const starts = data.processed.map((p: { windowStart: string }) => Date.parse(p.windowStart));
+    expect([...starts].sort((a, b) => a - b)).toEqual(starts);
+    if (starts.length) expect(starts.at(-1)).toBe(lastCompletedWindowStart(new Date(), 15).getTime());
+
+    // Sin repetir nada: vacío, salvo que entre ambas llamadas se haya cerrado una ventana nueva.
+    const again = await (await call('POST', `Bearer ${SECRET}`)).json();
+    const againStarts = again.data.processed.map((p: { windowStart: string }) => Date.parse(p.windowStart));
+    expect(againStarts.length).toBeLessThanOrEqual(1);
+    for (const t of againStarts) expect(t).toBeGreaterThan(starts.at(-1) ?? 0);
   });
 });

@@ -6,6 +6,8 @@ import type { OperationalStatus } from '@/lib/engine/status-bands';
 import { pageMetadata } from '@/lib/seo/metadata';
 import Link from 'next/link';
 import { ROUTE, categoryHref } from '@/lib/nav';
+import { EngineFreshnessNotice } from '@/components/ui/EngineFreshnessNotice';
+import { getEngineFreshness } from '@/lib/queries/engine';
 
 // Datos en vivo: se renderiza en cada petición (si no, `next build` la congela).
 export const dynamic = 'force-dynamic';
@@ -45,8 +47,11 @@ export default async function ServicesDirectoryPage({
     getCategories(),
   ]);
 
+  const freshness = await getEngineFreshness();
+
   return (
     <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6">
+      <EngineFreshnessNotice freshness={freshness} />
       <div className="flex items-baseline justify-between gap-4">
         <h1 className="font-display text-2xl font-semibold tracking-tight">Servicios</h1>
         <p className="font-mono text-sm text-ink-muted tabular-nums">{total} servicios</p>

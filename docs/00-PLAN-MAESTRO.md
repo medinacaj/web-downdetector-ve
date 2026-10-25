@@ -996,3 +996,56 @@ Decisión de la persona propietaria: publicar en su cuenta de Vercel (plan Hobby
   recibe 403 al listar o crear proyectos; los flujos de GitHub Actions no se han
   ejecutado en GitHub; Neon, el pooler y las cabeceras de Vercel siguen sin probarse
   en real. Pasos para la persona propietaria: `docs/DESPLIEGUE-VERCEL.md`.
+
+### Mejoras tomadas de Monitor Cashea — 2026-10-25
+
+La persona propietaria pidió adoptar mejoras de su otro proyecto, Monitor Cashea
+(`medinacaj/monitor-cashea`: sitio estático que comprueba cada 15 min con GitHub
+Actions si la web pública de Cashea responde). Se leyó su código y su historial
+(`status.json`) en modo solo lectura; no se modificó.
+
+**Lo que enseña su historial:** 44 comprobaciones entre el 18 y el 25/10/2026 donde
+se esperaban unas 670, y las 44 con HTTP 403 desde los servidores de GitHub. No se ven
+sus registros de Actions: no se sabe si las ejecuciones no ocurrieron o fallaron al
+publicar. Dos consecuencias para PulsoVE, cuyo motor también se dispara desde GitHub
+Actions (ver «Preparación del despliegue en Vercel»):
+
+- **Frescura de datos** (`src/lib/engine/freshness.ts`, `src/lib/queries/engine.ts`,
+  `<EngineFreshnessNotice>`). Sin un ciclo del motor en `ENGINE_STALE_AFTER_MINUTES`
+  (60 min), las páginas con estados o incidentes —inicio, directorio, servicio,
+  categoría, incidentes, estadísticas— avisan «Datos desactualizados»; si nunca se
+  ejecutó, «Sin análisis todavía». Antes, con el motor detenido, un incidente abierto
+  no podía cerrarse y seguía mostrándose como actual, y la portada decía «Actualizado
+  <hora de la petición>» y «Sin incidentes activos en este momento». Ahora muestra la
+  hora del último ciclo y no afirma ausencia de incidentes con datos viejos.
+  `/api/services/:slug/status` añade `meta.engine`. `/metodologia` explica el umbral.
+  `/mapa` no lleva aviso: cuenta reportes directamente, sin pasar por el motor.
+- **Recuperación de ventanas** (`windowsToProcess` en `src/lib/engine/cycle.ts`). El
+  endpoint del motor procesa en orden las ventanas cerradas pendientes desde la última
+  procesada (como mucho `ENGINE_MAX_CATCH_UP_WINDOWS` = 8) y no reprocesa ninguna
+  anterior: el ciclo de incidentes las ve en orden. Una llamada duplicada no hace nada,
+  así que puede añadirse un cron externo sin quitar GitHub Actions. Las líneas base se
+  recalculan una vez por ejecución; tope de 40 s.
+- Migración `0004`: índices en `aggregated_windows.created_at` y `window_start` para
+  esas dos lecturas.
+
+**Decisión para la futura señal técnica** (hoy `ENABLE_TECHNICAL_CHECKS=false`): se
+adoptará la clasificación de Monitor Cashea. 2xx/3xx = respondió; 401/403/429 = acceso
+restringido, **no** caída; fallo de red o tiempo agotado = «no se pudo comprobar»,
+**no** caída. Un veredicto exige al menos dos proveedores de red independientes que
+coincidan: dos URL o dos reintentos desde el mismo servidor no cuentan. Su 403
+constante muestra que comprobar desde un solo centro de datos no informa de nada.
+
+**No adoptado:**
+- Tipografías propias en vez de `next/font/google`: `next/font` ya las sirve desde el
+  propio dominio, así que el visitante no contacta con Google; solo evitaría la
+  dependencia de red del build.
+- Su selector 24/72 h: el gráfico de PulsoVE cubre 24 h; queda como mejora posible.
+
+- Pruebas: 130 → **139**.
+- **Verificado:** `next dev` con los estados «nunca», «al día» y «desactualizado (3 h)»
+  en las siete páginas y en la API; en Chromium a 390 px (claro y oscuro) y 1280 px,
+  sin desbordamiento horizontal. Con `npm run build` + `npm start`, tras simular 2 h sin
+  motor: la primera llamada recuperó 7 ventanas en orden (5,1 s) y la segunda respondió
+  `processed: []`.
+- **No verificado:** en Vercel o Neon reales (sigue sin desplegarse).

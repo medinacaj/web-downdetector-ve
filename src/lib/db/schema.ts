@@ -243,6 +243,10 @@ export const aggregatedWindows = pgTable(
   },
   (t) => ({
     serviceWindowIdx: index('aw_service_window_idx').on(t.serviceId, t.windowStart),
+    // Último ciclo del motor (src/lib/queries/engine.ts) y última ventana procesada
+    // (lastProcessedWindowStart en src/lib/engine/cycle.ts) sin recorrer la tabla entera.
+    createdAtIdx: index('aw_created_at_idx').on(t.createdAt),
+    windowStartIdx: index('aw_window_start_idx').on(t.windowStart),
   }),
 );
 

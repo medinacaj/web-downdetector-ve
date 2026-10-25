@@ -75,6 +75,5 @@ export async function getHomeData() {
       servicesCount: servicesWithStatus.length,
     },
     activeIncidents,
-    generatedAt: new Date(),
   };
 }

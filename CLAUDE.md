@@ -63,7 +63,7 @@ confirmación en decisiones menores y sin dejar nada a medias.
 ```bash
 bash scripts/dev-bootstrap.sh         # entorno desde cero: deps, Postgres, .env, migraciones, semillas
 npm run dev                           # http://localhost:3000 (PORT=3100 npm run dev para otro puerto)
-npm run typecheck && npm test         # 130 pruebas; las de API usan Postgres real
+npm run typecheck && npm test         # 139 pruebas; las de API usan Postgres real
 npm run db:seed                       # idempotente (ver "Semillas y catálogo")
 npm run aggregate:run -- --window=15  # un ciclo del motor (cron externo)
 printf '%s' 'contraseña' | npm run create-admin -- --email a@b.org [--reset]  # cuentas del panel
@@ -87,7 +87,8 @@ comandos con base de datos comprueba que Postgres esté arriba (`pg_isready`;
   de problema, estados, servicios). `scripts/seed.ts` las siembra.
 - `src/lib/engine/` — agregación, línea base, anomalías, ciclo de vida de incidentes;
   `parameters.ts` reúne pesos, umbrales y bandas (sin dependencias); `cycle.ts` es el ciclo
-  completo que comparten `aggregate:run` y `/api/cron/engine`.
+  completo que comparten `aggregate:run` y `/api/cron/engine` (este recupera ventanas
+  perdidas: `windowsToProcess`); `freshness.ts` decide si los datos están desactualizados.
 - `src/lib/queries/` — lecturas compartidas por API y páginas (`status.ts` deriva el
   estado). `src/lib/api/respond.ts` (sobre de respuesta), `security/` (rate limit,
   `turnstile.ts`), `privacy.ts`, `geo.ts` (estado sugerido por cabeceras del hosting),
@@ -99,8 +100,8 @@ comandos con base de datos comprueba que Postgres esté arriba (`pg_isready`;
   serie y eje del gráfico de 24 h (`HistoryChart`, cargado con `LazyHistoryChart`).
 - `src/lib/auth/` — `session.ts`, `dal.ts` (`requireAdmin`), `totp.ts`, `crypto.ts`, `password.ts`;
   `src/lib/audit.ts`.
-- `tests/` — Vitest (16 archivos). `.github/workflows/`: `engine-cron.yml` (motor cada
-  15 min contra el sitio publicado) y `db-setup.yml` (migrar, sembrar, cuenta del panel). `drizzle/` — migraciones 0000 a 0003.
+- `tests/` — Vitest (17 archivos). `.github/workflows/`: `engine-cron.yml` (motor cada
+  15 min contra el sitio publicado) y `db-setup.yml` (migrar, sembrar, cuenta del panel). `drizzle/` — migraciones 0000 a 0004.
 - `docs/` — plan maestro, catálogo de servicios, SEO pendiente, migración a Code.
 
 ## Convenciones
@@ -130,6 +131,11 @@ comandos con base de datos comprueba que Postgres esté arriba (`pg_isready`;
 - Parámetros del motor solo en `src/lib/engine/parameters.ts`: los usa el motor y los
   muestra `/metodologia`, así la explicación pública nunca se desincroniza. En scripts,
   `import 'dotenv/config'` va **antes** que cualquier módulo que lo importe.
+- Frescura: toda página que muestre estados o incidentes pinta `<EngineFreshnessNotice>`
+  con `getEngineFreshness()` (lo exige `tests/engine-freshness.test.ts`); con el motor
+  detenido ≥ `ENGINE_STALE_AFTER_MINUTES` dice «Datos desactualizados» y la portada nunca
+  afirma «Sin incidentes activos en este momento». La hora visible es la del último
+  ciclo, no la de la petición.
 - Estado visible: sin incidente abierto y con menos de 3 ventanas de línea base en la
   franja → "Sin datos suficientes" (`windowStatus`), nunca "Normal".
 - Visualizaciones: sigue la guía `dataviz` (una tonalidad para magnitud, rampas
@@ -239,6 +245,12 @@ sesiones revocables, límite de intentos y auditoría.
 Despliegue (2026-10-19): **preparado, no desplegado** para Vercel (Hobby) + Neon, con el
 motor disparado por GitHub Actions; pasos de la persona propietaria en
 `docs/DESPLIEGUE-VERCEL.md`. El conector de Vercel de la sesión da 403 al crear proyectos.
+
+Mejoras tomadas de Monitor Cashea (2026-10-25, repositorio `medinacaj/monitor-cashea`,
+solo lectura): aviso de datos desactualizados y recuperación de ventanas perdidas (su
+historial mostró que GitHub Actions omite muchas ejecuciones programadas); su regla de
+clasificación prudente queda como decisión para la futura señal técnica
+(`docs/00-PLAN-MAESTRO.md`).
 
 Pendiente, en orden: **6b** gestión desde el panel (servicios y categorías —un slug no
 puede cambiarse sin redirección 308—, incidentes, comunicados oficiales, moderación de

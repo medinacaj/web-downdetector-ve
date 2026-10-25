@@ -64,3 +64,23 @@ export const REPORT_RATE_LIMIT = {
 
 /** Duración de ventana con la que se ejecuta el motor por defecto (`aggregate:run`). */
 export const DEFAULT_WINDOW_MINUTES = 15;
+
+/**
+ * Minutos sin un ciclo del motor a partir de los cuales las páginas avisan de que
+ * los datos están desactualizados. Con ventanas de 15 min, un ciclo normal llega
+ * cada 15 min y GitHub Actions puede retrasarlo varios minutos: 60 min son cuatro
+ * ventanas, margen suficiente para no avisar por un retraso puntual. Si el motor
+ * se detiene, un incidente abierto no puede cerrarse solo y seguiría mostrándose:
+ * el aviso evita presentarlo como actual (lección del monitor de Cashea, que
+ * también marca sus datos como desactualizados en vez de seguir mostrándolos).
+ */
+export const ENGINE_STALE_AFTER_MINUTES = 60;
+
+/**
+ * Ventanas cerradas que la tarea programada recupera de una vez si se perdieron
+ * ejecuciones (8 × 15 min = 2 h). GitHub Actions omite ejecuciones programadas: el
+ * historial del monitor de Cashea registró 44 comprobaciones en 7 días donde se
+ * esperaban unas 670. Más atrás no se recupera (una ventana muy antigua ya no
+ * cambia el estado actual y alargaría la ejecución).
+ */
+export const ENGINE_MAX_CATCH_UP_WINDOWS = 8;

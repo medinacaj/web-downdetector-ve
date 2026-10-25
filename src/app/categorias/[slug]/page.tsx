@@ -8,6 +8,8 @@ import { GamblingNotice, GAMBLING_CATEGORY_SLUG, GAMBLING_META_DISCLAIMER } from
 import { pageMetadata } from '@/lib/seo/metadata';
 import { ROUTE, categoryHref } from '@/lib/nav';
 import { Breadcrumbs } from '@/components/layout/Breadcrumbs';
+import { EngineFreshnessNotice } from '@/components/ui/EngineFreshnessNotice';
+import { getEngineFreshness } from '@/lib/queries/engine';
 
 // Datos en vivo: se renderiza en cada petición (si no, `next build` la congela).
 export const dynamic = 'force-dynamic';
@@ -49,8 +51,11 @@ export default async function CategoryPage({ params }: { params: Params }) {
   const { category, services, total } = data;
   const otherCategories = (await getCategories()).filter((c) => c.slug !== category.slug);
 
+  const freshness = await getEngineFreshness();
+
   return (
     <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6">
+      <EngineFreshnessNotice freshness={freshness} />
       <Breadcrumbs
         crumbs={[
           { name: ROUTE.services.label, path: ROUTE.services.href },

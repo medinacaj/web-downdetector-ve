@@ -1,10 +1,11 @@
-import { and, eq } from 'drizzle-orm';
+import { and, eq, isNull, max } from 'drizzle-orm';
 import { db } from '@/lib/db/client';
 import { services, aggregatedWindows } from '@/lib/db/schema';
 import { aggregateWindow } from './aggregate';
 import { recomputeBaselines } from './baseline';
 import { scoreWindow } from './anomaly';
 import { updateIncidentLifecycle } from './incident-lifecycle';
+import { ENGINE_MAX_CATCH_UP_WINDOWS } from './parameters';
 
 /** Redondea hacia abajo al múltiplo de windowMinutes, para que ventanas consecutivas no se solapen. */
 export function windowStartFor(date: Date, windowMinutes: number): Date {
@@ -19,6 +20,38 @@ export function windowStartFor(date: Date, windowMinutes: number): Date {
  */
 export function lastCompletedWindowStart(now: Date, windowMinutes: number): Date {
   return new Date(windowStartFor(now, windowMinutes).getTime() - windowMinutes * 60_000);
+}
+
+/**
+ * Ventanas a procesar, en orden cronológico: las cerradas posteriores a la última
+ * procesada, hasta la última cerrada (como mucho `maxWindows`, las más recientes).
+ * Si no hay ninguna pendiente devuelve [] (una ejecución duplicada no hace nada).
+ * Nunca reprocesa una ventana anterior o igual a la última procesada: el ciclo de
+ * incidentes debe ver las ventanas en orden.
+ */
+export function windowsToProcess(
+  lastProcessedStart: Date | null,
+  now: Date,
+  windowMinutes: number,
+  maxWindows: number = ENGINE_MAX_CATCH_UP_WINDOWS,
+): Date[] {
+  const target = lastCompletedWindowStart(now, windowMinutes).getTime();
+  const step = windowMinutes * 60_000;
+  if (!lastProcessedStart) return [new Date(target)];
+  if (lastProcessedStart.getTime() >= target) return [];
+  const first = Math.max(windowStartFor(lastProcessedStart, windowMinutes).getTime() + step, target - (maxWindows - 1) * step);
+  const out: Date[] = [];
+  for (let t = first; t <= target; t += step) out.push(new Date(t));
+  return out;
+}
+
+/** Inicio de la ventana más reciente que el motor ha procesado (null si ninguna). */
+export async function lastProcessedWindowStart(): Promise<Date | null> {
+  const [row] = await db
+    .select({ last: max(aggregatedWindows.windowStart) })
+    .from(aggregatedWindows)
+    .where(isNull(aggregatedWindows.stateId));
+  return row?.last ?? null;
 }
 
 export interface EngineCycleResult {
@@ -41,6 +74,7 @@ export async function runEngineCycle(
   at: Date,
   windowMinutes: number,
   log: (line: string) => void = () => {},
+  { recomputeBaselines: recompute = true }: { recomputeBaselines?: boolean } = {},
 ): Promise<EngineCycleResult> {
   const windowStart = windowStartFor(at, windowMinutes);
   log(`→ Ciclo del motor — ventana ${windowMinutes}min, inicio ${windowStart.toISOString()}`);
@@ -49,9 +83,14 @@ export async function runEngineCycle(
   const aggregated = await aggregateWindow(windowStart, windowMinutes);
   log(`      ${aggregated.length} servicios agregados`);
 
-  log('  2/4 recalculando líneas base...');
-  const { bucketsUpdated } = await recomputeBaselines(at);
-  log(`      ${bucketsUpdated} buckets (servicio×estado×día×hora) actualizados`);
+  let bucketsUpdated = 0;
+  if (recompute) {
+    log('  2/4 recalculando líneas base...');
+    ({ bucketsUpdated } = await recomputeBaselines(at));
+    log(`      ${bucketsUpdated} buckets (servicio×estado×día×hora) actualizados`);
+  } else {
+    log('  2/4 líneas base: se reutilizan las de esta ejecución');
+  }
 
   log('  3/4 puntuando anomalías...');
   const activeServices = await db

@@ -68,7 +68,7 @@ producción desde `main`.
    - `ADMIN_EMAIL` y `ADMIN_PASSWORD` (mínimo 12 caracteres): la cuenta del panel.
 2. **Actions → "Base de datos (migrar y sembrar)" → Run workflow**, con
    *Cuenta del panel* = `crear`.
-3. Debe terminar en verde: migraciones aplicadas (0000 a 0003), 71 servicios sembrados y la cuenta
+3. Debe terminar en verde: migraciones aplicadas (0000 a 0004), 71 servicios sembrados y la cuenta
    creada. Después **borra** los secretos `ADMIN_EMAIL` y `ADMIN_PASSWORD`.
    Puedes volver a ejecutarlo sin riesgo (es idempotente) cuando haya migraciones
    nuevas.
@@ -92,6 +92,8 @@ del formulario.
 - `https://<proyecto>.vercel.app/` → 200; `/api/services` → `meta.total = 71`.
 - `/robots.txt` → `Allow: /`, `Disallow: /api/` y **sin** línea `Sitemap`;
   `/sitemap.xml` vacío; el HTML con `<meta name="robots" content="noindex, follow">`.
+- La portada muestra «Último análisis …» con una hora de hace menos de 15–30 min y
+  ningún aviso «Datos desactualizados» (si aparece, el motor no se está ejecutando).
 - `/admin` → pide correo y contraseña; en el primer acceso, alta del segundo factor
   con el QR (app de autenticación).
 - Envía un reporte desde una página de servicio: el formulario debería sugerir tu
@@ -100,13 +102,24 @@ del formulario.
 
 ## Limitaciones conocidas
 
-- **Motor por GitHub Actions:** GitHub puede retrasar las ejecuciones varios
-  minutos (el endpoint procesa la última ventana *cerrada*, así que un retraso no la
-  deja a medias), puede saltarse alguna en horas de mucha carga (esa ventana no se
-  agrega) y **desactiva** las tareas programadas tras 60 días sin actividad en un
-  repositorio público (se reactivan desde la pestaña Actions). Si hace falta más
-  precisión: un servicio de cron externo que haga el mismo `POST` con la cabecera
-  `Authorization: Bearer <CRON_SECRET>`, o el plan Pro de Vercel.
+- **Motor por GitHub Actions:** GitHub retrasa y **omite** ejecuciones programadas.
+  Prueba en casa: el historial de Monitor Cashea (`medinacaj/monitor-cashea`, mismo
+  intervalo de 15 min) guarda solo 44 comprobaciones entre el 18 y el 25/10/2026,
+  donde se esperaban unas 670. Desde aquí no se ven sus registros de Actions, así que
+  no se sabe si GitHub no las ejecutó o si fallaron al publicar. Para que eso no
+  pierda datos:
+  - el endpoint procesa ventanas *cerradas*, así que un retraso no deja ninguna a medias;
+  - recupera en orden las ventanas pendientes desde la última procesada (hasta
+    `ENGINE_MAX_CATCH_UP_WINDOWS` = 8, es decir 2 h);
+  - si pasan 60 min sin un ciclo (`ENGINE_STALE_AFTER_MINUTES`), las páginas avisan
+    «Datos desactualizados».
+
+  GitHub además **desactiva** las tareas programadas tras 60 días sin actividad en un
+  repositorio público (se reactivan desde la pestaña Actions). **Recomendado:** un
+  servicio de cron externo gratuito (p. ej. cron-job.org) que haga el mismo `POST` a
+  `/api/cron/engine` cada 15 min con la cabecera `Authorization: Bearer <CRON_SECRET>`,
+  y dejar GitHub Actions como respaldo: llamarlo dos veces no duplica nada (la segunda
+  llamada responde `processed: []`).
 - **Límite de intentos en memoria:** sin `REDIS_URL`, cada instancia de función
   lleva su propia cuenta, así que el límite de reportes y de accesos al panel es
   más débil que con un solo servidor. Para endurecerlo: un Redis gestionado (por
