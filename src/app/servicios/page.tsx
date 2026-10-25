@@ -3,12 +3,21 @@ import { getDirectoryServices, getCategories, type DirectorySort } from '@/lib/q
 import { ViewToggleProvider } from '@/components/directory/ViewToggle';
 import { ServiceGrid } from '@/components/directory/ServiceGrid';
 import type { OperationalStatus } from '@/lib/engine/status-bands';
+import { pageMetadata } from '@/lib/seo/metadata';
+import Link from 'next/link';
+import { ROUTE, categoryHref } from '@/lib/nav';
+import { EngineFreshnessNotice } from '@/components/ui/EngineFreshnessNotice';
+import { getEngineFreshness } from '@/lib/queries/engine';
 
-export const metadata: Metadata = {
+// Datos en vivo: se renderiza en cada petición (si no, `next build` la congela).
+export const dynamic = 'force-dynamic';
+
+// Canónica sin parámetros: los filtros (?category=, ?q=…) no compiten con el directorio.
+export const metadata: Metadata = pageMetadata({
   title: 'Servicios',
-  alternates: { canonical: '/servicios' },
   description: 'Directorio de servicios monitoreados en Venezuela: telecomunicaciones, banca, servicios públicos, plataformas, streaming, videojuegos, delivery y loterías.',
-};
+  path: ROUTE.services.href,
+});
 
 const STATUS_OPTIONS: { value: OperationalStatus; label: string }[] = [
   { value: 'normal', label: 'Normal' },
@@ -38,12 +47,32 @@ export default async function ServicesDirectoryPage({
     getCategories(),
   ]);
 
+  const freshness = await getEngineFreshness();
+
   return (
     <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6">
+      <EngineFreshnessNotice freshness={freshness} />
       <div className="flex items-baseline justify-between gap-4">
         <h1 className="font-display text-2xl font-semibold tracking-tight">Servicios</h1>
         <p className="font-mono text-sm text-ink-muted tabular-nums">{total} servicios</p>
       </div>
+
+      {/* Enlaces HTML a cada categoría: el <select> de abajo filtra, pero los buscadores no
+          siguen formularios, y las páginas de categoría deben poder descubrirse. */}
+      <nav aria-label="Categorías" className="mt-4">
+        <ul className="flex flex-wrap gap-2 text-sm">
+          {categoryList.map((c) => (
+            <li key={c.slug}>
+              <Link
+                href={categoryHref(c.slug)}
+                className="inline-block rounded-full border border-border px-3 py-1 text-ink-muted transition-colors hover:border-brand-400 hover:text-ink"
+              >
+                {c.name}
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </nav>
 
       <form className="mt-6 grid gap-3 sm:grid-cols-[2fr_1fr_1fr_1fr_auto]" action="/servicios">
         <label className="sr-only" htmlFor="q">

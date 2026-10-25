@@ -1,7 +1,25 @@
+import type { Metadata } from 'next';
 import Link from 'next/link';
+import { pageMetadata, SITE_NAME } from '@/lib/seo/metadata';
 import { getHomeData } from '@/lib/queries/home';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { ROUTE, isRouteAvailable } from '@/lib/nav';
+import { JsonLd } from '@/components/seo/JsonLd';
+import { siteJsonLd } from '@/lib/seo/json-ld';
+import { getSiteConfig } from '@/lib/seo/site';
+import { EngineFreshnessNotice } from '@/components/ui/EngineFreshnessNotice';
+import { getEngineFreshness } from '@/lib/queries/engine';
+
+export const metadata: Metadata = pageMetadata({
+  title: `${SITE_NAME} — Estado de servicios en Venezuela`,
+  description:
+    'Consulta si un servicio presenta problemas en Venezuela: internet, bancos, servicios públicos, redes, streaming, juegos y delivery. Monitoreo ciudadano.',
+  path: '/',
+  absoluteTitle: true,
+});
+
+// Datos en vivo: se renderiza en cada petición (si no, `next build` la congela).
+export const dynamic = 'force-dynamic';
 
 function formatUpdatedAt(date: Date) {
   return new Intl.DateTimeFormat('es-VE', {
@@ -14,17 +32,24 @@ function formatUpdatedAt(date: Date) {
 }
 
 const METHODOLOGY_STEPS = [
-  { title: 'Recopilación', text: 'Reportes ciudadanos anónimos y mediciones técnicas automáticas.' },
+  // Sin mediciones técnicas: aún no están activas (ver /metodologia, sección 1).
+  { title: 'Recopilación', text: 'Reportes ciudadanos anónimos, sin datos personales.' },
   { title: 'Comparación', text: 'Cada ventana se compara contra el comportamiento habitual de ese servicio, no contra un umbral fijo.' },
-  { title: 'Validación', text: 'Diversidad de reportantes, persistencia y señales técnicas antes de confiar en una desviación.' },
+  { title: 'Validación', text: 'Diversidad de reportantes, persistencia y dispersión geográfica antes de confiar en una desviación.' },
   { title: 'Publicación del estado', text: 'Un estado prudente, nunca una afirmación categórica sin evidencia suficiente.' },
 ];
 
 export default async function HomePage() {
-  const data = await getHomeData();
+  const [data, freshness] = await Promise.all([getHomeData(), getEngineFreshness()]);
 
   return (
     <>
+      <JsonLd data={siteJsonLd(getSiteConfig().origin)} />
+      {freshness.state !== 'fresh' && (
+        <div className="mx-auto max-w-6xl px-4 pt-6 sm:px-6">
+          <EngineFreshnessNotice freshness={freshness} className="" />
+        </div>
+      )}
       {/* Hero — izquierda: el trabajo real (buscar); derecha: pulso nacional en vivo */}
       <section className="border-b border-border">
         <div className="mx-auto grid max-w-6xl gap-10 px-4 py-14 sm:px-6 lg:grid-cols-[1.1fr_0.9fr] lg:items-center lg:py-20">
@@ -33,8 +58,8 @@ export default async function HomePage() {
               Consulta si un servicio está presentando problemas en Venezuela
             </h1>
             <p className="mt-4 max-w-md text-ink-muted">
-              Reportes ciudadanos anónimos y mediciones técnicas, combinados con un motor
-              estadístico explicable. Independiente de cualquier proveedor.
+              Reportes ciudadanos anónimos analizados por un motor estadístico explicable.
+              Independiente de cualquier proveedor.
             </p>
 
             <form action="/servicios" className="mt-7 flex max-w-md gap-2">
@@ -62,7 +87,8 @@ export default async function HomePage() {
               </Link>
               <span className="text-ink-muted">·</span>
               <span className="text-ink-muted">
-                Actualizado {formatUpdatedAt(data.generatedAt)}
+                {/* Hora del último ciclo del motor, no la de esta petición: con el motor detenido, la otra engañaría. */}
+                {freshness.lastRunAt ? `Último análisis ${formatUpdatedAt(freshness.lastRunAt)}` : 'Sin análisis todavía'}
               </span>
             </div>
           </div>
@@ -98,7 +124,9 @@ export default async function HomePage() {
 
             {data.totals.incidentsOpen === 0 && (
               <p className="mt-5 border-t border-border pt-4 text-sm text-ink-muted">
-                Sin incidentes activos en este momento.
+                {freshness.state === 'fresh'
+                  ? 'Sin incidentes activos en este momento.'
+                  : 'Sin incidentes activos registrados (datos sin actualizar: ver aviso).'}
               </p>
             )}
           </div>

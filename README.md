@@ -6,19 +6,28 @@ plataformas digitales, streaming, videojuegos, delivery y movilidad, y
 apuestas y loterías. No es una copia de Downdetector ni de ninguna plataforma
 existente: identidad visual, arquitectura, código y metodología propios.
 
-**Estado actual del código: base 4c + páginas informativas 4d (mapa esquemático, incidentes, estadísticas, metodología).**
+**Estado actual del proyecto: Etapa 4 de 10 completada — inicio,
+directorio, categorías, página de servicio con reporte funcional y gráfico
+de 24 horas, incidentes, metodología, mapa y estadísticas. Etapa 5 hecha en el
+código (Turnstile y estado sugerido), con Turnstile desactivado y pendiente de
+probar con claves reales. Etapa 6 en curso: acceso al panel hecho (contraseña +
+segundo factor TOTP, sesiones revocables, auditoría); falta la gestión de
+contenidos.**
 Ver `docs/00-PLAN-MAESTRO.md` para la evaluación completa, la arquitectura y
 el plan de etapas. Ya se puede reportar una falla desde la interfaz, de
-verdad — no solo vía la API. Falta: mapa, incidentes, estadísticas,
-metodología, y el gráfico de la página de servicio.
+verdad — no solo vía la API.
 
-**Todavía no está listo para publicarse:** falta la capa de SEO técnico
-(`robots.txt`, `sitemap.xml`, canonical, Open Graph, favicon, datos
-estructurados y dominio). Ver `docs/SEO-PENDIENTE.md`.
+**Todavía no está listo para publicarse.** Ya hay `robots.txt`, `sitemap.xml`
+y política de indexación: **noindex global** mientras los datos sean
+demostrativos (decisión del 2026-10-11; se abre con `SITE_INDEXING="true"`).
+El SEO técnico base está hecho y verificado en local: canonical, Open Graph
+con imagen, favicon, 404 propia, páginas de categoría, datos estructurados
+(JSON-LD) y metadescripciones propias. Falta lo que depende de terceros:
+dominio, hosting y Search Console. Ver `docs/SEO-PENDIENTE.md`.
 
 ## Qué existe hoy
 
-- Esquema completo de base de datos (17 tablas) en Drizzle ORM, con
+- Esquema completo de base de datos (18 tablas; `admin_sessions` desde la Etapa 6) en Drizzle ORM, con
   migraciones generadas y verificadas contra PostgreSQL 16 real (incluida
   una segunda migración aditiva: `reports.network_carrier`).
 - Datos semilla verificados: 24 estados (códigos ISO 3166-2:VE reales), 8
@@ -45,21 +54,47 @@ estructurados y dominio). Ver `docs/SEO-PENDIENTE.md`.
   tanto en la base de datos como a través de la API pública.
 - Configuración de proyecto (Next.js 16, Tailwind, TypeScript, Vitest) y
   variables de entorno documentadas con valores por defecto seguros.
-- 66 pruebas automatizadas (datos semilla y calidad del catálogo, registro
-  de rutas de navegación, privacidad, bandas de estado, integración real de
+- 125 pruebas automatizadas (TOTP con los vectores oficiales de RFC 4226 y
+  RFC 6238, cifrado del secreto, contraseñas, límite de intentos, Turnstile ante cada respuesta posible de
+  Cloudflare, estado sugerido por cabeceras, serie y eje del gráfico histórico, escala y abreviaturas del mapa, estado "Sin datos suficientes" sin historia,
+  datos estructurados JSON-LD, metadata de página: canonical, Open Graph y Twitter,
+  renderizado dinámico de las páginas con datos,
+  datos semilla y calidad del catálogo, registro
+  de rutas de navegación, configuración SEO e indexación (robots, sitemap), privacidad, bandas de estado, integración real de
   `POST /api/reports`, estadística robusta del motor, combinación ponderada
   de señales).
 - **Página de inicio real** (`/`): buscador, panel de "pulso nacional" con
   datos en vivo, incidentes activos, servicios, metodología resumida.
   Header, footer, modo oscuro con selector y tipografía (Space Grotesk +
   Inter + JetBrains Mono) ya están en su lugar para el resto del sitio.
+- **Gráfico de las últimas 24 horas** en cada servicio: reportes por ventana
+  de 15 minutos (la resolución del motor), "lo habitual" de esa franja solo
+  donde hay historia suficiente, incidentes sombreados, tooltip con ratón y
+  teclado, y tabla equivalente. `recharts` se descarga solo si hay gráfico.
+- **Mapa** (`/mapa`): cartograma por estado (esquema por adyacencia, no a
+  escala) con filtros de período (24 h, 7 y 30 días) y servicio; escala de
+  una tonalidad validada para daltonismo y contraste en los dos temas,
+  tooltip con ratón y teclado, y vista de tabla equivalente. Solo agregados.
+- **Estadísticas** (`/estadisticas`): indicadores en vivo, reportes por
+  categoría, servicios más reportados en 24 h y la lista de métricas que aún
+  no se publican y por qué (en vez de mostrarlas como cero).
+- **Incidentes** (`/incidentes`): los activos y los resueltos en los últimos
+  30 días que detecta el motor, con estado, duración y estados afectados.
+  En los resueltos se muestra cuándo fue el máximo, no la confianza final.
+- **Metodología** (`/metodologia`): cómo se calcula todo, con los mismos
+  parámetros que usa el motor (`src/lib/engine/parameters.ts`): si cambian,
+  la página se actualiza sola. Dice qué no está activo todavía.
+- **Páginas de categoría** (`/categorias/:slug`): una por categoría, con
+  su introducción, sus servicios con estado y enlaces a las demás; el
+  directorio y cada servicio enlazan a ellas. En apuestas y loterías, el
+  aviso legal lo pone el código (no depende de texto editable).
 - **Directorio de servicios real** (`/servicios`): búsqueda, filtro por
   categoría y estado, tres órdenes, vista tarjetas/lista — todo vía
   formulario GET, sin depender de JavaScript para funcionar.
 - **Página de servicio con reporte funcional** (`/servicios/:slug`):
   estado real, confianza, desglose de problemas, actividad geográfica,
   incidentes recientes — y un formulario de reporte que de verdad
-  funciona (sin Turnstile ni geolocalización todavía, eso es la Etapa 5).
+  funciona; desde la Etapa 5, con Turnstile opcional y estado sugerido.
 
 ## Endpoints disponibles
 
@@ -67,13 +102,14 @@ estructurados y dominio). Ver `docs/SEO-PENDIENTE.md`.
 |---|---|---|
 | GET | `/api/services` | Lista servicios activos (filtros: `category`, `q`; paginación `limit`/`offset`) |
 | GET | `/api/services/:slug` | Detalle de un servicio |
-| GET | `/api/services/:slug/status` | Estado operativo derivado en vivo de incidentes/ventanas agregadas (sin actividad aún: `insufficient_data`, nunca "normal" por defecto) |
+| GET | `/api/services/:slug/status` | Estado operativo derivado en vivo de incidentes/ventanas agregadas (sin actividad aún: `insufficient_data`, nunca "normal" por defecto); `meta.engine` dice si el motor está al día (`fresh`), detenido (`stale`) o sin ejecutar (`never`) |
 | GET | `/api/services/:slug/reports` | Reportes recientes, solo campos no identificantes |
 | GET | `/api/services/:slug/incidents` | Incidentes de ese servicio |
 | GET | `/api/incidents` | Incidentes globales (filtros: `service`, `category`, `status`) |
 | GET | `/api/map` | Reportes agregados por estado (24 estados, nunca ubicaciones individuales) |
 | GET | `/api/statistics` | Métricas realmente calculables hoy; lo que depende del motor se declara en `meta.pendingMetrics`, no se inventa |
 | POST | `/api/reports` | Crea un reporte — ver payload abajo |
+| GET/POST | `/api/cron/engine` | **No pública:** un ciclo del motor sobre la última ventana cerrada, recuperando en orden las pendientes si se perdieron ejecuciones (máx. 8). Exige `Authorization: Bearer <CRON_SECRET>` (401 sin ella; 503 si `CRON_SECRET` no está configurada). La llama GitHub Actions cada 15 min |
 
 `POST /api/reports` espera:
 ```json
@@ -112,20 +148,38 @@ catálogo real — existe solo para ejercitar el motor (brief, sección 28).
 
 ## Qué NO existe todavía
 
-Del frontend: el gráfico principal de la página de servicio (`recharts`
-ya instalado, sin usar), mapa nacional (cartograma — los datos
-`grid_row`/`grid_col` ya existen desde la Etapa 1), página de incidentes
-global, estadísticas, metodología completa. El formulario de reporte
-funciona pero sin Turnstile ni geolocalización (Etapa 5).
+Del frontend público no falta ninguna página prevista. Las
+mediciones técnicas automáticas no existen (la portada ya no las anuncia).
+El formulario de reporte
+usa Turnstile solo si se activa con claves reales (Etapa 5, sin probar
+contra Cloudflare: la red del entorno de desarrollo lo bloquea).
 
-SEO técnico e indexación: `robots.txt`, `sitemap.xml`, canonical, Open
-Graph, favicon, datos estructurados, dominio y la decisión de indexar o no
-mientras todo sea demostrativo (`docs/SEO-PENDIENTE.md`).
+SEO técnico: solo lo que depende de terceros (dominio, hosting, Search
+Console; `docs/SEO-PENDIENTE.md`).
 
-Panel administrativo, autenticación, tiempo real, mediciones técnicas
-activas (sección 10 del brief), moderación — Etapas 5 en adelante. Las
-carpetas para esto ya están planificadas en `src/app` pero sin
-implementar.
+Del panel de administración: la gestión de servicios y categorías,
+incidentes, comunicados oficiales, moderación de reportes y la consulta de la
+auditoría (Etapa 6b). Tiempo real, mediciones técnicas activas y abuso
+avanzado: Etapas 7 en adelante.
+
+## Panel de administración (`/admin`)
+
+Privado: `noindex, nofollow` (meta y cabecera `X-Robots-Tag`), fuera del
+sitemap y sin mencionarse en `robots.txt`. No hay registro público; las
+cuentas se crean desde el servidor:
+
+```bash
+printf '%s' 'contraseña-de-al-menos-12' | npm run create-admin -- --email persona@dominio.org
+printf '%s' 'contraseña-nueva' | npm run create-admin -- --email persona@dominio.org --reset   # perdió el teléfono
+```
+
+Acceso en dos pasos: contraseña (bcrypt) y código de una app autenticadora
+(TOTP, obligatorio; el alta se hace en el primer acceso, con QR). Sesiones
+guardadas en la base (en ella solo el hash del token), con cookie `httpOnly`,
+`Secure` en producción, `SameSite=Strict` y limitada a `/admin`; caducan a las
+12 h o tras 2 h sin uso y se pueden cerrar desde el panel. Solo cuentan los
+intentos fallidos: 5 por correo cada 15 min. Todo queda en `audit_logs`.
+Requiere `ADMIN_ENCRYPTION_KEY` (cifra los secretos TOTP).
 
 ## Requisitos
 
@@ -181,13 +235,14 @@ esta carpeta. Cómo llegó aquí el proyecto, qué falta resolver y qué se veri
 | `npm run dev` / `build` / `start` | Next.js (inicio, directorio, página de servicio y API reales). `build` necesita acceso a Google Fonts |
 | `bash scripts/dev-bootstrap.sh` | Entorno de desarrollo desde cero (ver "Instalación"); idempotente, nunca toca un `.env` existente |
 | `npm run typecheck` | `tsc --noEmit` |
-| `npm test` / `test:watch` | Vitest (66 pruebas; las de integración de reportes requieren Postgres real) |
+| `npm test` / `test:watch` | Vitest (144 pruebas; las de `tests/api-*.test.ts` requieren Postgres real) |
+| `npm run test:unit` / `test:integration` | Solo las que no tocan la base (las del CI) / solo las de integración |
 | `npm run db:generate` | Genera migración SQL a partir de `schema.ts` |
 | `npm run db:migrate` | `drizzle-kit push` (sincroniza esquema directo, sin historial — útil en dev) |
 | `npm run db:migrate:deploy` | Aplica las migraciones versionadas de `drizzle/` |
 | `npm run db:seed` | Carga los datos semilla (idempotente): sincroniza categorías y tipos de problema; inserta los estados y servicios que falten |
 | `npm run db:studio` | Explorador visual de la base de datos |
-| `npm run create-admin` | **Pendiente de implementar** (Etapa 6 — panel admin) |
+| `npm run create-admin` | Crea una cuenta del panel o, con `--reset`, restablece su acceso (contraseña por stdin) |
 | `npm run aggregate:run -- [--window=N] [--at=ISO]` | Un ciclo del motor: agregación + línea base + anomalías + incidentes |
 | `npm run dev:synthetic-traffic -- [--cleanup]` | Genera/limpia tráfico sintético para probar el motor (ver sección dedicada) |
 
@@ -199,6 +254,14 @@ propósito y, cuando aplica, por qué su valor por defecto es conservador
 sondeos ni verificaciones anti-abuso reales contra terceros hasta que se
 configuren credenciales explícitamente). Esta etapa añadió
 `RATE_LIMIT_REPORTS_MAX` y `RATE_LIMIT_REPORTS_WINDOW_SECONDS`.
+
+`SITE_URL` (origen canónico, sin barra final) y `SITE_INDEXING` (`"false"`
+por defecto = noindex global y sitemap vacío; `"true"` solo surte efecto con
+un `SITE_URL` público en `https`). Se leen al arrancar el servidor **y**
+durante `npm run build` (la 404 se genera en el build): defínelas en ambos.
+
+`CRON_SECRET` (solo producción, mínimo 32 caracteres) protege `/api/cron/engine`.
+Despliegue en Vercel + Neon y todas las variables de producción: `docs/DESPLIEGUE-VERCEL.md`.
 
 ## Seguridad — hallazgos de esta etapa
 
@@ -220,7 +283,17 @@ la consulta SQL, en la respuesta HTTP — ahora todas las rutas devuelven un
 `internal_error` genérico y registran el detalle solo en el log del
 servidor.
 
-Quedan 9 vulnerabilidades de severidad moderada/alta/crítica, **todas
+> **Actualización 2026-10-18:** el 2026-10-11 `npm audit` informó **3
+> vulnerabilidades en dependencias de producción**: `next` 16.0.0–16.3.7
+> (crítica: varias ejecuciones remotas de código y envenenamiento de caché),
+> `sharp` (alta) y `source-map-js` (alta). **Corregidas** subiendo a `next`
+> 16.3.8 (parche de la misma serie; la 16.4 no hacía falta), `sharp` 0.35.5 y
+> `source-map-js` 1.2.2: `npm audit --omit=dev` → **0**. Quedan **17**, todas
+> de herramientas de desarrollo (`vitest`/`vite`/`esbuild` y dependencias),
+> para la Etapa 10. El párrafo siguiente describe la situación de etapas
+> anteriores.
+
+Quedaban 9 vulnerabilidades de severidad moderada/alta/crítica, **todas
 confinadas a herramientas de desarrollo** (`vitest`/`vite`/`esbuild` vía la
 cadena de `drizzle-kit` y `@vitest/ui`) — no se ejecutan en producción, solo
 al correr pruebas o el explorador visual de base de datos en local. Requieren
@@ -289,7 +362,10 @@ antes de cualquier despliegue con datos reales (sección 4.2 del brief).
   respaldo sin romperse. En Vercel, GitHub Actions o cualquier máquina con
   acceso normal a internet, `npm run build` compila sin cambios — se
   verificó aislando el problema (build limpio sin next/font) para
-  confirmar que no hay ningún otro error oculto detrás.
+  confirmar que no hay ningún otro error oculto detrás. **Verificado de
+  verdad el 2026-10-18** en una sesión de Claude Code con acceso a Google
+  Fonts: `npm run build` y `npm start` funcionan completos (ver
+  `docs/00-PLAN-MAESTRO.md`).
 
 ## Documentación
 
@@ -304,14 +380,16 @@ antes de cualquier despliegue con datos reales (sección 4.2 del brief).
 - `docs/MIGRACION-CLAUDE-CODE.md` — migración del chat a este repositorio, cómo
   abrirlo en Claude Code, pregunta abierta sobre una versión más avanzada y qué
   se verificó.
+- `docs/DESPLIEGUE-VERCEL.md` — publicar en Vercel con base Neon, motor por GitHub
+  Actions, secretos y comprobaciones (preparado, aún no desplegado).
 - `CLAUDE.md` y `.claude/rules/` — instrucciones para Claude Code.
 
 ## Control de dependencias y pruebas (P1 · octubre de 2026)
 
 Se configuran PRs de actualización semanales con Dependabot y una auditoría programada de dependencias de producción con reporte descargable desde GitHub Actions. La auditoría de npm en CI del 18-10 detectó avisos de varias severidades: **no acredita explotación efectiva** ni sustituye estudiar el aviso y actualizar con pruebas.
 
-- `npm run test:unit`: pruebas aisladas; utiliza variables ficticias de CI solo para operaciones criptográficas. No llama a una base real.
-- `npm run test:integration`: requiere una instancia **independiente de PostgreSQL de pruebas**, migrada y sembrada con datos ficticios; no ejecutar contra producción.
+- `npm run test:unit`: pruebas aisladas; utiliza variables ficticias de CI solo para operaciones criptográficas. No llama a una base real. Lo ejecuta `.github/workflows/p1-quality.yml` en cada PR.
+- `npm run test:integration`: las pruebas que escriben en Postgres (`api-reports` y `api-cron-engine`); requiere una instancia **independiente de PostgreSQL de pruebas**, migrada y sembrada con datos ficticios; no ejecutar contra producción. `npm test` ejecuta ambas.
 - `npm run typecheck`: comprobación de tipos.
 - Las páginas de 4d leen la base en tiempo de ejecución: su fusión no prueba disponibilidad de la instancia desplegada.
 

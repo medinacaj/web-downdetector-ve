@@ -73,7 +73,10 @@ export function hashAnonymousId(deviceSeed: string): string {
  * (Vercel, Cloudflare, Nginx). No hay IP directa de socket disponible en
  * un Route Handler de Next.js.
  */
-export function getClientIp(request: Request): string {
+/** Desconocida: sin cabecera confiable configurada (o con un valor que no es una IP). */
+export const UNKNOWN_IP = '0.0.0.0';
+
+export function getClientIp(request: { headers: Pick<Headers, 'get'> }): string {
   // Solo confiar en la cabecera que el proxy/CDN autenticado y administrado
   // SOBRESCRIBE. No aceptar X-Forwarded-For aportado libremente por el cliente.
   const configured = process.env.TRUSTED_CLIENT_IP_HEADER?.toLowerCase().trim();

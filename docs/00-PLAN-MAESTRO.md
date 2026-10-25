@@ -158,7 +158,7 @@ incidents + incident_regions + services.status (a añadir: Etapa 3)
 ### Datos
 
 Ver Parte 6 (en el propio `schema.ts`, que ya es la fuente de verdad) —
-17 tablas, descritas con su propósito en los comentarios del archivo.
+18 tablas (17 desde la Etapa 1 más `admin_sessions` de la Etapa 6), descritas con su propósito en los comentarios del archivo.
 
 ### Seguridad
 
@@ -186,10 +186,10 @@ reevaluar `@neondatabase/serverless` o un pool externo (PgBouncer).
 | 1 | Fundación de datos: esquema, migración, seeds, config, pruebas de integridad de datos | — | **Completada** |
 | 2 | API pública de lectura + `POST /api/reports` con validación/rate limiting básico | 1 | **Completada esta sesión** |
 | 3 | Motor de agregación y anomalías (`aggregate:run`), apertura/cierre de incidentes | 2 | **Completada** |
-| 4 | Frontend público: inicio, directorio, página de servicio, mapa, incidentes, estadísticas, metodología | 2, 3 | **En curso — 4a (layout + inicio), 4b (directorio) y 4c (página de servicio con reporte) completadas; 4d (gráfico histórico, mapa, incidentes, estadísticas, metodología) pendiente** |
-| SEO | SEO técnico e indexación: dominio y `metadataBase`, `robots.ts`, `sitemap.ts`, canonical, Open Graph, favicon, datos estructurados y decisión de indexación. Regla permanente de la persona propietaria: forma parte de cada entrega web | 4a–4c | **Pendiente — ver `docs/SEO-PENDIENTE.md`** |
-| 5 | Formulario de reporte conectado de extremo a extremo (UI + API + Turnstile + geolocalización aproximada) | 2, 4 | Pendiente |
-| 6 | Panel administrativo (auth, CRUD servicios/categorías, incidentes, moderación, auditoría, `create-admin`) | 1–3 | Pendiente |
+| 4 | Frontend público: inicio, directorio, página de servicio, mapa, incidentes, estadísticas, metodología | 2, 3 | **Completada** — 4a (layout + inicio), 4b (directorio), 4c (página de servicio con reporte) y 4d (incidentes, metodología, mapa, estadísticas y gráfico de 24 h) |
+| SEO | SEO técnico e indexación: dominio y `metadataBase`, `robots.ts`, `sitemap.ts`, canonical, Open Graph, favicon, datos estructurados y decisión de indexación. Regla permanente de la persona propietaria: forma parte de cada entrega web | 4a–4c | **En curso** — política de indexación decidida (opción A: noindex global mientras todo sea demostrativo), `robots.ts`, `sitemap.ts`, `SITE_URL` y `metadataBase` hechos (2026-10-11); canonical, Open Graph, favicon, 404 propia, páginas de categoría, JSON-LD y metadescripciones por servicio (2026-10-18). **Completo en local**; faltan dominio, hosting y Search Console. Ver `docs/SEO-PENDIENTE.md` |
+| 5 | Formulario de reporte conectado de extremo a extremo (UI + API + Turnstile + geolocalización aproximada) | 2, 4 | **Hecha en código (2026-10-19)** — Turnstile desactivado por defecto y sin probar contra Cloudflare real; estado sugerido sin probar en un hosting real |
+| 6 | Panel administrativo (auth, CRUD servicios/categorías, incidentes, moderación, auditoría, `create-admin`) | 1–3 | **En curso** — 6a (acceso: contraseña + TOTP obligatorio, sesiones en BD, `create-admin`, auditoría) hecha el 2026-10-19; 6b (gestión de contenidos) pendiente |
 | 7 | Prevención de abuso avanzada: puntuación de confianza, detección de campañas coordinadas | 2, 3 | Pendiente |
 | 8 | Tiempo real (SSE) con reconexión y degradación a polling | 2, 3 | Pendiente |
 | 9 | Observabilidad: logs estructurados, página de salud del sistema | 2–8 | Pendiente |
@@ -197,7 +197,7 @@ reevaluar `@neondatabase/serverless` o un pool externo (PgBouncer).
 
 ## Parte 4 — Estructura del repositorio
 
-Estado real a 2026-10-10 (repositorio `medinacaj/web-downdetector-ve`; la
+Estado real a 2026-10-18 (repositorio `medinacaj/web-downdetector-ve`; la
 plataforma se llama PulsoVE):
 
 ```
@@ -219,6 +219,7 @@ web-downdetector-ve/
 │   └── meta/                     # snapshots y _journal.json
 ├── scripts/
 │   ├── aggregate-cron.ts         # npm run aggregate:run
+│   ├── generate-icons.mjs        # favicon.ico y apple-icon.png desde src/app/icon.svg
 │   ├── dev-bootstrap.sh          # entorno desde cero: deps, Postgres, .env, migraciones, semillas
 │   ├── dev-synthetic-traffic.ts  # tráfico sintético para probar el motor
 │   └── seed.ts                   # npm run db:seed
@@ -232,27 +233,44 @@ web-downdetector-ve/
 │   │   │   └── services/
 │   │   │       ├── route.ts
 │   │   │       └── [slug]/       # route.ts + status/, reports/ e incidents/ (cada uno con route.ts)
+│   │   ├── categorias/[slug]/page.tsx   # página de categoría
+│   │   ├── estadisticas/page.tsx # indicadores, reportes por categoría, más reportados, métricas pendientes
+│   │   ├── incidentes/page.tsx   # incidentes activos y resueltos recientes
+│   │   ├── mapa/page.tsx         # cartograma por estado con filtros y vista de tabla
+│   │   ├── metodologia/page.tsx  # metodología con los parámetros reales del motor
 │   │   ├── servicios/
 │   │   │   ├── page.tsx          # directorio
 │   │   │   └── [slug]/page.tsx   # página de servicio + formulario de reporte
 │   │   ├── globals.css
-│   │   ├── layout.tsx
-│   │   └── page.tsx              # inicio
+│   │   ├── layout.tsx            # metadataBase + política de indexación global
+│   │   ├── page.tsx              # inicio
+│   │   ├── not-found.tsx         # 404 propia
+│   │   ├── favicon.ico, icon.svg, apple-icon.png   # generados por scripts/generate-icons.mjs
+│   │   ├── opengraph-image.tsx, twitter-image.tsx  # imagen para compartir (1200×630)
+│   │   ├── robots.ts             # robots.txt dinámico
+│   │   └── sitemap.ts            # sitemap.xml dinámico (vacío mientras rija el noindex)
 │   ├── components/
 │   │   ├── directory/            # ServiceGrid, ViewToggle
-│   │   ├── layout/               # Header, Footer
-│   │   ├── service/              # ReportForm
+│   │   ├── map/                  # Cartogram
+│   │   ├── layout/               # Header, Footer, Breadcrumbs (miga visible + BreadcrumbList)
+│   │   ├── seo/                  # JsonLd
+│   │   ├── service/              # ReportForm, TurnstileWidget, GamblingNotice, HistoryChart + LazyHistoryChart
 │   │   └── ui/                   # StatusBadge, ThemeToggle
 │   └── lib/
 │       ├── api/respond.ts        # sobre de respuesta { data, meta } / { error }
-│       ├── db/                   # client.ts, schema.ts (17 tablas), seed-data/ (categorías, tipos de problema, estados, servicios)
-│       ├── engine/               # aggregate, anomaly, baseline, incident-lifecycle, robust-stats, status-bands, time-bucket
+│       ├── db/                   # client.ts, schema.ts (18 tablas), seed-data/ (categorías, tipos de problema, estados, servicios)
+│       ├── engine/               # aggregate, anomaly, baseline, incident-lifecycle, parameters, robust-stats, status-bands, time-bucket
 │       ├── nav.ts                # registro de rutas: enlaces solo a páginas que existen
 │       ├── privacy.ts
-│       ├── queries/              # directory, home, service-detail, services, status
-│       ├── security/             # rate-limit, sanitize
+│       ├── format.ts             # fechas y duraciones (es-VE, America/Caracas)
+│       ├── history.ts            # serie, incidentes y eje del gráfico de 24 h
+│       ├── map-scale.ts          # clases de color y abreviaturas del cartograma
+│       ├── queries/              # directory, home, incidents, map, service-detail, service-history, services, statistics, status
+│       ├── security/             # rate-limit, sanitize, turnstile
+│       ├── geo.ts                # estado sugerido por cabeceras del hosting
+│       ├── seo/                  # site.ts (SITE_URL, SITE_INDEXING), crawl.ts (robots y sitemap), metadata.ts (pageMetadata), json-ld.ts, brand.ts, share-image.tsx
 │       └── validation/reports.ts
-├── tests/                        # 7 archivos de prueba + setup.ts; 66 pruebas
+├── tests/                        # 15 archivos de prueba + setup.ts; 125 pruebas
 ├── .env.example                  # .env no se versiona
 ├── .gitignore
 ├── drizzle.config.ts
@@ -266,9 +284,7 @@ web-downdetector-ve/
 ```
 
 Todavía no existen: contenido en `public/` (ni en `src/types/`; son carpetas
-vacías que git no versiona), `src/app/{robots,sitemap,not-found}`, favicon e
-imagen Open Graph (ver `docs/SEO-PENDIENTE.md`); las páginas de mapa,
-incidentes, estadísticas y metodología (Etapa 4d); `src/app/admin` (Etapa 6).
+vacías que git no versiona); `src/app/admin` (Etapa 6).
 
 ---
 
@@ -661,3 +677,420 @@ Cashea.
 - `.gitignore`: `CLAUDE.local.md` y `.claude/settings.local.json`.
 - **No verificado:** `npm run build` (Google Fonts bloqueado en el entorno); el
   bootstrap fuera de Linux; nada del SEO contra un dominio real.
+
+### SEO técnico base, primer bloque — 2026-10-11
+
+Primera sesión en Claude Code. Antes de escribir código se verificó el entorno:
+`scripts/dev-bootstrap.sh` funcionó sin cambios en Ubuntu 24.04 (Node 22.22,
+PostgreSQL 16.15), 66/66 pruebas en verde y las rutas clave con los códigos
+esperados en `next dev`.
+
+- **Decisión de la persona propietaria: opción A**, `noindex` global mientras los
+  servicios sean demostrativos (`docs/SEO-PENDIENTE.md`, sección 5).
+- `src/lib/seo/site.ts`: `SITE_URL` (solo origen) y `SITE_INDEXING`. Se indexa
+  únicamente con `SITE_INDEXING="true"` y un origen público en `https`; con
+  cualquier otra cosa el sitio queda en noindex y, si se pidió indexar, el servidor
+  registra el motivo. Abrir la indexación no requiere tocar código.
+- `layout.tsx`: `metadataBase` y `robots` (`noindex, follow` hoy). Única fuente de la
+  política: una prueba falla si una página o layout define su propio `robots`.
+- `src/app/robots.ts` y `src/app/sitemap.ts` (dinámicos) sobre funciones puras de
+  `src/lib/seo/crawl.ts`. `robots.txt` nunca bloquea el sitio (`Disallow: /api/`) y
+  anuncia el sitemap solo si es indexable; el sitemap queda vacío en noindex y, con
+  la indexación abierta, lista portada, directorio y servicios activos.
+- `.env.example`: `SITE_URL` y `SITE_INDEXING`.
+- Pruebas: 66 → **76** (`tests/seo.test.ts`).
+- Verificado en `next dev` con tres configuraciones (por defecto, indexable con un
+  dominio ficticio y mal configurada): ver el registro de `docs/SEO-PENDIENTE.md`.
+- **Hallazgo, sin corregir:** `npm audit` da hoy 20 vulnerabilidades, 3 en
+  producción (`next` crítica, `sharp` y `source-map-js` altas), todas con arreglo
+  disponible. Ya no es cierto que solo afecten a herramientas de desarrollo.
+- **No verificado:** dominio real, `npm run build`, Search Console.
+
+### Dependencias de producción y build real — 2026-10-18
+
+- **Vulnerabilidades de producción corregidas** (detectadas el 2026-10-11): `next`
+  16.3.0 → **16.3.8** (crítica: varias RCE, envenenamiento de caché, SSRF en la
+  optimización de imágenes). Se eligió el parche de la misma serie, no la 16.4: es el
+  salto mínimo que cierra los avisos. Con `npm audit fix` sin `--force`: `sharp`
+  0.35.3 → 0.35.5 y `source-map-js` 1.2.1 → 1.2.2. El lockfile solo cambia esos
+  paquetes y sus binarios (`@next/*`, `@img/*`). `npm audit --omit=dev` → **0**;
+  quedan 17, todas de herramientas de desarrollo (Etapa 10).
+- **`npm run build` y `npm start` verificados por primera vez** (esta sesión sí
+  alcanza Google Fonts). Rutas, `robots.txt`, `sitemap.xml` y `noindex` en
+  producción, igual que en desarrollo.
+- **Fallo destapado por el build, corregido:** la portada no declaraba
+  `dynamic` ni leía datos de la petición, así que `next build` la prerenderizaba y
+  en producción habría mostrado para siempre las cifras del momento del build
+  (pulso nacional, incidentes). Ahora `/`, `/servicios` y `/servicios/[slug]`
+  exportan `dynamic = 'force-dynamic'`. Comprobado en `npm start`: tras borrar los
+  reportes, la portada pasó de 17 a 0 sin reiniciar. `tests/rendering.test.ts`
+  exige `force-dynamic` a toda página que importe `@/lib/queries` o `@/lib/db`
+  (falla sin el arreglo, comprobado).
+- Prueba en Chromium a 390 y 1280 px: portada, directorio y servicio con 200 y sin
+  desborde horizontal; envío real del formulario de reporte (201 y confirmación en
+  pantalla). Único error de consola: un 404 que coincide con `/favicon.ico` (S7).
+- Pruebas: 76 → **77**.
+- **No verificado:** dominio real, despliegue en un hosting, Search Console.
+
+### SEO técnico base, tercer bloque — 2026-10-18
+
+- **Canonical** (S4, S5): `src/lib/seo/metadata.ts` (`pageMetadata`) da a cada página
+  title, description, canonical, Open Graph y Twitter coherentes. Canónicas absolutas
+  (vía `metadataBase` = `SITE_URL`) y sin parámetros: `/servicios?category=…` apunta a
+  `/servicios`; en los servicios, la del slug de la base. Una prueba exige que toda
+  `page.tsx` pública use `pageMetadata`.
+- **Open Graph y Twitter** (S6): `og:locale es_VE`, `summary_large_image` y una imagen
+  1200×630 generada con `next/og` (`src/lib/seo/share-image.tsx`), solo con la marca
+  propia y sin cifras. Hallazgo: la imagen de archivo no llega a las páginas que
+  definen su propio `openGraph` (la metadata se fusiona de forma superficial), así
+  que `pageMetadata` la declara explícitamente.
+- **Iconos** (S7): `favicon.ico` (16/32), `icon.svg`, `apple-icon.png` (180, a sangre)
+  con el trazo de pulso; `scripts/generate-icons.mjs` los regenera con `sharp`.
+- **404 propia** (S11): `src/app/not-found.tsx`, con buscador y enlaces. Limitación de
+  Next 16.3 documentada: la de un servicio inexistente la pinta el cliente (ya pasaba
+  con la 404 por defecto; comprobado construyendo el commit anterior).
+- **Despliegue:** `SITE_URL`/`SITE_INDEXING` deben existir también en `npm run build`
+  (la 404 general es estática).
+- Pruebas: 77 → **81**.
+- Verificado en `next dev` y en `npm run build` + `npm start`, con y sin un `SITE_URL`
+  ficticio, y en Chromium a 390 px. **No verificado:** dominio real, cómo lo muestran
+  WhatsApp/X/Facebook al compartir (necesitan una URL pública), Search Console.
+
+### Páginas de categoría — 2026-10-18
+
+- **URL decidida por la persona propietaria:** `/categorias/<slug>` (frente a
+  `/servicios/categoria/<slug>` y a la raíz). No cambiarla sin redirección 308.
+- `src/app/categorias/[slug]/page.tsx`: title "{Categoría}: estado de los servicios en
+  Venezuela", metadescripción a partir de la descripción de la semilla, introducción,
+  miga de pan visible, "Datos demostrativos", sus servicios (`ServiceGrid`, con estado)
+  y enlaces a las demás categorías. 404 si el slug no existe o no tiene servicios
+  activos.
+- **Enlazado interno:** el directorio enlaza las 8 categorías con `<a>` (el `<select>`
+  de filtro no lo siguen los buscadores) y cada servicio enlaza la suya.
+  `serviceHref`/`categoryHref` en `src/lib/nav.ts`.
+- **Sitemap:** incluye las categorías con servicios activos (81 URL con la indexación
+  abierta).
+- **Aviso legal de apuestas:** sale del código (`GamblingNotice`,
+  `GAMBLING_META_DISCLAIMER`), también en la metadescripción; la descripción de la
+  semilla quedó neutra para no duplicarlo (`db:seed` la sincroniza).
+- `isDemo` en `getDirectoryServices`; `getCategoryBySlug` y
+  `getCategorySlugsWithServices`.
+- Pruebas: 81 → **82** (descripciones de categoría propias y distintas; sitemap con
+  categorías).
+- Verificado en `next dev` y `npm run build` + `npm start` (ver el registro de
+  `docs/SEO-PENDIENTE.md`) y en Chromium a 390 y 1280 px. **No verificado:** dominio
+  real, Search Console.
+
+### SEO técnico base, último bloque — 2026-10-18
+
+- **Datos estructurados** (S9): `src/lib/seo/json-ld.ts` (funciones puras) y
+  `<JsonLd>`. Portada: `WebSite` + `Organization` con nombre, URL y logo propio, nada
+  más. Categorías y servicios: `BreadcrumbList` generado por `<Breadcrumbs>` desde la
+  misma lista que la miga de pan visible (nueva en los servicios: Servicios /
+  Categoría / Servicio). Se escapa `<`. Descartados: `SearchAction` (Google retiró
+  ese cuadro), `Rating`, `Service`, `Product` y cualquier contacto.
+- **Metadescripciones de servicio** (S10): la descripción propia de la semilla más qué
+  ofrece la página; frase legal fija en apuestas. 71 distintas.
+- Pruebas: 82 → **85**.
+- Verificado en `next dev` y `npm run build` + `npm start` extrayendo y parseando el
+  JSON-LD del HTML real, y en Chromium a 390 px. **No verificado:** prueba de
+  resultados enriquecidos de Google (necesita URL pública), dominio, Search Console.
+- **Con esto, el SEO técnico base queda completo en local.** Lo que falta (dominio y
+  redirecciones, rendimiento en producción, Search Console) depende de terceros.
+
+### Etapa 4d, primera parte — 2026-10-18 (incidentes y metodología)
+
+- **`/incidentes`**: activos (por confianza) y resueltos en los últimos 30 días, de
+  servicios activos, con estado en lenguaje prudente, duración, estados afectados y
+  enlaces al servicio y a su categoría. Sin incidentes, no dice "todo normal": dice
+  que el motor no detectó ninguno y que eso no lo garantiza.
+- **`/metodologia`**: fuentes de datos, cálculo (ventanas, línea base, seis señales con
+  sus pesos, renormalización, factor de confiabilidad), bandas de estado, reglas de
+  incidentes, privacidad y limitaciones. Las cifras salen de
+  `src/lib/engine/parameters.ts` (nuevo), que ahora usan también `anomaly.ts`,
+  `incident-lifecycle.ts`, `baseline.ts`, `aggregate-cron.ts` y la API de reportes.
+  Las afirmaciones de privacidad se contrastaron con `src/lib/privacy.ts`.
+- **Fallo corregido (regla innegociable):** sin incidente abierto, la página de
+  servicio mostraba **"Normal"** con una sola ventana de historia (reproducido: un
+  reporte a Netflix + un ciclo del motor → "Normal, confianza 7/100"). Ahora,
+  con menos de 3 ventanas en la línea base de esa franja, "Sin datos suficientes" y sin
+  cifra de confianza (`windowStatus`, con pruebas). Además, la consulta podía tomar una
+  ventana por estado (nunca puntuada): ahora solo la del servicio completo.
+- **Fallo corregido:** los incidentes resueltos mostraban "confianza 0/100" (la del
+  último ciclo, ya en recuperación). Ahora muestran cuándo fue el máximo (`peak_at`),
+  en `/incidentes` y en la página de servicio.
+- **Texto corregido:** la portada y el pie anunciaban "mediciones técnicas
+  automáticas", que no existen (`ENABLE_TECHNICAL_CHECKS=false`).
+- Menú móvil: desvanecido en el borde derecho para que se note que se desplaza.
+- `nav.ts`: `incidents` y `methodology` disponibles; entran solas en menú, pie y
+  sitemap (83 URL con la indexación abierta).
+- Pruebas: 85 → **88**.
+- **Verificado:** `next dev` y `npm run build` + `npm start`; el ciclo completo del
+  motor con tráfico sintético (50 ventanas, sin errores) da los mismos valores que en
+  la Etapa 3 (abierto 87,1 → 92,9 → recuperación 0,0 → resuelto 2,3), lo que confirma
+  que mover los parámetros no cambió el cálculo; `/incidentes` visto con un incidente
+  activo y con uno resuelto; Chromium a 390 y 1280 px sin desbordes ni errores. Datos
+  sintéticos y de prueba eliminados después.
+
+### Etapa 4d, segunda parte — 2026-10-18 (mapa y estadísticas)
+
+- **`/mapa`**: cartograma de cuadrícula (`src/components/map/Cartogram.tsx`) con los
+  `grid_row`/`grid_col` de la Etapa 1; filtros de período (24 h, 7 y 30 días) y
+  servicio en un formulario GET (sin JavaScript); resumen en texto, leyenda, tooltip
+  con ratón y teclado y vista de tabla equivalente. Escala (`src/lib/map-scale.ts`):
+  0 reportes es una clase neutra propia y el resto, 4 clases de una sola tonalidad
+  relativas al máximo. Rampas de marca **validadas con el script de la guía
+  `dataviz`** en claro (`#7aabc4→#173c53`) y oscuro (`#2c6483→#adccdd`; la primera
+  propuesta clara falló: 1,69:1 contra la superficie); texto de cada celda con
+  contraste ≥ 4,5:1. Abreviaturas legibles en las celdas (DC, MIR, ZUL…), únicas.
+- **`/estadisticas`**: fila de indicadores, barras de una sola serie por categoría,
+  servicios más reportados en 24 h y "lo que todavía no publicamos" con su motivo.
+- `src/lib/queries/map.ts` y `statistics.ts`: las consultas salen de las rutas de la
+  API, que ahora solo las envuelven (respuesta idéntica). Textos de métricas
+  pendientes corregidos: el motor existe; lo que falta son datos reales y mediciones
+  técnicas.
+- **Fallo previo corregido:** en tema oscuro, todas las páginas daban un aviso de
+  hidratación de React (el script de tema cambia la clase de `<html>` antes de
+  hidratar). `suppressHydrationWarning` en `<html>`.
+- **Fallo propio corregido antes de entregar:** los tooltips ocultos con `invisible`
+  ensanchaban la página a 390 px; ahora `hidden` y alineados hacia dentro.
+- `nav.ts`: `map` y `statistics` disponibles (ya no queda ninguna ruta pendiente);
+  sitemap con 85 URL con la indexación abierta.
+- Pruebas: 88 → **93**.
+- **Verificado:** `next dev` y `npm run build` + `npm start`; 61 reportes enviados por
+  la API pública repartidos en 7 estados para ver todas las clases; Chromium a 390 y
+  1280 px en claro y oscuro, sin desbordes ni errores de consola; tooltip por teclado.
+  Datos de prueba eliminados después.
+
+### Etapa 4d, tercera parte — 2026-10-18 (gráfico de 24 horas). Etapa 4 completa
+
+- **Gráfico en la página de servicio** ("Últimas 24 horas"): reportes por ventana de
+  15 minutos —la resolución con la que el motor agrega y compara, sin inventar
+  agregaciones horarias—, línea de 2 px con relleno al 10 %, lineal (sin suavizado que
+  invente valores entre ventanas). "Lo habitual" es la mediana de la línea base de esa
+  franja día×hora, en gris discontinuo (no se distingue solo por color), y solo donde
+  la franja tiene al menos 3 ventanas (`MIN_BASELINE_SAMPLES_FOR_STATUS`, el mismo
+  umbral que el estado visible). Incidentes del periodo como franjas. Cursor vertical
+  con tooltip de todas las series (valor primero), navegable con teclado
+  (`accessibilityLayer`), leyenda HTML y tabla equivalente. Sin reportes no se dibuja
+  una línea plana: se dice "Sin reportes en las últimas 24 horas".
+- `src/lib/history.ts` (puro: serie de 96 ventanas, recorte de incidentes, marcas
+  redondas del eje Y) y `src/lib/queries/service-history.ts`. `formatWindow` en
+  `src/lib/format.ts`.
+- **Rendimiento:** `recharts` (406 KB sin comprimir) se carga con `next/dynamic` solo
+  cuando hay gráfico. Medido en producción con Chromium: portada 454 KB de JS y
+  servicio sin reportes 463 KB, ambos sin `recharts`; servicio con gráfico 870 KB.
+- Corregido antes de entregar: marcas del eje Y poco legibles (0, 7, 14, 21, 28) →
+  pasos de 1, 2 o 5 × 10^k (`niceTicks`, con pruebas).
+- Pruebas: 93 → **98**.
+- **Verificado:** `next dev` y `npm run build` + `npm start` con el escenario sintético
+  del motor (pico, línea base e incidente abierto) y con reportes enviados por la API;
+  Chromium a 390 y 1280 px en claro y oscuro, sin desbordes ni errores; tooltip con
+  ratón y con teclado. Datos de prueba eliminados después.
+
+### Etapa 5 — 2026-10-19 (Turnstile y ubicación aproximada)
+
+- **Turnstile** (`src/lib/security/turnstile.ts`, `TurnstileWidget`): desactivado por
+  defecto. Con `ENABLE_TURNSTILE="true"`, `POST /api/reports` valida el token con la
+  API siteverify antes de tocar la base. **Falla cerrada**: sin token o rechazado → 400
+  `verification_failed`; sin claves, Cloudflare caído, error HTTP, respuesta extraña o
+  secreto rechazado → 503 `service_unavailable` (con el motivo en el log). No se envía
+  la IP del usuario (`remoteip` es opcional). Tiempo de espera de 5 s. El widget
+  (render explícito, español, tema automático) solo se carga si el servidor pasa la
+  clave pública, pide un token nuevo tras cada envío y, si su script no carga, lo
+  explica en el formulario.
+- **Ubicación aproximada** (`src/lib/geo.ts`): preselecciona el **estado** a partir de
+  las cabeceras de país y región de Vercel (`x-vercel-ip-country`/`-region`) o
+  Cloudflare (`cf-ipcountry`/`cf-region-code`), solo si el país es VE y el código
+  corresponde a un estado sembrado; la persona puede cambiarlo. Sin GPS, sin servicios
+  de terceros, sin bajar de estado y sin guardar nada aparte. La metodología lo cuenta.
+- **Fallo previo corregido (calidad de datos):** los desplegables de problema y estado
+  arrancaban en el primer elemento, así que quien no los tocaba reportaba "Amazonas" y
+  el primer tipo de problema. Ahora empiezan en "Elige…" y `required` impide enviar sin
+  elegir (salvo un estado sugerido).
+- Códigos de error nuevos en la API: `verification_failed` (400) y
+  `service_unavailable` (503).
+- Pruebas: 98 → **111** (`tests/turnstile.test.ts`, `tests/geo.test.ts`).
+- **Verificado:** `next dev` y `npm run build` + `npm start`. Formulario en Chromium:
+  sin elegir no hay envío; cabeceras de Vercel (VE/M) y de Cloudflare (VE/V) →
+  Miranda y Zulia preseleccionados y guardados; país CO o sin cabeceras → sin
+  sugerencia. Turnstile activado contra el Cloudflare **real**, inalcanzable desde el
+  sandbox: API sin token → 400, con token → 503, formulario con aviso y botón
+  desactivado. Desactivado: 0 peticiones a Cloudflare.
+- **No verificado:** Turnstile contra Cloudflare con claves reales (la red del entorno
+  bloquea `challenges.cloudflare.com` y su documentación); las cabeceras de ubicación en
+  un hosting real (aún no hay despliegue). Las pruebas de Turnstile inyectan las
+  respuestas de siteverify: prueban nuestro código, no a Cloudflare.
+- **Para activarlo (persona propietaria):** crear un widget de Turnstile en el panel de
+  Cloudflare con el dominio definitivo, poner `TURNSTILE_SITE_KEY` y
+  `TURNSTILE_SECRET_KEY` en el entorno del hosting (nunca en el repositorio),
+  `ENABLE_TURNSTILE="true"`, y comprobar un envío real. En Cloudflare como CDN, activar
+  la transformación de cabeceras de ubicación del visitante para la sugerencia de estado.
+
+### Etapa 6a — 2026-10-19 (acceso al panel de administración)
+
+**Decisiones de la persona propietaria:** correo + contraseña con sesión guardada en la
+base (frente a JWT o enlace mágico) y segundo factor TOTP obligatorio.
+
+- **Cuentas:** `npm run create-admin` (contraseña por stdin o `ADMIN_PASSWORD`, nunca
+  por argumento; mínimo 12 caracteres; bcrypt coste 12). `--reset` pone contraseña
+  nueva, borra el TOTP y cierra todas las sesiones (recuperación de quien pierde el
+  teléfono). No hay registro público.
+- **Acceso** (`/admin/acceso` → `/verificar` o `/configurar-2fa` → `/admin`): contraseña
+  y luego código TOTP. TOTP propio (RFC 6238, `node:crypto`), probado con los vectores
+  oficiales de RFC 4226 y RFC 6238; ventana de ±1 paso; un código ya aceptado no vale
+  otra vez (`users.totp_last_step`). Secreto cifrado con AES-256-GCM
+  (`ADMIN_ENCRYPTION_KEY`), generado en la acción de acceso (un GET nunca escribe) y
+  mostrado con QR (`qrcode`) solo durante el alta.
+- **Sesiones** (`admin_sessions`, migraciones 0002 y 0003): token aleatorio de 256 bits
+  en cookie `httpOnly`, `Secure` en producción, `SameSite=Strict`, `path=/admin`; en la
+  base solo su SHA-256. Pendientes de segundo factor: 10 min; activas: 12 h o 2 h sin
+  uso. Token nuevo al completar el segundo factor (evita fijación). El panel lista las
+  sesiones abiertas y permite cerrar una o todas las demás.
+- **Autorización:** `requireAdmin()`/`requireStage()` en cada página y en cada Server
+  Action (guía de autenticación de Next 16: el layout no basta).
+- **Abuso:** mensaje genérico ("Correo o contraseña incorrectos"), comparación bcrypt
+  de relleno cuando el correo no existe (mismo tiempo de respuesta), 5 fallos por correo
+  y 20 por prefijo de IP cada 15 min, 5 códigos fallidos por sesión pendiente. Solo
+  cuentan los fallos (`peekRateLimit`/`resetRateLimit` nuevos).
+- **Auditoría:** cada intento y acción en `audit_logs` con hash del prefijo de IP.
+- **Indexación:** `noindex, nofollow` (meta y `X-Robots-Tag`), fuera de sitemap y de
+  robots.txt; con pruebas.
+- **Fallos propios corregidos antes de entregar:** el hash de relleno escrito a mano no
+  era un hash bcrypt válido (no igualaba tiempos); el límite contaba también los accesos
+  correctos (5 entradas legítimas bloqueaban la cuenta); tras un error se borraba el
+  correo escrito.
+- Dependencias nuevas: `qrcode` 1.5.4 y `server-only`; `npm audit --omit=dev` = 0.
+- Pruebas: 111 → **125**.
+- **Verificado:** `next dev` y `npm run build` + `npm start`; en Chromium, alta con QR,
+  código malo/bueno, código reutilizado rechazado, segundo navegador, cierre remoto de
+  sesión con efecto inmediato, cierre de sesión, bloqueo al sexto fallo incluso con la
+  contraseña buena; cookie con `Secure` en producción; en la base, secreto cifrado y
+  solo hashes de tokens. Los códigos de la prueba se calcularon con una implementación
+  TOTP independiente escrita en el script (comprobación cruzada). Cuenta y datos de
+  prueba borrados después.
+- **No verificado:** con Redis (los límites probados son los de memoria), detrás de un
+  proxy/CDN real (la IP sale de `x-forwarded-for`), apps autenticadoras reales escaneando
+  el QR (el código se calculó en el script).
+
+### Preparación del despliegue en Vercel — 2026-10-19
+
+Decisión de la persona propietaria: publicar en su cuenta de Vercel (plan Hobby).
+- **Motor programado:** `src/lib/engine/cycle.ts` reúne el ciclo (lo usan
+  `npm run aggregate:run` y el nuevo `/api/cron/engine`). El endpoint procesa la
+  última ventana **cerrada**, exige `Authorization: Bearer <CRON_SECRET>` comparada en
+  tiempo constante y falla cerrado sin `CRON_SECRET` (503). Lo dispara
+  `.github/workflows/engine-cron.yml` cada 15 min, porque en Hobby Vercel Cron solo
+  se ejecuta una vez al día.
+- **Base sin computadora:** `.github/workflows/db-setup.yml` (manual) aplica
+  migraciones, siembra y opcionalmente crea o reinicia una cuenta del panel con
+  correo y contraseña como secretos (los registros de Actions son públicos).
+- **Conexión:** pool de 3 conexiones por instancia en Vercel y `prepare: false` con
+  la URL `-pooler` de Neon.
+- Código de error nuevo `unauthorized` (401). Pruebas: 125 → **130**.
+- **Verificado en local:** `npm run build` + `npm start`; el endpoint responde 401
+  sin clave o con una errónea y 200 con la buena (71 servicios puntuados); el paso del
+  flujo de GitHub simulado con bash: sin configurar termina en 0 sin hacer nada, con
+  clave buena 200, con clave mala falla. robots.txt sin cambios.
+- **No verificado:** nada se ha desplegado. El conector de Vercel lee la cuenta pero
+  recibe 403 al listar o crear proyectos; los flujos de GitHub Actions no se han
+  ejecutado en GitHub; Neon, el pooler y las cabeceras de Vercel siguen sin probarse
+  en real. Pasos para la persona propietaria: `docs/DESPLIEGUE-VERCEL.md`.
+
+### Mejoras tomadas de Monitor Cashea — 2026-10-25
+
+La persona propietaria pidió adoptar mejoras de su otro proyecto, Monitor Cashea
+(`medinacaj/monitor-cashea`: sitio estático que comprueba cada 15 min con GitHub
+Actions si la web pública de Cashea responde). Se leyó su código y su historial
+(`status.json`) en modo solo lectura; no se modificó.
+
+**Lo que enseña su historial:** 44 comprobaciones entre el 18 y el 25/10/2026 donde
+se esperaban unas 670, y las 44 con HTTP 403 desde los servidores de GitHub. No se ven
+sus registros de Actions: no se sabe si las ejecuciones no ocurrieron o fallaron al
+publicar. Dos consecuencias para PulsoVE, cuyo motor también se dispara desde GitHub
+Actions (ver «Preparación del despliegue en Vercel»):
+
+- **Frescura de datos** (`src/lib/engine/freshness.ts`, `src/lib/queries/engine.ts`,
+  `<EngineFreshnessNotice>`). Sin un ciclo del motor en `ENGINE_STALE_AFTER_MINUTES`
+  (60 min), las páginas con estados o incidentes —inicio, directorio, servicio,
+  categoría, incidentes, estadísticas— avisan «Datos desactualizados»; si nunca se
+  ejecutó, «Sin análisis todavía». Antes, con el motor detenido, un incidente abierto
+  no podía cerrarse y seguía mostrándose como actual, y la portada decía «Actualizado
+  <hora de la petición>» y «Sin incidentes activos en este momento». Ahora muestra la
+  hora del último ciclo y no afirma ausencia de incidentes con datos viejos.
+  `/api/services/:slug/status` añade `meta.engine`. `/metodologia` explica el umbral.
+  `/mapa` no lleva aviso: cuenta reportes directamente, sin pasar por el motor.
+- **Recuperación de ventanas** (`windowsToProcess` en `src/lib/engine/cycle.ts`). El
+  endpoint del motor procesa en orden las ventanas cerradas pendientes desde la última
+  procesada (como mucho `ENGINE_MAX_CATCH_UP_WINDOWS` = 8) y no reprocesa ninguna
+  anterior: el ciclo de incidentes las ve en orden. Una llamada duplicada no hace nada,
+  así que puede añadirse un cron externo sin quitar GitHub Actions. Las líneas base se
+  recalculan una vez por ejecución; tope de 40 s.
+- Migración `0004`: índices en `aggregated_windows.created_at` y `window_start` para
+  esas dos lecturas.
+
+**Decisión para la futura señal técnica** (hoy `ENABLE_TECHNICAL_CHECKS=false`): se
+adoptará la clasificación de Monitor Cashea. 2xx/3xx = respondió; 401/403/429 = acceso
+restringido, **no** caída; fallo de red o tiempo agotado = «no se pudo comprobar»,
+**no** caída. Un veredicto exige al menos dos proveedores de red independientes que
+coincidan: dos URL o dos reintentos desde el mismo servidor no cuentan. Su 403
+constante muestra que comprobar desde un solo centro de datos no informa de nada.
+
+**No adoptado:**
+- Tipografías propias en vez de `next/font/google`: `next/font` ya las sirve desde el
+  propio dominio, así que el visitante no contacta con Google; solo evitaría la
+  dependencia de red del build.
+- Su selector 24/72 h: el gráfico de PulsoVE cubre 24 h; queda como mejora posible.
+
+- Pruebas: 130 → **139**.
+- **Verificado:** `next dev` con los estados «nunca», «al día» y «desactualizado (3 h)»
+  en las siete páginas y en la API; en Chromium a 390 px (claro y oscuro) y 1280 px,
+  sin desbordamiento horizontal. Con `npm run build` + `npm start`, tras simular 2 h sin
+  motor: la primera llamada recuperó 7 ventanas en orden (5,1 s) y la segunda respondió
+  `processed: []`.
+- **No verificado:** en Vercel o Neon reales (sigue sin desplegarse).
+
+### Fusión con `main` — 2026-10-25
+
+El PR #19 entró en conflicto con `main` (14 archivos). Entre el 18 y el 19/10, `main`
+había recibido otros seis cambios de la persona propietaria, trabajados con otra IA
+(PR #1, #2, #3, #4 y #17, más un commit directo): versiones más simples de lo que esta
+rama ya tenía, y algunas piezas nuevas. Se fusionó `main` en la rama sin reescribir
+historia.
+
+- **Se conservó lo de esta rama** en SEO (`robots.ts`, `sitemap.ts`, layout, metadata)
+  y en `/mapa`, `/incidentes`, `/estadisticas`, `/metodologia`: superconjuntos ya
+  verificados.
+  - El `robots.ts` de `main` respondía `Disallow: /` sin indexación. Google no podría
+    rastrear las páginas ni leer su `noindex`, y una URL enlazada desde fuera podría
+    indexarse sin contenido: lo contrario de la opción A. Además listaba `/admin/`,
+    que CLAUDE.md prohíbe.
+  - `src/lib/seo.ts` y la variable `PUBLIC_INDEXABLE` se retiraron (duplicaban
+    `SITE_INDEXING`). También se quitó un `alternates` que la fusión automática dejó en
+    `/servicios`.
+- **Se adoptó de `main`:**
+  - `getClientIp` solo confía en la cabecera de `TRUSTED_CLIENT_IP_HEADER`.
+  - Normalización de IPv6 e IPv4 mapeada antes del hash.
+  - Límite amplio por prefijo de red en reportes (`REPORT_RATE_LIMIT.prefixMax`,
+    `RATE_LIMIT_PREFIX_MAX`).
+  - Redis que falla cerrado si está configurado y cae.
+  - `tests/security-network.test.ts`.
+  - CI (`p1-quality.yml`: typecheck + `test:unit`), `dependency-audit.yml`, Dependabot.
+  - `docs/ASESOR_LEGAL_TECNOLOGICO.md` y `docs/agent-workflow.md`, con sus secciones en
+    AGENTS.md y CLAUDE.md.
+- **Fallo que la fusión habría introducido, corregido:** con la IP desconocida por
+  defecto, el límite de 20 fallos por IP del acceso al panel (Etapa 6a) pasaba a ser
+  un cubo común, y 20 fallos de cualquiera bloqueaban el acceso de todos. Ahora ese
+  límite solo se aplica con IP atribuible (`requestIp()` en `src/lib/auth/session.ts`);
+  el de 5 fallos por correo sigue siempre.
+- **CI sin base de datos:** las pruebas que escriben en Postgres pasan a
+  `tests/api-*.test.ts` (`api-turnstile`, `api-cron-engine`, junto a `api-reports`);
+  `test:unit` las excluye por patrón.
+- Pruebas: 139 → **144** (134 unitarias + 10 de integración).
+- **Verificado:** `npm run test:unit` con la base ficticia del CI (134 en verde),
+  `test:integration` y `npm test` en local. En Chromium contra `next dev`: 21 accesos
+  fallidos con correos distintos y después el acceso correcto entra (pasa al alta del
+  segundo factor); 5 fallos con el mismo correo bloquean ese correo. Cuenta de prueba
+  borrada.
+- **No verificado:** el workflow `p1-quality.yml` en GitHub (correrá en este PR) y la
+  cabecera `x-forwarded-for` en un despliegue real de Vercel.

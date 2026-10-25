@@ -2,8 +2,9 @@ import type { Metadata } from 'next';
 import { Space_Grotesk, Inter, JetBrains_Mono } from 'next/font/google';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
+import { getSiteConfig } from '@/lib/seo/site';
+import { SITE_NAME } from '@/lib/seo/metadata';
 import './globals.css';
-import { siteUrl, indexable } from '@/lib/seo';
 
 const display = Space_Grotesk({
   subsets: ['latin'],
@@ -21,15 +22,17 @@ const mono = JetBrains_Mono({
   display: 'swap',
 });
 
+const site = getSiteConfig();
+
 export const metadata: Metadata = {
-  metadataBase: siteUrl() ?? undefined,
-  robots: { index: indexable(), follow: indexable() },
-  alternates: siteUrl() ? { canonical: '/' } : undefined,
-  openGraph: { type: 'website', locale: 'es_VE', siteName: 'PulsoVE', title: 'PulsoVE — Estado de servicios en Venezuela', description: 'Observación ciudadana de disponibilidad de servicios en Venezuela. Datos insuficientes no equivalen a normalidad.' },
+  metadataBase: new URL(site.origin),
+  // Política de indexación: ver src/lib/seo/site.ts (hoy noindex global, opción A).
+  robots: site.indexable ? { index: true, follow: true } : { index: false, follow: true },
   title: {
-    default: 'PulsoVE — Estado de servicios en Venezuela',
-    template: '%s | PulsoVE',
+    default: `${SITE_NAME} — Estado de servicios en Venezuela`,
+    template: `%s | ${SITE_NAME}`,
   },
+  applicationName: SITE_NAME,
   description:
     'Consulta si un servicio presenta problemas en Venezuela: internet, bancos, servicios públicos, redes, streaming, juegos y delivery. Monitoreo ciudadano.',
 };
@@ -50,7 +53,9 @@ const THEME_INIT_SCRIPT = `
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="es" className={`${display.variable} ${body.variable} ${mono.variable}`}>
+    // suppressHydrationWarning: THEME_INIT_SCRIPT añade `dark` a <html> antes de hidratar, así que
+    // su className difiere a propósito del HTML del servidor. Solo afecta a los atributos de <html>.
+    <html lang="es" className={`${display.variable} ${body.variable} ${mono.variable}`} suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
       </head>

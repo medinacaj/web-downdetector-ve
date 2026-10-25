@@ -243,6 +243,10 @@ export const aggregatedWindows = pgTable(
   },
   (t) => ({
     serviceWindowIdx: index('aw_service_window_idx').on(t.serviceId, t.windowStart),
+    // Último ciclo del motor (src/lib/queries/engine.ts) y última ventana procesada
+    // (lastProcessedWindowStart en src/lib/engine/cycle.ts) sin recorrer la tabla entera.
+    createdAtIdx: index('aw_created_at_idx').on(t.createdAt),
+    windowStartIdx: index('aw_window_start_idx').on(t.windowStart),
   }),
 );
 
@@ -320,7 +324,42 @@ export const users = pgTable('users', {
   role: userRoleEnum('role').notNull().default('user'),
   status: varchar('status', { length: 16 }).notNull().default('active'),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  // Segundo factor TOTP (Etapa 6), obligatorio para administradores. El secreto se
+  // guarda cifrado (AES-256-GCM, src/lib/auth/crypto.ts), nunca en claro;
+  // totp_enabled_at null = alta pendiente.
+  totpSecretEnc: text('totp_secret_enc'),
+  totpEnabledAt: timestamp('totp_enabled_at', { withTimezone: true }),
+  // Último paso TOTP aceptado: el mismo código no vale dos veces (anti-repetición).
+  totpLastStep: integer('totp_last_step'),
+  lastLoginAt: timestamp('last_login_at', { withTimezone: true }),
 });
+
+/**
+ * Sesiones del panel de administración (Etapa 6). En la base solo vive el hash
+ * SHA-256 del token; el token en claro solo existe en la cookie httpOnly. Así una
+ * sesión se revoca borrando su fila, y una copia de la base no permite suplantar a
+ * nadie. `stage`: pending_mfa (contraseña correcta, falta el código), enrolling (alta
+ * del TOTP pendiente) o active.
+ */
+export const adminSessions = pgTable(
+  'admin_sessions',
+  {
+    id: uuid('id').primaryKey().default(sql`gen_random_uuid()`),
+    userId: uuid('user_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    tokenHash: varchar('token_hash', { length: 64 }).notNull().unique(),
+    stage: varchar('stage', { length: 16 }).notNull(),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+    expiresAt: timestamp('expires_at', { withTimezone: true }).notNull(),
+    lastSeenAt: timestamp('last_seen_at', { withTimezone: true }).notNull().defaultNow(),
+    ipHash: varchar('ip_hash', { length: 64 }),
+    userAgent: varchar('user_agent', { length: 160 }),
+  },
+  (t) => ({
+    userIdx: index('admin_sessions_user_idx').on(t.userId),
+  }),
+);
 
 export const subscriptions = pgTable('subscriptions', {
   id: uuid('id').primaryKey().default(sql`gen_random_uuid()`),

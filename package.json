@@ -19,8 +19,8 @@
     "aggregate:run": "tsx scripts/aggregate-cron.ts",
     "dev:synthetic-traffic": "tsx scripts/dev-synthetic-traffic.ts",
     "db:generate": "drizzle-kit generate",
-    "test:unit": "vitest run --exclude tests/api-reports.test.ts",
-    "test:integration": "vitest run tests/api-reports.test.ts"
+    "test:unit": "vitest run --exclude 'tests/api-*.test.ts'",
+    "test:integration": "vitest run tests/api-"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
@@ -28,17 +28,20 @@
     "drizzle-orm": "^0.45.2",
     "ioredis": "^6.0.0",
     "jsonwebtoken": "^9.0.2",
-    "next": "^16.3.0",
+    "next": "^16.3.8",
     "postgres": "^3.4.4",
+    "qrcode": "^1.5.4",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
     "recharts": "^2.12.7",
+    "server-only": "^0.0.1",
     "zod": "^3.23.8"
   },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.6",
     "@types/jsonwebtoken": "^9.0.7",
     "@types/node": "^20.16.10",
+    "@types/qrcode": "^1.5.6",
     "@types/react": "^19.2.18",
     "@types/react-dom": "^19.2.4",
     "@vitest/ui": "^2.1.2",

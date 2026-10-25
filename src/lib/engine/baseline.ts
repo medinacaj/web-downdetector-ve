@@ -3,8 +3,9 @@ import { db } from '@/lib/db/client';
 import { services, aggregatedWindows, baselines } from '@/lib/db/schema';
 import { getCaracasWeekdayHour } from './time-bucket';
 import { median, medianAbsoluteDeviation } from './robust-stats';
+import { BASELINE_LOOKBACK_DAYS } from './parameters';
 
-const LOOKBACK_DAYS = Number(process.env.BASELINE_LOOKBACK_DAYS ?? 90);
+const LOOKBACK_DAYS = BASELINE_LOOKBACK_DAYS;
 
 /**
  * Recalcula baselines para todos los servicios activos a partir del

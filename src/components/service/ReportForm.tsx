@@ -2,6 +2,7 @@
 
 import { useId, useState } from 'react';
 import { ROUTE, isRouteAvailable } from '@/lib/nav';
+import { TurnstileWidget } from './TurnstileWidget';
 
 interface Option {
   slug?: string;
@@ -25,14 +26,22 @@ export function ReportForm({
   serviceSlug,
   issueTypes,
   states,
+  suggestedStateCode = null,
+  turnstile = null,
 }: {
   serviceSlug: string;
   issueTypes: Option[];
   states: Option[];
+  /** Estado sugerido por la conexión (src/lib/geo.ts); la persona puede cambiarlo. */
+  suggestedStateCode?: string | null;
+  /** Clave pública y script de Turnstile si está activo (src/lib/security/turnstile.ts). */
+  turnstile?: { siteKey: string; scriptUrl: string } | null;
 }) {
   const formId = useId();
   const [state, setState] = useState<SubmitState>({ kind: 'idle' });
   const [consent, setConsent] = useState(false);
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
+  const [turnstileReset, setTurnstileReset] = useState(0);
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -51,10 +60,13 @@ export function ReportForm({
           networkCarrier: form.get('networkCarrier') || undefined,
           comment: form.get('comment') || undefined,
           deviceSeed: getDeviceSeed(),
+          turnstileToken: turnstileToken ?? undefined,
         }),
       });
 
       const json = await res.json();
+      // El token de Turnstile es de un solo uso: se pide otro para el siguiente envío.
+      if (turnstile) setTurnstileReset((n) => n + 1);
 
       if (!res.ok) {
         const message =
@@ -100,8 +112,13 @@ export function ReportForm({
             id={`${formId}-issue`}
             name="issueTypeSlug"
             required
+            defaultValue=""
             className="mt-1 w-full rounded-md border border-border bg-surface px-3 py-2 text-sm focus:border-pulse-500"
           >
+            {/* Sin preselección: antes el primero de la lista se enviaba sin que nadie lo eligiera. */}
+            <option value="" disabled>
+              Elige el problema…
+            </option>
             {issueTypes.map((o) => (
               <option key={o.slug} value={o.slug}>
                 {o.name}
@@ -118,14 +135,24 @@ export function ReportForm({
             id={`${formId}-state`}
             name="stateCode"
             required
+            defaultValue={suggestedStateCode ?? ''}
+            aria-describedby={suggestedStateCode ? `${formId}-state-hint` : undefined}
             className="mt-1 w-full rounded-md border border-border bg-surface px-3 py-2 text-sm focus:border-pulse-500"
           >
+            <option value="" disabled>
+              Elige tu estado…
+            </option>
             {states.map((o) => (
               <option key={o.code} value={o.code}>
                 {o.name}
               </option>
             ))}
           </select>
+          {suggestedStateCode && (
+            <p id={`${formId}-state-hint`} className="mt-1 text-xs text-ink-muted">
+              Sugerido según tu conexión. Cámbialo si no es correcto.
+            </p>
+          )}
         </div>
 
         <div>
@@ -182,7 +209,7 @@ export function ReportForm({
           {isRouteAvailable(ROUTE.methodology) && (
             <>
               {' '}
-              <a href={ROUTE.methodology.href} className="underline underline-offset-2 hover:text-ink">
+              <a href={`${ROUTE.methodology.href}#privacidad`} className="underline underline-offset-2 hover:text-ink">
                 Cómo se protege la ubicación
               </a>
               .
@@ -191,11 +218,20 @@ export function ReportForm({
         </span>
       </label>
 
+      {turnstile && (
+        <TurnstileWidget
+          siteKey={turnstile.siteKey}
+          scriptUrl={turnstile.scriptUrl}
+          onToken={setTurnstileToken}
+          resetSignal={turnstileReset}
+        />
+      )}
+
       {state.kind === 'error' && <p className="text-sm text-status-incident">{state.message}</p>}
 
       <button
         type="submit"
-        disabled={state.kind === 'sending' || !consent}
+        disabled={state.kind === 'sending' || !consent || (turnstile !== null && !turnstileToken)}
         className="rounded-md bg-brand-600 px-4 py-2 text-sm font-medium text-white hover:bg-brand-700 disabled:cursor-not-allowed disabled:opacity-50"
       >
         {state.kind === 'sending' ? 'Enviando…' : 'Enviar reporte'}

@@ -1,16 +1,17 @@
 import { and, eq, gt, sql } from 'drizzle-orm';
+import { REPORT_RATE_LIMIT } from '@/lib/engine/parameters';
+import { getTurnstileConfig, verifyTurnstileToken } from '@/lib/security/turnstile';
 import { db } from '@/lib/db/client';
 import { reports, services, issueTypes, states } from '@/lib/db/schema';
 import { createReportSchema } from '@/lib/validation/reports';
 import { sanitizeFreeText } from '@/lib/security/sanitize';
-import { hashAnonymousId, hashIpPrefix, getClientIp } from '@/lib/privacy';
+import { hashAnonymousId, hashIpPrefix, getClientIp, UNKNOWN_IP } from '@/lib/privacy';
 import { checkRateLimit } from '@/lib/security/rate-limit';
 import { ok, apiError, withErrorHandling } from '@/lib/api/respond';
 
-const REPORT_LIMIT_PER_HASH = Number(process.env.RATE_LIMIT_REPORTS_MAX ?? 5);
-const REPORT_WINDOW_SECONDS = Number(process.env.RATE_LIMIT_REPORTS_WINDOW_SECONDS ?? 3600);
-const prefixLimitRaw = Number(process.env.RATE_LIMIT_PREFIX_MAX ?? 100);
-const REPORT_LIMIT_PER_PREFIX = Number.isInteger(prefixLimitRaw) && prefixLimitRaw > 0 ? prefixLimitRaw : 100;
+const REPORT_LIMIT_PER_HASH = REPORT_RATE_LIMIT.max;
+const REPORT_WINDOW_SECONDS = REPORT_RATE_LIMIT.windowSeconds;
+const REPORT_LIMIT_PER_PREFIX = REPORT_RATE_LIMIT.prefixMax;
 
 /**
  * Puntuación inicial básica (brief, sección 11.2). Es deliberadamente
@@ -76,6 +77,23 @@ async function handlePOST(request: Request) {
   }
   const input = parsed.data;
 
+  // Turnstile (Etapa 5), antes de tocar la base: falla cerrada si está activado.
+  const turnstile = getTurnstileConfig();
+  if (turnstile.enabled) {
+    if ('misconfigured' in turnstile) {
+      console.error(`[turnstile] ${turnstile.misconfigured}`);
+      return apiError('service_unavailable', 'No pudimos verificar el reporte en este momento. Intenta de nuevo más tarde.');
+    }
+    const check = await verifyTurnstileToken(input.turnstileToken, turnstile.secretKey);
+    if (!check.ok) {
+      if (check.reason === 'unavailable') {
+        console.error(`[turnstile] verificación no disponible: ${check.detail}`);
+        return apiError('service_unavailable', 'No pudimos verificar el reporte en este momento. Intenta de nuevo más tarde.');
+      }
+      return apiError('verification_failed', 'No pudimos confirmar que el reporte lo envía una persona. Vuelve a intentarlo.');
+    }
+  }
+
   // Resolver referencias por slug/código a id — 404 explícito si no existen,
   // nunca insertar con una referencia adivinada.
   const [service, issueType, state] = await Promise.all([
@@ -115,7 +133,7 @@ async function handlePOST(request: Request) {
   // Segundo límite, mucho más amplio, por prefijo de red truncado y
   // anonimizado. Solo se aplica si el ingress verifica la IP: cabeceras
   // reenviadas sin una cadena de confianza no sirven como antiabuso.
-  if (ip !== '0.0.0.0') {
+  if (ip !== UNKNOWN_IP) {
     const networkLimit = await checkRateLimit(
       `report:network:${ipPrefixHash}`,
       REPORT_LIMIT_PER_PREFIX,

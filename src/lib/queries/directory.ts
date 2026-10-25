@@ -12,6 +12,7 @@ export interface DirectoryService {
   description: string | null;
   categorySlug: string;
   categoryName: string;
+  isDemo: boolean;
   reportsLast24h: number;
   incidentsAllTime: number;
   status: OperationalStatus;
@@ -19,6 +20,26 @@ export interface DirectoryService {
 
 export async function getCategories() {
   return db.select({ slug: categories.slug, name: categories.name }).from(categories).orderBy(asc(categories.sortOrder));
+}
+
+/** Una categoría por slug (para su página), o null si no existe. */
+export async function getCategoryBySlug(slug: string) {
+  const rows = await db
+    .select({ slug: categories.slug, name: categories.name, description: categories.description })
+    .from(categories)
+    .where(eq(categories.slug, slug))
+    .limit(1);
+  return rows[0] ?? null;
+}
+
+/** Slugs de las categorías con al menos un servicio activo (las demás responden 404). */
+export async function getCategorySlugsWithServices(): Promise<string[]> {
+  const rows = await db
+    .selectDistinct({ slug: categories.slug, sortOrder: categories.sortOrder })
+    .from(categories)
+    .innerJoin(services, and(eq(services.categoryId, categories.id), eq(services.active, true)))
+    .orderBy(asc(categories.sortOrder));
+  return rows.map((r) => r.slug);
 }
 
 export async function getDirectoryServices(params: {
@@ -41,6 +62,7 @@ export async function getDirectoryServices(params: {
       description: services.description,
       categorySlug: categories.slug,
       categoryName: categories.name,
+      isDemo: services.isDemo,
       reportsLast24h: sql<number>`count(distinct ${reports.id}) filter (where ${reports.createdAt} >= ${since24h})::int`,
       incidentsAllTime: sql<number>`count(distinct ${incidents.id})::int`,
     })

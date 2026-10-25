@@ -1,4 +1,4 @@
-import { eq } from 'drizzle-orm';
+import { asc, eq } from 'drizzle-orm';
 import { db } from '@/lib/db/client';
 import { services, categories } from '@/lib/db/schema';
 
@@ -28,4 +28,23 @@ export async function getServiceBySlug(slug: string) {
     .limit(1);
 
   return rows[0] ?? null;
+}
+
+/** Slugs de los servicios activos (los inactivos responden 404), para el sitemap. */
+export async function getActiveServiceSlugs(): Promise<string[]> {
+  const rows = await db
+    .select({ slug: services.slug })
+    .from(services)
+    .where(eq(services.active, true))
+    .orderBy(asc(services.slug));
+  return rows.map((r) => r.slug);
+}
+
+/** Servicios activos para un selector (nombre y slug), en orden alfabético. */
+export async function getActiveServiceOptions(): Promise<{ slug: string; name: string }[]> {
+  return db
+    .select({ slug: services.slug, name: services.name })
+    .from(services)
+    .where(eq(services.active, true))
+    .orderBy(asc(services.name));
 }

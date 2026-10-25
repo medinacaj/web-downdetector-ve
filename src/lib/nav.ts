@@ -21,7 +21,7 @@ export interface RouteInfo {
 export const ROUTE = {
   home: { href: '/', label: 'Inicio', available: true },
   services: { href: '/servicios', label: 'Servicios', available: true },
-  // Etapa 4d: páginas disponibles, con datos agregados y límites explícitos.
+  // Etapa 4d: las cuatro páginas existen.
   map: { href: '/mapa', label: 'Mapa', available: true },
   incidents: { href: '/incidentes', label: 'Incidentes', available: true },
   statistics: { href: '/estadisticas', label: 'Estadísticas', available: true },
@@ -30,4 +30,14 @@ export const ROUTE = {
 
 export function isRouteAvailable(route: RouteInfo): boolean {
   return route.available;
+}
+
+/** Página de una categoría (src/app/categorias/[slug]/page.tsx). */
+export function categoryHref(slug: string): string {
+  return `/categorias/${slug}`;
+}
+
+/** Página de un servicio (src/app/servicios/[slug]/page.tsx). */
+export function serviceHref(slug: string): string {
+  return `${ROUTE.services.href}/${slug}`;
 }

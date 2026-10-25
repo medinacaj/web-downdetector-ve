@@ -1,0 +1,42 @@
+# Ejecuta el motor de detección cada 15 minutos contra el sitio publicado
+# (POST /api/cron/engine, que procesa la última ventana cerrada).
+#
+# Configuración (Settings → Secrets and variables → Actions):
+#   - Variable PULSOVE_URL: origen del sitio, p. ej. https://pulsove.vercel.app
+#   - Secreto  CRON_SECRET: el mismo valor que la variable CRON_SECRET en Vercel
+# Sin ambos, el trabajo termina sin hacer nada (no falla).
+#
+# GitHub solo ejecuta tareas programadas desde la rama por defecto, puede
+# retrasarlas varios minutos y las desactiva tras 60 días sin actividad en
+# un repositorio público. Ver docs/DESPLIEGUE-VERCEL.md.
+name: Motor (cada 15 min)
+
+on:
+  schedule:
+    - cron: '2,17,32,47 * * * *'
+  workflow_dispatch:
+
+permissions: {}
+
+concurrency:
+  group: engine-cron
+  cancel-in-progress: false
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Ejecutar un ciclo del motor
+        env:
+          PULSOVE_URL: ${{ vars.PULSOVE_URL }}
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+        run: |
+          if [ -z "$PULSOVE_URL" ] || [ -z "$CRON_SECRET" ]; then
+            echo "::notice::PULSOVE_URL o CRON_SECRET sin configurar; no se ejecuta el motor."
+            exit 0
+          fi
+          status=$(curl -sS -o body.json -w '%{http_code}' --max-time 90 -X POST \
+            -H "Authorization: Bearer $CRON_SECRET" "${PULSOVE_URL%/}/api/cron/engine")
+          cat body.json; echo
+          test "$status" = "200"
