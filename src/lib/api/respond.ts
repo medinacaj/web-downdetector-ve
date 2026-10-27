@@ -12,6 +12,7 @@ export type ApiErrorCode =
   | 'not_found'
   | 'rate_limited'
   | 'suspicious_activity'
+  | 'service_unavailable'
   | 'internal_error';
 
 const STATUS_BY_CODE: Record<ApiErrorCode, number> = {
@@ -19,6 +20,7 @@ const STATUS_BY_CODE: Record<ApiErrorCode, number> = {
   not_found: 404,
   rate_limited: 429,
   suspicious_activity: 422,
+  service_unavailable: 503,
   internal_error: 500,
 };
 

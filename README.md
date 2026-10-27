@@ -112,6 +112,15 @@ catálogo real — existe solo para ejercitar el motor (brief, sección 28).
 
 ## Qué NO existe todavía
 
+**Actualización — bases de beta privada:** mapa, incidentes, estadísticas,
+metodología y SEO básico ya cuentan con implementaciones en `src/app`; las
+listas históricas de pendientes de este documento y del plan maestro no
+reflejan todas esas incorporaciones. Se añadió integración Turnstile
+opcional (formulario y validación en servidor) y un ejecutor del motor para
+cron de un único host. Configuración, restricciones y pendientes reales de
+despliegue: [`docs/BETA-PRIVADA.md`](docs/BETA-PRIVADA.md). La beta no está
+publicada ni se ha verificado Turnstile con claves reales.
+
 Del frontend: el gráfico principal de la página de servicio (`recharts`
 ya instalado, sin usar), mapa nacional (cartograma — los datos
 `grid_row`/`grid_col` ya existen desde la Etapa 1), página de incidentes

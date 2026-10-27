@@ -1,15 +1,15 @@
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { POST } from '../src/app/api/reports/route';
 import { _resetMemoryRateLimits } from '../src/lib/security/rate-limit';
+import { db } from '../src/lib/db/client';
+import { reports } from '../src/lib/db/schema';
+import { sql } from 'drizzle-orm';
 
 /**
  * Estas pruebas llaman el route handler directamente (sin servidor HTTP) y
  * SÍ tocan Postgres de verdad — requieren DATABASE_URL configurada y la
- * migración aplicada (igual que `npm run db:seed`). No están aisladas en
- * una base de datos de prueba separada: insertan filas reales en la BD de
- * desarrollo. Limitación conocida, documentada en docs/00-PLAN-MAESTRO.md
- * (registro de la Etapa 2) — una base de datos de prueba dedicada es
- * trabajo de la Etapa 10 (CI).
+ * migración aplicada y datos semilla. Ejecutar con DATABASE_URL apuntando
+ * a pulsove_test; nunca usar datos ni credenciales de producción.
  */
 function makeRequest(body: unknown) {
   return new Request('http://localhost/api/reports', {
@@ -22,6 +22,40 @@ function makeRequest(body: unknown) {
 describe('POST /api/reports (integración, Postgres real)', () => {
   beforeEach(() => {
     _resetMemoryRateLimits();
+    vi.stubEnv('ENABLE_TURNSTILE', 'false');
+  });
+  afterEach(() => { vi.unstubAllEnvs(); vi.unstubAllGlobals(); });
+
+  it.each(['missing', 'invalid', 'unavailable'])(
+    'Turnstile %s impide insertar reportes', async (scenario) => {
+      vi.stubEnv('ENABLE_TURNSTILE', 'true');
+      vi.stubEnv('TURNSTILE_SECRET_KEY', 'test-secret-not-real');
+      vi.stubEnv('SITE_URL', 'https://beta.example.test');
+      vi.stubGlobal('fetch', async () => {
+        if (scenario === 'unavailable') throw new Error('provider unavailable');
+        return Response.json({ success: false, 'error-codes': ['invalid-input-response'] });
+      });
+      const count = async () => (await db.select({ n: sql<number>`count(*)::int` }).from(reports))[0].n;
+      const before = await count();
+      const response = await POST(makeRequest({
+        serviceSlug: 'movistar', issueTypeSlug: 'lentitud', stateCode: 'VE-M',
+        deviceSeed: `vitest-challenge-${scenario}-${Date.now()}`,
+        ...(scenario === 'missing' ? {} : { turnstileToken: 'a-token' }),
+      }));
+      expect(response.status).toBe(scenario === 'unavailable' ? 503 : 422);
+      expect(await count()).toBe(before);
+    },
+  );
+
+  it('inserta un reporte después de verificar el desafío', async () => {
+    vi.stubEnv('ENABLE_TURNSTILE', 'true');
+    vi.stubEnv('TURNSTILE_SECRET_KEY', 'test-secret-not-real');
+    vi.stubEnv('SITE_URL', 'https://beta.example.test');
+    vi.stubGlobal('fetch', async () => Response.json({ success: true, hostname: 'beta.example.test', action: 'report' }));
+    const response = await POST(makeRequest({ serviceSlug: 'movistar', issueTypeSlug: 'lentitud',
+      stateCode: 'VE-M', deviceSeed: `vitest-challenge-valid-${Date.now()}`, turnstileToken: 'a-token' }));
+    expect(response.status).toBe(201);
+    expect((await response.json()).data.id).toBeTruthy();
   });
 
   it('crea un reporte válido y devuelve 201 con confianza base', async () => {

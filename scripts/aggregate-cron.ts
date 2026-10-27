@@ -4,9 +4,8 @@
  * puntúa anomalías y actualiza el ciclo de vida de incidentes.
  *
  * Uso: npm run aggregate:run -- --window=15 --at=2026-08-17T14:00:00Z
- * Pensado para invocarse periódicamente (cron externo, GitHub Actions
- * scheduled, etc.) — este proyecto no incluye un scheduler propio todavía
- * (ver docs/00-PLAN-MAESTRO.md, pendientes de la Etapa 3).
+ * Para cron de un único host: scripts/aggregate-scheduled.sh usa --completed
+ * y bloqueo local. Instalación y límites: docs/BETA-PRIVADA.md.
  */
 import 'dotenv/config';
 import { and, eq } from 'drizzle-orm';
@@ -16,26 +15,10 @@ import { aggregateWindow } from '../src/lib/engine/aggregate';
 import { recomputeBaselines } from '../src/lib/engine/baseline';
 import { scoreWindow } from '../src/lib/engine/anomaly';
 import { updateIncidentLifecycle } from '../src/lib/engine/incident-lifecycle';
-
-function parseArgs() {
-  const args = process.argv.slice(2);
-  const windowArg = args.find((a) => a.startsWith('--window='));
-  const atArg = args.find((a) => a.startsWith('--at='));
-  return {
-    windowMinutes: windowArg ? Number(windowArg.split('=')[1]) : 15,
-    at: atArg ? new Date(atArg.split('=')[1]) : new Date(),
-  };
-}
-
-/** Redondea hacia abajo al múltiplo de windowMinutes más cercano, para que ventanas consecutivas no se solapen. */
-function floorToWindow(date: Date, windowMinutes: number): Date {
-  const ms = windowMinutes * 60_000;
-  return new Date(Math.floor(date.getTime() / ms) * ms);
-}
+import { parseRunOptions } from '../src/lib/engine/run-options';
 
 async function main() {
-  const { windowMinutes, at } = parseArgs();
-  const windowStart = floorToWindow(at, windowMinutes);
+  const { windowMinutes, at, windowStart } = parseRunOptions(process.argv.slice(2));
 
   console.log(`→ Ciclo del motor — ventana ${windowMinutes}min, inicio ${windowStart.toISOString()}`);
 

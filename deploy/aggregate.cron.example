@@ -1,0 +1,4 @@
+# Instalar bajo el MISMO usuario y en UN SOLO host. Reemplazar /srv/pulsove.
+# Node >=22 y npm deben estar en PATH; guardar secretos solo en .env protegido.
+# Ejecutar dos minutos después del cierre de cada ventana de 15 min.
+2,17,32,47 * * * * cd /srv/pulsove && bash scripts/aggregate-scheduled.sh >> /srv/pulsove/aggregate.log 2>&1

@@ -106,7 +106,8 @@ export default async function ServiceDetailPage({ params }: { params: Promise<{ 
         <h2 className="font-display text-lg font-semibold">Reportar un problema</h2>
         <p className="mt-1 text-sm text-ink-muted">Toma menos de 20 segundos y es anónimo.</p>
         <div className="mt-4">
-          <ReportForm serviceSlug={service.slug} issueTypes={issueTypeOptions} states={allStates} />
+          <ReportForm serviceSlug={service.slug} issueTypes={issueTypeOptions} states={allStates}
+            turnstileSiteKey={process.env.ENABLE_TURNSTILE === 'true' ? process.env.TURNSTILE_SITE_KEY || '' : null} />
         </div>
       </section>
 

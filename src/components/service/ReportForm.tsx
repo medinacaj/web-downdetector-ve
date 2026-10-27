@@ -2,6 +2,7 @@
 
 import { useId, useState } from 'react';
 import { ROUTE, isRouteAvailable } from '@/lib/nav';
+import { TurnstileChallenge } from './TurnstileChallenge';
 
 interface Option {
   slug?: string;
@@ -25,17 +26,24 @@ export function ReportForm({
   serviceSlug,
   issueTypes,
   states,
+  turnstileSiteKey,
 }: {
   serviceSlug: string;
   issueTypes: Option[];
   states: Option[];
+  // null: deshabilitado; vacío: habilitado pero sin configurar (no permitir envío).
+  turnstileSiteKey?: string | null;
 }) {
   const formId = useId();
   const [state, setState] = useState<SubmitState>({ kind: 'idle' });
   const [consent, setConsent] = useState(false);
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
+  const [challengeAttempt, setChallengeAttempt] = useState(0);
+  const challengeRequired = turnstileSiteKey !== null && turnstileSiteKey !== undefined;
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    if (!consent || state.kind === 'sending' || (challengeRequired && !turnstileToken)) return;
     const form = new FormData(e.currentTarget);
     setState({ kind: 'sending' });
 
@@ -51,6 +59,7 @@ export function ReportForm({
           networkCarrier: form.get('networkCarrier') || undefined,
           comment: form.get('comment') || undefined,
           deviceSeed: getDeviceSeed(),
+          turnstileToken: turnstileToken || undefined,
         }),
       });
 
@@ -68,6 +77,9 @@ export function ReportForm({
       setState({ kind: 'done' });
     } catch {
       setState({ kind: 'error', message: 'No se pudo conectar. Revisa tu conexión e intenta de nuevo.' });
+    } finally {
+      setTurnstileToken(null);
+      setChallengeAttempt(n => n + 1);
     }
   }
 
@@ -193,9 +205,13 @@ export function ReportForm({
 
       {state.kind === 'error' && <p className="text-sm text-status-incident">{state.message}</p>}
 
+      {challengeRequired && (turnstileSiteKey
+        ? <TurnstileChallenge key={challengeAttempt} siteKey={turnstileSiteKey} onToken={setTurnstileToken} />
+        : <p role="alert" className="text-sm text-status-incident">El envío de reportes no está disponible temporalmente.</p>)}
+
       <button
         type="submit"
-        disabled={state.kind === 'sending' || !consent}
+        disabled={state.kind === 'sending' || !consent || (challengeRequired && !turnstileToken)}
         className="rounded-md bg-brand-600 px-4 py-2 text-sm font-medium text-white hover:bg-brand-700 disabled:cursor-not-allowed disabled:opacity-50"
       >
         {state.kind === 'sending' ? 'Enviando…' : 'Enviar reporte'}

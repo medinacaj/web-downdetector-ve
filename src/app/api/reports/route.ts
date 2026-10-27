@@ -5,6 +5,7 @@ import { createReportSchema } from '@/lib/validation/reports';
 import { sanitizeFreeText } from '@/lib/security/sanitize';
 import { hashAnonymousId, hashIpPrefix, getClientIp } from '@/lib/privacy';
 import { checkRateLimit } from '@/lib/security/rate-limit';
+import { verifyTurnstile } from '@/lib/security/turnstile';
 import { ok, apiError, withErrorHandling } from '@/lib/api/respond';
 
 const REPORT_LIMIT_PER_HASH = Number(process.env.RATE_LIMIT_REPORTS_MAX ?? 5);
@@ -75,6 +76,14 @@ async function handlePOST(request: Request) {
     });
   }
   const input = parsed.data;
+
+  const challenge = await verifyTurnstile(input.turnstileToken);
+  if (challenge === 'unavailable') {
+    return apiError('service_unavailable', 'La verificación de seguridad no está disponible. Intenta de nuevo.');
+  }
+  if (challenge === 'rejected') {
+    return apiError('suspicious_activity', 'Completa de nuevo la verificación de seguridad.');
+  }
 
   // Resolver referencias por slug/código a id — 404 explícito si no existen,
   // nunca insertar con una referencia adivinada.
