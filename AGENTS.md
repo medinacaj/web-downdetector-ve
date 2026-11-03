@@ -13,3 +13,6 @@ Al diseñar, corregir, auditar o publicar, leer `docs/ASESOR_LEGAL_TECNOLOGICO.m
 
 ## Colaboración Claude + ChatGPT/Codex mediante GitHub
 Para cambios, auditorías, Pull Requests y transferencias entre agentes, aplicar `docs/agent-workflow.md`. Recuperar el Issue, diff, SHA y resultados de pruebas antes de pedir contexto adicional. No asumir que la rama predeterminada se llama `main`. Mantener estas reglas específicas del proyecto y las exigencias jurídico-tecnológicas aplicables; el protocolo compartido no las reemplaza.
+
+## Controles verificables del proyecto
+Aplicar `docs/ESTANDARES-Y-CONTROLES.md` al cambiar código o datos y `docs/OPERACION-ITIL.md` al preparar cambios operativos. Ejecutar `npm run check:standards` y las pruebas pertinentes. Mantener el diccionario con `npm run docs:data` cuando cambie el esquema; no reescribir migraciones históricas ni sus checksums para hacer pasar controles. Registrar excepciones y verificaciones no ejecutadas. No afirmar certificación ITIL/ISO ni conformidad integral a partir de lint, plantillas o pruebas locales.

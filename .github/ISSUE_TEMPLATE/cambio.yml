@@ -1,0 +1,35 @@
+name: Solicitud de cambio
+description: Evaluar y autorizar un cambio de aplicación, datos o infraestructura.
+title: "[RFC] "
+body:
+  - type: dropdown
+    id: tipo
+    attributes:
+      label: Tipo de cambio propuesto
+      options:
+        - Normal
+        - Estándar (referenciar procedimiento previamente aprobado)
+        - Emergencia
+    validations:
+      required: true
+  - type: textarea
+    id: alcance
+    attributes:
+      label: Objetivo, impacto y dependencias
+      description: Problema, criterio de éxito, componentes, datos, seguridad y usuarios afectados.
+    validations:
+      required: true
+  - type: textarea
+    id: plan
+    attributes:
+      label: Implementación, pruebas y recuperación
+      description: Ventana, pasos, evidencia, backup, compatibilidad, reversión o restauración con sus límites y criterio de detenerse.
+    validations:
+      required: true
+  - type: textarea
+    id: aprobacion
+    attributes:
+      label: Roles, autorización y revisión posterior
+      description: Solicitante, implementador, revisor, aprobador, evidencia de autorización y observación posterior. No publicar sin autorización aplicable.
+    validations:
+      required: true

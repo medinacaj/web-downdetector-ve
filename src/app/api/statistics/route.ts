@@ -12,7 +12,7 @@ import { ok, withErrorHandling } from '@/lib/api/respond';
  * en vez de devolverse como cero o como null silencioso — sección 28: no
  * inventar estadísticas.
  */
-async function handleGET(_request: Request) {
+async function handleGET() {
   const since24h = new Date(Date.now() - 24 * 60 * 60 * 1000);
 
   const [

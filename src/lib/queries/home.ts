@@ -1,4 +1,4 @@
-import { and, asc, desc, eq, gte, ne, sql } from 'drizzle-orm';
+import { asc, desc, eq, gte, ne, sql } from 'drizzle-orm';
 import { db } from '@/lib/db/client';
 import { services, categories, reports, incidents } from '@/lib/db/schema';
 import { statusForService } from './status';

@@ -6,6 +6,8 @@ export function ThemeToggle() {
   const [isDark, setIsDark] = useState<boolean | null>(null);
 
   useEffect(() => {
+    // EXC-LINT-001: leer una vez el tema aplicado antes de hidratar; evita HTML inicial distinto.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setIsDark(document.documentElement.classList.contains('dark'));
   }, []);
 

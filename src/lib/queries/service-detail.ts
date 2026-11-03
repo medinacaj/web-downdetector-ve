@@ -1,4 +1,4 @@
-import { and, desc, eq, isNull, or, sql } from 'drizzle-orm';
+import { desc, eq, isNull, or, sql } from 'drizzle-orm';
 import { db } from '@/lib/db/client';
 import { issueTypes, reports, incidents, states } from '@/lib/db/schema';
 import { getServiceBySlug } from './services';

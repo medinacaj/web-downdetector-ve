@@ -302,6 +302,10 @@ antes de cualquier despliegue con datos reales (sección 4.2 del brief).
 
 ## Documentación
 
+- `docs/ESTANDARES-Y-CONTROLES.md` — nomenclatura, controles automáticos, clasificación de datos y excepciones conocidas; ejecutar `npm run check:standards` antes de entregar cambios.
+- `docs/DICCIONARIO-DATOS.md` — inventario de las 17 tablas, columnas, claves y enumeraciones; se genera con `npm run docs:data` y se comprueba en CI.
+- `docs/OPERACION-ITIL.md` — procedimientos de cambios, incidentes operativos, problemas y recuperación basados en prácticas ITIL; responsables y compromisos de servicio aún deben asignarse.
+
 - `docs/00-PLAN-MAESTRO.md` — evaluación, arquitectura, plan de etapas,
   estructura del repositorio, registro de cambios por etapa.
 - `docs/CATALOGO-SERVICIOS.md` — qué servicios monitorea PulsoVE, criterio de

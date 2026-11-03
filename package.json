@@ -7,7 +7,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
+    "lint": "eslint . --max-warnings=0",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
@@ -20,7 +20,12 @@
     "dev:synthetic-traffic": "tsx scripts/dev-synthetic-traffic.ts",
     "db:generate": "drizzle-kit generate",
     "test:unit": "vitest run --exclude tests/api-reports.test.ts",
-    "test:integration": "vitest run tests/api-reports.test.ts"
+    "test:integration": "vitest run tests/api-reports.test.ts",
+    "check:schema": "tsx scripts/check-schema.ts",
+    "check:migrations": "tsx scripts/check-migrations.ts",
+    "check:standards": "npm run lint && npm run check:schema && npm run check:migrations && npm run check:docs",
+    "docs:data": "tsx scripts/data-dictionary.ts",
+    "check:docs": "tsx scripts/data-dictionary.ts --check"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
@@ -45,6 +50,8 @@
     "autoprefixer": "^10.4.20",
     "dotenv": "^17.4.2",
     "drizzle-kit": "^0.31.10",
+    "eslint": "^9.39.5",
+    "eslint-config-next": "^16.3.0",
     "postcss": "^8.4.47",
     "tailwindcss": "^3.4.13",
     "tsx": "^4.19.1",

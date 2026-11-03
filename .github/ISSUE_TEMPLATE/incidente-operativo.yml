@@ -1,0 +1,31 @@
+name: Incidente operativo de PulsoVE
+description: Registrar una degradación del propio sitio, no un reporte de caída de un proveedor.
+title: "[INC] "
+body:
+  - type: markdown
+    attributes:
+      value: "No adjuntar secretos, IP completas, datos personales ni logs sin depurar. Ante sospecha de vulnerabilidad o datos expuestos, usar el canal privado definido por el responsable."
+  - type: textarea
+    id: impacto
+    attributes:
+      label: Impacto, alcance y prioridad propuesta
+      description: Qué capacidad falla, usuarios afectados, inicio UTC, evidencia depurada y prioridad P1–P4 con motivo.
+    validations:
+      required: true
+  - type: textarea
+    id: coordinacion
+    attributes:
+      label: Responsable y comunicación
+      description: Coordinador, personas de soporte, canal y próxima actualización. No inventar responsables aún no asignados.
+    validations:
+      required: true
+  - type: textarea
+    id: acciones
+    attributes:
+      label: Línea de tiempo y restauración del servicio
+      description: Hechos frente a hipótesis, contención, acciones con UTC, resultados, cambios relacionados y validación de recuperación.
+  - type: textarea
+    id: cierre
+    attributes:
+      label: Cierre y seguimiento
+      description: Evidencia de estabilidad, aceptación del responsable y problema/RFC de seguimiento si corresponde.
