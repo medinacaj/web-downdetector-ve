@@ -4,7 +4,7 @@ El entorno cloud de desarrollo no es el alojamiento público. Esta entrega prepa
 
 ## Web, acceso y datos
 
-Usar Node.js >=22, PostgreSQL >=16 persistente y una base separada para pruebas. Elegir proveedor, región y dominio HTTPS. Antes de invitar usuarios, colocar una barrera de acceso del proveedor o proxy autenticado delante de **todas las páginas y API**. `PUBLIC_INDEXABLE=false` impide indexación, pero no restringe acceso.
+Usar Node.js 22.12+ de la serie 22 o 24 LTS, PostgreSQL >=16 persistente y una base separada para pruebas. Elegir proveedor, región y dominio HTTPS. Antes de invitar usuarios, colocar una barrera de acceso del proveedor o proxy autenticado delante de **todas las páginas y API**. `PUBLIC_INDEXABLE=false` impide indexación, pero no restringe acceso.
 
 Configurar `DATABASE_URL`, `JWT_SECRET` y `ANONYMIZATION_SALT` mediante el almacén de secretos del hosting. No reutilizar valores de desarrollo. Configurar `SITE_URL=https://dominio-aprobado` y mantener `PUBLIC_INDEXABLE=false`. Los servicios semilla son demostrativos: no presentarlos como mediciones reales ni cambiar su marca sin verificar las fuentes.
 
@@ -41,6 +41,10 @@ El ejemplo corre a los minutos 2, 17, 32 y 47 y procesa la última ventana compl
 Limitaciones: el bloqueo es local, no coordina hosts ni invocaciones manuales; no instalar múltiples programadores. Una caída del host puede omitir ventanas. No hay recuperación automática ni garantía de ejecución exactamente una vez. Revisar logs, configurar alerta por ausencia de ciclos y planificar recuperación antes de operar con tráfico real. No ejecutar recuperación histórica sobre incidentes activos sin revisar el motor y respaldar la base.
 
 ## Instalación y pruebas
+
+La migración `0002_integrity_constraints` requiere la transacción del flujo
+`npm run db:migrate:deploy`. No aplicar ese archivo con `psql -f` en autocommit:
+su preflight y los cambios de restricciones deben ejecutarse como una unidad.
 
 ```sh
 npm ci

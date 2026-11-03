@@ -1,7 +1,8 @@
-import { and, desc, eq, ne } from 'drizzle-orm';
+import { and, desc, eq, isNull, ne } from 'drizzle-orm';
 import { db } from '@/lib/db/client';
 import { incidents, aggregatedWindows } from '@/lib/db/schema';
-import { scoreToStatus, STATUS_LABELS_ES, type OperationalStatus } from '@/lib/engine/status-bands';
+import { STATUS_LABELS_ES, type OperationalStatus } from '@/lib/engine/status-bands';
+import { statusFromWindow } from '@/lib/engine/window-status';
 
 /**
  * Estado visible de un servicio cuando no se necesita el detalle completo
@@ -87,7 +88,7 @@ export async function getServiceStatusDetail(serviceId: string): Promise<Service
   const [latestWindow] = await db
     .select()
     .from(aggregatedWindows)
-    .where(eq(aggregatedWindows.serviceId, serviceId))
+    .where(and(eq(aggregatedWindows.serviceId, serviceId), isNull(aggregatedWindows.stateId)))
     .orderBy(desc(aggregatedWindows.windowStart))
     .limit(1);
 
@@ -103,11 +104,11 @@ export async function getServiceStatusDetail(serviceId: string): Promise<Service
     };
   }
 
-  const status = scoreToStatus(latestWindow.confidence);
+  const status = statusFromWindow(latestWindow);
   return {
     status,
     label: STATUS_LABELS_ES[status],
-    confidence: latestWindow.confidence,
+    confidence: status === 'insufficient_data' ? null : latestWindow.confidence,
     officiallyConfirmed: false,
     incidentId: null,
     since: latestWindow.windowStart,

@@ -25,6 +25,10 @@ for (const table of tables.sort((a, b) => getTableConfig(a).name.localeCompare(g
     lines.push(`| ${col.name} | ${col.getSQLType()} | ${col.notNull ? 'no' : 'sí'} | ${primary ? 'sí' : 'no'} | ${col.hasDefault ? 'sí' : 'no'} | ${references.join(', ') || '—'} |`);
   }
   lines.push('', `Índices explícitos: ${config.indexes.map(index => index.config.name).join(', ') || 'ninguno (puede haber índices implícitos de PK/UNIQUE)'}.`, '');
+  lines.push(`Restricciones CHECK: ${config.checks.map(item => item.name).join(', ') || 'ninguna'}.`, '');
+  for (const item of config.uniqueConstraints) {
+    lines.push(`UNIQUE ${item.getName()}: ${item.columns.map(col => col.name).join(', ')}${item.nullsNotDistinct ? ' (NULLS NOT DISTINCT)' : ''}.`, '');
+  }
 }
 lines.push('## Enumeraciones', '');
 for (const value of values.filter(isPgEnum).sort((a, b) => a.enumName.localeCompare(b.enumName))) {

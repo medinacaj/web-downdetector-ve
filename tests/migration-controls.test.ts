@@ -14,7 +14,7 @@ function fixture() {
   const sql = 'CREATE TABLE example (id uuid PRIMARY KEY);\n';
   writeFileSync(join(root, 'drizzle/0000_initial.sql'), sql);
   writeFileSync(join(root, 'drizzle/meta/_journal.json'), JSON.stringify({ entries: [{ idx: 0, tag: '0000_initial' }] }));
-  writeFileSync(join(root, 'drizzle/meta/checksums.json'), JSON.stringify({
+  writeFileSync(join(root, 'drizzle/checksums.json'), JSON.stringify({
     '0000_initial.sql': createHash('sha256').update(sql).digest('hex'),
   }));
   return root;
@@ -40,7 +40,7 @@ describe('control de migraciones', () => {
   });
   it('detecta un checksum eliminado', () => {
     const root = fixture();
-    writeFileSync(join(root, 'drizzle/meta/checksums.json'), '{}');
+    writeFileSync(join(root, 'drizzle/checksums.json'), '{}');
     expect(checkMigrations(root)).toContain('Falta checksum: 0000_initial.sql');
   });
   it('rechaza un journal sin migraciones', () => {

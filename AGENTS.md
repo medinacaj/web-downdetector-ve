@@ -16,3 +16,5 @@ Para cambios, auditorías, Pull Requests y transferencias entre agentes, aplicar
 
 ## Controles verificables del proyecto
 Aplicar `docs/ESTANDARES-Y-CONTROLES.md` al cambiar código o datos y `docs/OPERACION-ITIL.md` al preparar cambios operativos. Ejecutar `npm run check:standards` y las pruebas pertinentes. Mantener el diccionario con `npm run docs:data` cuando cambie el esquema; no reescribir migraciones históricas ni sus checksums para hacer pasar controles. Registrar excepciones y verificaciones no ejecutadas. No afirmar certificación ITIL/ISO ni conformidad integral a partir de lint, plantillas o pruebas locales.
+
+Aplicar además el estándar entregado por el usuario en `docs/ESTANDAR-WEB-INTEGRAL.md`, según contexto y riesgo; consultar `docs/APLICACION-ESTANDAR-WEB.md` para alcance, evidencia y pendientes. No introducir servicios o tecnologías sin utilidad demostrada ni afirmar métricas, auditorías o despliegues que no se ejecutaron.

@@ -9,7 +9,7 @@ const labels:Record<string,string>={possible:'Posible interrupción',detected:'I
 export default async function IncidentsPage(){
  const data=await db.select({id:incidents.id,status:incidents.status,confidence:incidents.confidence,startedAt:incidents.startedAt,endedAt:incidents.endedAt,service:services.name,slug:services.slug,official:incidents.officiallyConfirmed})
  .from(incidents).innerJoin(services,eq(services.id,incidents.serviceId)).orderBy(desc(incidents.startedAt)).limit(100);
- return <main className="mx-auto max-w-5xl px-4 py-10 sm:px-6">
+ return <div className="mx-auto max-w-5xl px-4 py-10 sm:px-6">
   <h1 className="font-display text-3xl font-semibold">Registro de incidentes</h1>
   <p className="mt-3 text-sm text-ink-muted">Señales registradas por el sistema, no necesariamente confirmaciones oficiales. Historial limitado a los 100 más recientes.</p>
   {!data.length?<p className="mt-8 rounded-lg border border-border bg-surface p-5">Aún no existen incidentes registrados. Esto no prueba que todos los servicios estén disponibles.</p>:
@@ -18,5 +18,5 @@ export default async function IncidentsPage(){
    <p className="mt-1 text-sm text-ink-muted">{labels[item.status]||'Estado no determinado'} · {new Intl.DateTimeFormat('es-VE',{timeZone:'America/Caracas',dateStyle:'medium',timeStyle:'short'}).format(item.startedAt)}</p></div>
    <span className="text-sm text-ink-muted">{item.official?'Confirmación del proveedor registrada':'Sin confirmación oficial'}</span>
    </li>)}</ul>}
- </main>;
+ </div>;
 }

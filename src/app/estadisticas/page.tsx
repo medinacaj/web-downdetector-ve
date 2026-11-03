@@ -5,7 +5,7 @@ export const metadata:Metadata={title:'Estadísticas',description:'Cifras agrega
 export default async function StatisticsPage(){
  const {totals,generatedAt,services,hasAnyActivity}=await getHomeData();
  const values=[['Reportes últimas 24 h',totals.reportsLast24h],['Reportes históricos',totals.reportsAllTime],['Servicios activos',totals.servicesCount],['Incidentes sin resolver',totals.incidentsOpen]];
- return <main className="mx-auto max-w-5xl px-4 py-10 sm:px-6">
+ return <div className="mx-auto max-w-5xl px-4 py-10 sm:px-6">
    <h1 className="font-display text-3xl font-semibold">Estadísticas agregadas</h1>
    <p className="mt-3 text-sm text-ink-muted">Corte {new Intl.DateTimeFormat('es-VE',{timeZone:'America/Caracas',dateStyle:'medium',timeStyle:'short'}).format(generatedAt)} (hora Venezuela). Son registros recibidos, no estimaciones de población afectada.</p>
    <dl className="mt-7 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">{values.map(([name,value])=><div key={String(name)} className="rounded-lg border border-border bg-surface p-4"><dt className="text-sm text-ink-muted">{name}</dt><dd className="mt-2 font-mono text-2xl">{value}</dd></div>)}</dl>
@@ -14,5 +14,5 @@ export default async function StatisticsPage(){
    <ul className="mt-4 divide-y divide-border">{services.filter(s=>s.reportsLast24h>0).sort((a,b)=>b.reportsLast24h-a.reportsLast24h).slice(0,25).map(s=>
     <li key={s.slug} className="flex justify-between gap-4 py-3"><span>{s.name}</span><span className="font-mono tabular-nums">{s.reportsLast24h} reportes</span></li>)}</ul>
    <p className="mt-5 text-xs text-ink-muted">La ausencia de incidentes confirmados puede reflejar falta de fuentes. No sustituye la comunicación del proveedor.</p>
- </main>;
+ </div>;
 }

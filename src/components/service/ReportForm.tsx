@@ -85,15 +85,15 @@ export function ReportForm({
 
   if (state.kind === 'done') {
     return (
-      <div className="rounded-lg border border-status-normal/30 bg-status-normal/10 p-5">
+      <div role="status" className="rounded-lg border border-status-normal/30 bg-status-normal/10 p-5">
         <p className="font-medium text-status-normal">Reporte enviado</p>
         <p className="mt-1 text-sm text-ink-muted">
-          Gracias — tu reporte ya forma parte del cálculo de este servicio.
+          Gracias — tu reporte se registró y se incluirá en las próximas actualizaciones del servicio.
         </p>
         <button
           type="button"
           onClick={() => setState({ kind: 'idle' })}
-          className="mt-3 text-sm text-brand-600 underline-offset-2 hover:underline"
+          className="mt-3 text-sm text-brand-600 dark:text-brand-300 underline-offset-2 hover:underline"
         >
           Enviar otro reporte
         </button>
@@ -190,7 +190,7 @@ export function ReportForm({
           className="mt-0.5"
         />
         <span>
-          Envío este reporte de forma anónima y entiendo que no se solicitan datos personales.
+          Entiendo que se utiliza un identificador seudónimo para prevenir abuso. No incluiré nombres, teléfonos ni otros datos personales en el comentario.
           {isRouteAvailable(ROUTE.methodology) && (
             <>
               {' '}
@@ -203,7 +203,8 @@ export function ReportForm({
         </span>
       </label>
 
-      {state.kind === 'error' && <p className="text-sm text-status-incident">{state.message}</p>}
+      {state.kind === 'error' && <p role="alert" className="text-sm text-status-incident">{state.message}</p>}
+      {state.kind === 'sending' && <p role="status" className="text-sm text-ink-muted">Enviando reporte…</p>}
 
       {challengeRequired && (turnstileSiteKey
         ? <TurnstileChallenge key={challengeAttempt} siteKey={turnstileSiteKey} onToken={setTurnstileToken} />

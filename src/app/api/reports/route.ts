@@ -6,6 +6,7 @@ import { sanitizeFreeText } from '@/lib/security/sanitize';
 import { hashAnonymousId, hashIpPrefix, getClientIp } from '@/lib/privacy';
 import { checkRateLimit } from '@/lib/security/rate-limit';
 import { verifyTurnstile } from '@/lib/security/turnstile';
+import { readJsonBody, RequestBodyError } from '@/lib/api/read-json';
 import { ok, apiError, withErrorHandling } from '@/lib/api/respond';
 
 const REPORT_LIMIT_PER_HASH = Number(process.env.RATE_LIMIT_REPORTS_MAX ?? 5);
@@ -64,9 +65,10 @@ async function scoreReport(params: {
 async function handlePOST(request: Request) {
   let body: unknown;
   try {
-    body = await request.json();
-  } catch {
-    return apiError('validation_error', 'El cuerpo de la solicitud no es JSON válido');
+    body = await readJsonBody(request);
+  } catch (error) {
+    if (error instanceof RequestBodyError) return apiError(error.code, error.message);
+    throw error;
   }
 
   const parsed = createReportSchema.safeParse(body);

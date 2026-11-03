@@ -11,7 +11,7 @@ export default async function MapPage(){
    .where(eq(states.active,true))
    .groupBy(states.id).orderBy(states.name);
  const max=Math.max(0,...rows.map(s=>s.count));
- return <main className="mx-auto max-w-5xl px-4 py-10 sm:px-6">
+ return <div className="mx-auto max-w-5xl px-4 py-10 sm:px-6">
   <h1 className="font-display text-3xl font-semibold">Actividad geográfica</h1>
   <p className="mt-3 text-sm text-ink-muted">Vista de regiones mediante cuadrícula esquemática; no es un mapa geográfico exacto ni un indicador concluyente de interrupciones. No se muestran ubicaciones individuales.</p>
   <p className="mt-2 text-xs text-ink-muted">Conteo histórico agregado del sistema, sin atribuirlo a las últimas 24 horas.</p>
@@ -21,5 +21,5 @@ export default async function MapPage(){
    <div className="mt-2 h-2 rounded bg-border"><div className="h-full rounded bg-pulse-500" style={{width:`${max?100*s.count/max:0}%`}}/></div>
   </div>)}</div>
   {!rows.length&&<p className="mt-6 text-ink-muted">No hay regiones cargadas.</p>}
- </main>;
+ </div>;
 }

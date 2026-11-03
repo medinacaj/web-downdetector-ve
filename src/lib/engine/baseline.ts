@@ -14,10 +14,9 @@ const LOOKBACK_DAYS = Number(process.env.BASELINE_LOOKBACK_DAYS ?? 90);
  * crece, migrar a EXTRACT(dow/hour FROM window_start AT TIME ZONE
  * 'America/Caracas') es la optimización natural, no resuelta aquí.
  *
- * Idempotente vía borrar-e-insertar por el mismo motivo que aggregate.ts:
- * `baselines_unique_bucket` sí es UNIQUE, pero con state_id nullable un
- * upsert dirigido a ese índice no deduplicaría correctamente las filas
- * service-wide (NULL != NULL en Postgres).
+ * Recalcula vía borrar-e-insertar. Desde 0002, la restricción UNIQUE NULLS
+ * NOT DISTINCT también protege buckets nacionales con estado NULL.
+ * Se conserva el requisito de ejecutar el ciclo serialmente.
  */
 export async function recomputeBaselines(now: Date = new Date()): Promise<{ bucketsUpdated: number }> {
   const since = new Date(now.getTime() - LOOKBACK_DAYS * 24 * 60 * 60 * 1000);

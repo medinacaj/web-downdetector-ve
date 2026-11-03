@@ -15,6 +15,13 @@
       "when": 1786885627566,
       "tag": "0001_add_network_carrier",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1793714862767,
+      "tag": "0002_integrity_constraints",
+      "breakpoints": true
     }
   ]
 }

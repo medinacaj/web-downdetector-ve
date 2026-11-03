@@ -185,7 +185,7 @@ export default async function HomePage() {
         <ol className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {METHODOLOGY_STEPS.map((step, i) => (
             <li key={step.title}>
-              <span className="font-mono text-sm text-pulse-600">{String(i + 1).padStart(2, '0')}</span>
+              <span className="font-mono text-sm text-pulse-700 dark:text-pulse-400">{String(i + 1).padStart(2, '0')}</span>
               <p className="mt-1 font-medium">{step.title}</p>
               <p className="mt-1 text-sm text-ink-muted">{step.text}</p>
             </li>
@@ -194,7 +194,7 @@ export default async function HomePage() {
         {isRouteAvailable(ROUTE.methodology) && (
           <Link
             href={ROUTE.methodology.href}
-            className="mt-6 inline-block text-sm text-brand-600 underline-offset-2 hover:underline"
+            className="mt-6 inline-block text-sm text-brand-600 dark:text-brand-300 underline-offset-2 hover:underline"
           >
             Leer la metodología completa
           </Link>

@@ -7,7 +7,7 @@ const stages=[
  ['4. Comunicación','Un pico aislado no demuestra una interrupción general. Las señales insuficientes se presentan expresamente como tales.'],
 ];
 export default function MethodologyPage(){
- return <main className="mx-auto max-w-4xl px-4 py-10 sm:px-6">
+ return <div className="mx-auto max-w-4xl px-4 py-10 sm:px-6">
   <h1 className="font-display text-3xl font-semibold">Cómo se evalúan los reportes</h1>
   <p className="mt-4 text-ink-muted">PulsoVE es independiente. El estado de un servicio se estima con la evidencia disponible; no certifica que todos los usuarios puedan utilizarlo.</p>
   <ol className="mt-8 grid gap-4 sm:grid-cols-2">{stages.map(([title,detail])=>
@@ -16,5 +16,5 @@ export default function MethodologyPage(){
   <section className="mt-10"><h2 className="font-display text-xl font-semibold">Limitaciones y privacidad</h2>
    <p className="mt-3 text-ink-muted">El volumen de reportes depende del acceso a Internet y de la participación. Los datos de ejemplo son demostrativos. La geografía presentada en la fase actual es esquemática y no muestra la ubicación precisa de personas. Nunca debe afirmarse una caída oficial sin corroboración suficiente.</p>
   </section>
- </main>;
+ </div>;
 }

@@ -17,7 +17,7 @@ export const createReportSchema = z.object({
   networkCarrier: z.string().max(64).trim().optional(),
   comment: z.string().max(280).trim().optional(),
   // Generado y persistido por el cliente (p. ej. UUID en localStorage).
-  // Nunca es un dato personal; ver src/lib/privacy.ts.
+  // Identificador seudónimo; no equivale a anonimato garantizado. Ver src/lib/privacy.ts.
   deviceSeed: z.string().min(8).max(128),
   turnstileToken: z.string().min(1).max(2048).optional(),
 });

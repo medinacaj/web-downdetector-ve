@@ -19,13 +19,17 @@
     "aggregate:run": "tsx scripts/aggregate-cron.ts",
     "dev:synthetic-traffic": "tsx scripts/dev-synthetic-traffic.ts",
     "db:generate": "drizzle-kit generate",
-    "test:unit": "vitest run --exclude tests/api-reports.test.ts",
-    "test:integration": "vitest run tests/api-reports.test.ts",
+    "test:unit": "vitest run --exclude tests/api-reports.test.ts --exclude tests/db-integrity.test.ts",
+    "test:integration": "vitest run tests/api-reports.test.ts tests/db-integrity.test.ts",
     "check:schema": "tsx scripts/check-schema.ts",
     "check:migrations": "tsx scripts/check-migrations.ts",
     "check:standards": "npm run lint && npm run check:schema && npm run check:migrations && npm run check:docs",
     "docs:data": "tsx scripts/data-dictionary.ts",
-    "check:docs": "tsx scripts/data-dictionary.ts --check"
+    "check:docs": "tsx scripts/data-dictionary.ts --check",
+    "smoke:migrations": "node scripts/smoke-migrations.cjs",
+    "audit:production": "npm audit --omit=dev --audit-level=high",
+    "smoke:accessibility": "node scripts/smoke-accessibility.cjs",
+    "audit:dependencies": "npm audit --audit-level=high"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
@@ -33,29 +37,32 @@
     "drizzle-orm": "^0.45.2",
     "ioredis": "^6.0.0",
     "jsonwebtoken": "^9.0.2",
-    "next": "^16.3.0",
+    "next": "^16.4.4",
     "postgres": "^3.4.4",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
     "recharts": "^2.12.7",
-    "zod": "^3.23.8"
+    "zod": "^4.6.7"
   },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.6",
     "@types/jsonwebtoken": "^9.0.7",
-    "@types/node": "^20.16.10",
+    "@types/node": "^22.20.5",
     "@types/react": "^19.2.18",
     "@types/react-dom": "^19.2.4",
-    "@vitest/ui": "^2.1.2",
+    "@vitest/ui": "^5.1.0",
     "autoprefixer": "^10.4.20",
     "dotenv": "^17.4.2",
-    "drizzle-kit": "^0.31.10",
+    "drizzle-kit": "^0.31.11",
     "eslint": "^9.39.5",
-    "eslint-config-next": "^16.3.0",
+    "eslint-config-next": "^16.4.4",
     "postcss": "^8.4.47",
     "tailwindcss": "^3.4.13",
     "tsx": "^4.19.1",
     "typescript": "^5.6.2",
-    "vitest": "^2.1.2"
+    "vitest": "^5.1.0"
+  },
+  "engines": {
+    "node": "^22.12.0 || ^24.0.0 || >=26.0.0"
   }
 }

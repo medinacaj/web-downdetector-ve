@@ -138,7 +138,7 @@ implementar.
 
 ## Requisitos
 
-- Node.js 22+ (probado con 22.22.2)
+- Node.js 22.12+ en la serie 22, o 24 LTS (entorno local verificado con 24.19.0)
 - PostgreSQL 16+ (usa `gen_random_uuid()` nativo; no requiere pgcrypto)
 - Redis (opcional — sin él, rate limiting y tiempo real degradan a una
   implementación en memoria válida para una sola instancia)
@@ -168,6 +168,11 @@ npm test
 > Postgres 16 real. En una terminal normal o en CI, `drizzle-kit migrate`
 > debería funcionar sin problema; si no, usa `psql -f` como alternativa
 > confiable.
+
+La alternativa manual anterior describe las migraciones históricas 0000/0001.
+Para `0002_integrity_constraints`, usar `npm run db:migrate:deploy`: necesita
+preflight y cambios de restricciones dentro de la misma transacción; no ejecutar
+ese archivo con autocommit.
 
 `npm run dev` ya responde de verdad: abre `http://localhost:3000` (inicio,
 `/servicios`, `/servicios/:slug`) o prueba `curl http://localhost:3000/api/services`.
@@ -210,6 +215,13 @@ configuren credenciales explícitamente). Esta etapa añadió
 `RATE_LIMIT_REPORTS_MAX` y `RATE_LIMIT_REPORTS_WINDOW_SECONDS`.
 
 ## Seguridad — hallazgos de esta etapa
+
+**Estado actualizado al 03-11-2026:** Next 16.4.4, Zod 4.6.7 y Vitest/UI 5.1.0.
+La auditoría ejecutada informa cero avisos en producción; el árbol completo conserva
+21 moderados de herramientas de desarrollo y ninguno alto/crítico. Esto no es un
+pentest ni una garantía de ausencia de vulnerabilidades. CI comprueba también las
+herramientas y bloquea avisos altos/críticos. El detalle y los límites están en
+`docs/APLICACION-ESTANDAR-WEB.md`. Los párrafos siguientes registran etapas anteriores.
 
 `npm audit` encontró y se corrigieron dos vulnerabilidades de severidad alta
 en dependencias de **producción** (Etapa 1):
@@ -301,6 +313,8 @@ antes de cualquier despliegue con datos reales (sección 4.2 del brief).
   confirmar que no hay ningún otro error oculto detrás.
 
 ## Documentación
+
+- `docs/ESTANDAR-WEB-INTEGRAL.md` — estándar proporcionado por el usuario, aplicado por contexto y riesgo; estado y límites en `docs/APLICACION-ESTANDAR-WEB.md`.
 
 - `docs/ESTANDARES-Y-CONTROLES.md` — nomenclatura, controles automáticos, clasificación de datos y excepciones conocidas; ejecutar `npm run check:standards` antes de entregar cambios.
 - `docs/DICCIONARIO-DATOS.md` — inventario de las 17 tablas, columnas, claves y enumeraciones; se genera con `npm run docs:data` y se comprueba en CI.

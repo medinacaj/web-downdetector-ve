@@ -15,6 +15,9 @@
   --ink: 15 23 32;
   --ink-muted: 91 102 114;
   --border: 226 232 238;
+  --status-normal: 19 117 71;
+  --status-elevated: 133 77 14;
+  --status-incident: 185 28 28;
 }
 
 .dark {
@@ -23,6 +26,9 @@
   --ink: 238 242 246;
   --ink-muted: 148 163 180;
   --border: 38 50 68;
+  --status-normal: 74 222 128;
+  --status-elevated: 253 224 71;
+  --status-incident: 248 113 113;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -47,6 +53,8 @@ body {
 
 /* Foco visible y consistente — nunca solo color (brief, sección 18). */
 :focus-visible {
-  outline: 2px solid #00c2a8;
+  outline: 2px solid #0f766e;
   outline-offset: 2px;
 }
+
+.dark :focus-visible { outline-color: #3fe0c4; }

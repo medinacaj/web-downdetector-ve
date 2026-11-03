@@ -79,7 +79,7 @@ export default async function ServiceDetailPage({ params }: { params: Promise<{ 
             href={service.officialUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="mt-2 inline-block text-sm text-brand-600 underline-offset-2 hover:underline"
+            className="mt-2 inline-block text-sm text-brand-600 dark:text-brand-300 underline-offset-2 hover:underline"
           >
             Sitio oficial ↗
           </a>
@@ -104,7 +104,7 @@ export default async function ServiceDetailPage({ params }: { params: Promise<{ 
       {/* Reportar */}
       <section className="mt-8">
         <h2 className="font-display text-lg font-semibold">Reportar un problema</h2>
-        <p className="mt-1 text-sm text-ink-muted">Toma menos de 20 segundos y es anónimo.</p>
+        <p className="mt-1 text-sm text-ink-muted">No necesitas crear una cuenta. Selecciona el problema y la región.</p>
         <div className="mt-4">
           <ReportForm serviceSlug={service.slug} issueTypes={issueTypeOptions} states={allStates}
             turnstileSiteKey={process.env.ENABLE_TURNSTILE === 'true' ? process.env.TURNSTILE_SITE_KEY || '' : null} />

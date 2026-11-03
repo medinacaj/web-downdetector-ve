@@ -36,9 +36,13 @@ jobs:
           node-version: '22'
           cache: npm
       - run: npm ci
+      - name: Avisos de dependencias incluidas las herramientas (bloquea high/critical)
+        run: npm run audit:dependencies
       - run: npm run check:standards
       - run: npm run typecheck
       - run: npm run db:migrate:deploy
       - run: npm run db:seed
       - name: Pruebas unitarias e integración con PostgreSQL aislado
         run: npm test
+      - name: Instalación limpia y rechazo de migración incompatible (bases temporales locales)
+        run: npm run smoke:migrations

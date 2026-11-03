@@ -26,6 +26,22 @@ describe('POST /api/reports (integración, Postgres real)', () => {
   });
   afterEach(() => { vi.unstubAllEnvs(); vi.unstubAllGlobals(); });
 
+  it('rechaza reportes demasiado grandes antes de consultar o insertar', async () => {
+    const response = await POST(makeRequest({ comment: 'x'.repeat(20_000) }));
+    expect(response.status).toBe(413);
+    expect((await response.json()).error.code).toBe('payload_too_large');
+  });
+
+  it('no acepta atributos de confianza ni privilegios enviados por el cliente', async () => {
+    const response = await POST(makeRequest({ serviceSlug: 'movistar', issueTypeSlug: 'lentitud',
+      stateCode: 'VE-M', deviceSeed: `vitest-tampered-${Date.now()}`, confidence: 1, suspicious: false, source: 'admin', role: 'admin' }));
+    expect(response.status).toBe(201);
+    const result = await response.json();
+    expect(result.data.confidence).toBeCloseTo(0.45);
+    const rows = await db.select({ source: reports.source }).from(reports).where(sql`${reports.id} = ${result.data.id}`);
+    expect(rows[0].source).toBe('web');
+  });
+
   it.each(['missing', 'invalid', 'unavailable'])(
     'Turnstile %s impide insertar reportes', async (scenario) => {
       vi.stubEnv('ENABLE_TURNSTILE', 'true');

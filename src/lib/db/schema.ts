@@ -10,7 +10,8 @@ import {
   timestamp,
   jsonb,
   primaryKey,
-  uniqueIndex,
+  unique,
+  check,
   index,
   pgEnum,
 } from 'drizzle-orm/pg-core';
@@ -168,6 +169,7 @@ export const reports = pgTable(
     serviceCreatedIdx: index('reports_service_created_idx').on(t.serviceId, t.createdAt),
     anonHashIdx: index('reports_anon_hash_idx').on(t.anonymousHash),
     ipPrefixIdx: index('reports_ip_prefix_idx').on(t.ipPrefixHash),
+    confidenceRange: check('reports_confidence_range', sql`${t.confidence} between 0 and 1`),
   }),
 );
 
@@ -214,12 +216,14 @@ export const baselines = pgTable(
     updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
   },
   (t) => ({
-    uniqueBucket: uniqueIndex('baselines_unique_bucket').on(
+    uniqueBucket: unique('baselines_unique_bucket').on(
       t.serviceId,
       t.stateId,
       t.weekday,
       t.hour,
-    ),
+    ).nullsNotDistinct(),
+    timeRange: check('baselines_time_range', sql`${t.weekday} between 0 and 6 and ${t.hour} between 0 and 23`),
+    statsRange: check('baselines_stats_range', sql`${t.medianReports} >= 0 and ${t.medianReports} < 'Infinity'::real and ${t.dispersion} > 0 and ${t.dispersion} < 'Infinity'::real and ${t.sampleSize} >= 0`),
   }),
 );
 
@@ -243,6 +247,10 @@ export const aggregatedWindows = pgTable(
   },
   (t) => ({
     serviceWindowIdx: index('aw_service_window_idx').on(t.serviceId, t.windowStart),
+    uniqueBucket: unique('aggregated_windows_unique_bucket').on(t.serviceId, t.stateId, t.windowStart).nullsNotDistinct(),
+    timeOrder: check('aggregated_windows_time_order', sql`${t.windowEnd} > ${t.windowStart}`),
+    countsRange: check('aggregated_windows_counts_range', sql`${t.totalReports} >= 0 and ${t.uniqueReporters} >= 0 and ${t.uniqueReporters} <= ${t.totalReports} and ${t.weightedReports} >= 0 and ${t.weightedReports} < 'Infinity'::real`),
+    scoresRange: check('aggregated_windows_scores_range', sql`${t.anomalyScore} between 0 and 100 and ${t.technicalScore} between 0 and 100 and ${t.confidence} between 0 and 100`),
   }),
 );
 
@@ -275,6 +283,8 @@ export const incidents = pgTable(
     // ordenado por inicio) — el índice anterior antepone service_id y no
     // ayuda a esa consulta.
     statusStartedIdx: index('incidents_status_started_idx').on(t.status, t.startedAt),
+    confidenceRange: check('incidents_confidence_range', sql`${t.confidence} between 0 and 100`),
+    timeOrder: check('incidents_time_order', sql`${t.endedAt} >= ${t.startedAt}`),
   }),
 );
 
@@ -293,6 +303,7 @@ export const incidentRegions = pgTable(
   },
   (t) => ({
     pk: primaryKey({ columns: [t.incidentId, t.stateId] }),
+    countsRange: check('incident_regions_counts_range', sql`${t.reportCount} >= 0 and ${t.confidence} between 0 and 100`),
   }),
 );
 

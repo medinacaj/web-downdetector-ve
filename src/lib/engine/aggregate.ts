@@ -9,12 +9,10 @@ import { services, reports, aggregatedWindows } from '@/lib/db/schema';
  * state_id = null; sirve tanto para el score general del servicio como
  * para poblar incident_regions cuando se abre un incidente.
  *
- * Idempotencia: se borran las filas existentes de (service_id,
- * window_start) antes de insertar — no se usa upsert porque el único
- * índice existente en aggregated_windows no es UNIQUE, y aunque lo fuera,
- * state_id nullable rompería la unicidad (NULL != NULL en Postgres). Borrar
- * y reinsertar es correcto y más simple para un job que recalcula la
- * ventana completa cada vez, no la actualiza incrementalmente.
+ * Recalcula mediante borrar-e-insertar por servicio/ventana. Desde 0002,
+ * UNIQUE NULLS NOT DISTINCT impide duplicados incluso con estado NULL.
+ * La operación completa aún requiere ejecución serial: esa restricción no
+ * convierte el ciclo de borrado/inserción en una transacción distribuida.
  *
  * No escribe anomaly_score/confidence/technical_score aquí — eso es
  * anomaly.ts, que necesita el baseline ya calculado. Aquí solo se cuenta.

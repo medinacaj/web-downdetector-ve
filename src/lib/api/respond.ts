@@ -13,6 +13,9 @@ export type ApiErrorCode =
   | 'rate_limited'
   | 'suspicious_activity'
   | 'service_unavailable'
+  | 'unsupported_media_type'
+  | 'payload_too_large'
+  | 'request_timeout'
   | 'internal_error';
 
 const STATUS_BY_CODE: Record<ApiErrorCode, number> = {
@@ -21,6 +24,9 @@ const STATUS_BY_CODE: Record<ApiErrorCode, number> = {
   rate_limited: 429,
   suspicious_activity: 422,
   service_unavailable: 503,
+  unsupported_media_type: 415,
+  payload_too_large: 413,
+  request_timeout: 408,
   internal_error: 500,
 };
 

@@ -23,6 +23,10 @@ Clasificación y decisiones operativas: [ESTANDARES-Y-CONTROLES.md](ESTANDARES-Y
 
 Índices explícitos: aw_service_window_idx.
 
+Restricciones CHECK: aggregated_windows_time_order, aggregated_windows_counts_range, aggregated_windows_scores_range.
+
+UNIQUE aggregated_windows_unique_bucket: service_id, state_id, window_start (NULLS NOT DISTINCT).
+
 ## audit_logs
 
 | Columna SQL | Tipo | Nullable | PK | Default | Referencia |
@@ -39,6 +43,8 @@ Clasificación y decisiones operativas: [ESTANDARES-Y-CONTROLES.md](ESTANDARES-Y
 
 Índices explícitos: audit_entity_idx.
 
+Restricciones CHECK: ninguna.
+
 ## baselines
 
 | Columna SQL | Tipo | Nullable | PK | Default | Referencia |
@@ -53,7 +59,11 @@ Clasificación y decisiones operativas: [ESTANDARES-Y-CONTROLES.md](ESTANDARES-Y
 | sample_size | integer | no | no | sí | — |
 | updated_at | timestamp with time zone | no | no | sí | — |
 
-Índices explícitos: baselines_unique_bucket.
+Índices explícitos: ninguno (puede haber índices implícitos de PK/UNIQUE).
+
+Restricciones CHECK: baselines_time_range, baselines_stats_range.
+
+UNIQUE baselines_unique_bucket: service_id, state_id, weekday, hour (NULLS NOT DISTINCT).
 
 ## categories
 
@@ -68,6 +78,8 @@ Clasificación y decisiones operativas: [ESTANDARES-Y-CONTROLES.md](ESTANDARES-Y
 
 Índices explícitos: ninguno (puede haber índices implícitos de PK/UNIQUE).
 
+Restricciones CHECK: ninguna.
+
 ## incident_regions
 
 | Columna SQL | Tipo | Nullable | PK | Default | Referencia |
@@ -79,6 +91,8 @@ Clasificación y decisiones operativas: [ESTANDARES-Y-CONTROLES.md](ESTANDARES-Y
 | confidence | real | no | no | sí | — |
 
 Índices explícitos: ninguno (puede haber índices implícitos de PK/UNIQUE).
+
+Restricciones CHECK: incident_regions_counts_range.
 
 ## incidents
 
@@ -101,6 +115,8 @@ Clasificación y decisiones operativas: [ESTANDARES-Y-CONTROLES.md](ESTANDARES-Y
 
 Índices explícitos: incidents_service_status_idx, incidents_status_started_idx.
 
+Restricciones CHECK: incidents_confidence_range, incidents_time_order.
+
 ## issue_types
 
 | Columna SQL | Tipo | Nullable | PK | Default | Referencia |
@@ -112,6 +128,8 @@ Clasificación y decisiones operativas: [ESTANDARES-Y-CONTROLES.md](ESTANDARES-Y
 | active | boolean | no | no | sí | — |
 
 Índices explícitos: ninguno (puede haber índices implícitos de PK/UNIQUE).
+
+Restricciones CHECK: ninguna.
 
 ## moderation_actions
 
@@ -127,6 +145,8 @@ Clasificación y decisiones operativas: [ESTANDARES-Y-CONTROLES.md](ESTANDARES-Y
 
 Índices explícitos: ninguno (puede haber índices implícitos de PK/UNIQUE).
 
+Restricciones CHECK: ninguna.
+
 ## municipalities
 
 | Columna SQL | Tipo | Nullable | PK | Default | Referencia |
@@ -137,6 +157,8 @@ Clasificación y decisiones operativas: [ESTANDARES-Y-CONTROLES.md](ESTANDARES-Y
 | geometry | jsonb | sí | no | no | — |
 
 Índices explícitos: ninguno (puede haber índices implícitos de PK/UNIQUE).
+
+Restricciones CHECK: ninguna.
 
 ## official_updates
 
@@ -153,6 +175,8 @@ Clasificación y decisiones operativas: [ESTANDARES-Y-CONTROLES.md](ESTANDARES-Y
 | verified_by | uuid | sí | no | no | — |
 
 Índices explícitos: ninguno (puede haber índices implícitos de PK/UNIQUE).
+
+Restricciones CHECK: ninguna.
 
 ## reports
 
@@ -175,6 +199,8 @@ Clasificación y decisiones operativas: [ESTANDARES-Y-CONTROLES.md](ESTANDARES-Y
 
 Índices explícitos: reports_service_created_idx, reports_anon_hash_idx, reports_ip_prefix_idx.
 
+Restricciones CHECK: reports_confidence_range.
+
 ## service_endpoints
 
 | Columna SQL | Tipo | Nullable | PK | Default | Referencia |
@@ -190,6 +216,8 @@ Clasificación y decisiones operativas: [ESTANDARES-Y-CONTROLES.md](ESTANDARES-Y
 | created_at | timestamp with time zone | no | no | sí | — |
 
 Índices explícitos: ninguno (puede haber índices implícitos de PK/UNIQUE).
+
+Restricciones CHECK: ninguna.
 
 ## services
 
@@ -209,6 +237,8 @@ Clasificación y decisiones operativas: [ESTANDARES-Y-CONTROLES.md](ESTANDARES-Y
 
 Índices explícitos: services_category_idx.
 
+Restricciones CHECK: ninguna.
+
 ## states
 
 | Columna SQL | Tipo | Nullable | PK | Default | Referencia |
@@ -223,6 +253,8 @@ Clasificación y decisiones operativas: [ESTANDARES-Y-CONTROLES.md](ESTANDARES-Y
 
 Índices explícitos: ninguno (puede haber índices implícitos de PK/UNIQUE).
 
+Restricciones CHECK: ninguna.
+
 ## subscriptions
 
 | Columna SQL | Tipo | Nullable | PK | Default | Referencia |
@@ -236,6 +268,8 @@ Clasificación y decisiones operativas: [ESTANDARES-Y-CONTROLES.md](ESTANDARES-Y
 | active | boolean | no | no | sí | — |
 
 Índices explícitos: ninguno (puede haber índices implícitos de PK/UNIQUE).
+
+Restricciones CHECK: ninguna.
 
 ## technical_checks
 
@@ -254,6 +288,8 @@ Clasificación y decisiones operativas: [ESTANDARES-Y-CONTROLES.md](ESTANDARES-Y
 
 Índices explícitos: tc_endpoint_checked_idx.
 
+Restricciones CHECK: ninguna.
+
 ## users
 
 | Columna SQL | Tipo | Nullable | PK | Default | Referencia |
@@ -266,6 +302,8 @@ Clasificación y decisiones operativas: [ESTANDARES-Y-CONTROLES.md](ESTANDARES-Y
 | created_at | timestamp with time zone | no | no | sí | — |
 
 Índices explícitos: ninguno (puede haber índices implícitos de PK/UNIQUE).
+
+Restricciones CHECK: ninguna.
 
 ## Enumeraciones
 

@@ -9,7 +9,7 @@ export function checkMigrations(root: string): string[] {
   try {
     const dir = join(root, 'drizzle');
     const journal = JSON.parse(readFileSync(join(dir, 'meta/_journal.json'), 'utf8'));
-    const checksums = JSON.parse(readFileSync(join(dir, 'meta/checksums.json'), 'utf8'));
+    const checksums = JSON.parse(readFileSync(join(dir, 'checksums.json'), 'utf8'));
     if (!Array.isArray(journal.entries) || !checksums || typeof checksums !== 'object' || Array.isArray(checksums)) {
       return ['Formato inválido del journal o checksums'];
     }

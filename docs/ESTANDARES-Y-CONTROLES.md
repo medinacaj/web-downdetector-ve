@@ -52,7 +52,7 @@ CI ejecuta esas puertas salvo build, que sigue siendo una comprobación local de
 
 1. Crear migración nueva y descripción del cambio; no usar `db:migrate`/push en producción.
 2. Revisar SQL, journal y snapshot, incluyendo SQL generado automáticamente; no basta con que Drizzle termine sin error.
-3. Añadir **solo la entrada nueva** a `drizzle/meta/checksums.json` usando el SHA-256 del SQL revisado. Ejemplo: `sha256sum drizzle/0002_descripcion.sql`. Conservar intactos los hashes previos.
+3. Añadir **solo la entrada nueva** a `drizzle/checksums.json` usando el SHA-256 del SQL revisado. Ejemplo: `sha256sum drizzle/0002_descripcion.sql`. Conservar intactos los hashes previos.
 4. Probar instalación desde cero y actualización desde la versión anterior con datos ficticios; evaluar bloqueos y compatibilidad con la versión web/worker aún activa.
 5. Antes de producción: backup recuperable probado, autorización RFC, ventana y criterio de detenerse. Revertir código no revierte automáticamente cambios de datos; puede requerirse corrección hacia adelante o restauración.
 
@@ -81,11 +81,11 @@ En producción separar identidad de migraciones de la cuenta de aplicación, con
 | DB-01 | PK, nombres, timestamps y referencias nuevas | scripts/check-schema.ts y tests | Automatizado sobre código, excepciones explícitas |
 | DB-02 | historial de migraciones íntegro | checksums + journal + tests | Automatizado local; exige revisión de hashes previos |
 | DB-03 | documentación de datos actualizada | generador + check:docs | Automatizado sobre código, no prueba drift de producción |
-| DB-04 | rangos, unicidad y borrados del dominio | esquema revisado | Pendiente: faltan CHECK numéricos y revisión de `baselines` con estado NULL; no se alteró el esquema en esta entrega |
+| DB-04 | rangos, unicidad y borrados del dominio | migración 0002, tests DB y ensayo limpio/incompatible | Rangos y buckets nacionales protegidos en pruebas; migración en hosting y semántica de borrados/retención pendientes |
 | DB-05 | recuperación real y cuentas mínimas | procedimiento de operación y ensayo local dump/restore | Ensayo local aprobado con datos ficticios; política, RPO/RTO, cuentas mínimas y prueba en hosting por asignar |
 | SEC-01 | recepción de reportes protegida | validación, límites y Turnstile | Tests locales; claves/proxy/despliegue reales aún no verificados |
 | SEC-02 | evaluación completa de seguridad y accesos | referencia ASVS | Pendiente de matriz por requisito, pruebas y roles del panel |
-| UX-01 | accesibilidad AA | objetivo WCAG 2.2 | Pendiente de auditoría: ESLint no acredita conformidad |
+| UX-01 | accesibilidad AA | objetivo WCAG 2.2, teclado y análisis automatizado en navegador | Comprobación local de escenarios definidos; lector de pantalla y evaluación manual completa pendientes |
 | OPS-01 | cambios, incidentes y problemas | OPERACION-ITIL.md y plantillas | Procedimiento definido; personas, canal y ejercicios por asignar |
 | OPS-02 | monitoreo, capacidad y disponibilidad | web, PostgreSQL y worker identificados | SLO, alertas y guardia no configurados en hosting |
 | GOV-01 | evidencia y revisión independiente | PR/RFC y política de excepciones | Depende de adopción y controles remotos; no se presume implantado |
@@ -100,6 +100,6 @@ Cada excepción necesita motivo, riesgo, control compensatorio, persona que la a
 | EXC-TOOL-001 | ESLint 9 señalado como fuera de soporte por npm | El plugin React utilizado declara compatibilidad hasta 9; no se fuerza una combinación incompatible con 10 | Actualización compatible o alternativa revisada; no afirmar toolchain plenamente vigente |
 | EXC-DB-001 | `incidents.created_by` y `official_updates.verified_by` sin FK | Existentes; permitidas de forma puntual por el control | Definir semántica de eliminación y migración con preflight de huérfanos |
 | EXC-DB-002 | `moderation_actions.target_id`, `audit_logs.entity_id` polimórficos | Una FK simple no representa múltiples destinos | Validación de destino en servidor al implementar administración/auditoría |
-| EXC-DB-003 | unicidad de baseline con estado NULL; rangos sin CHECK | Las escrituras actuales dependen de lógica de aplicación y ejecución serial | Migración revisada, análisis de duplicados/rangos y pruebas antes de concurrencia/distribución |
+| EXC-DB-003 | unicidad de baseline/ventanas con estado NULL; rangos sin CHECK | Corregidos por migración 0002 en pruebas: CHECK y UNIQUE NULLS NOT DISTINCT, preflight sin borrar datos | Aplicar mediante cambio autorizado en hosting; el worker sigue requiriendo ejecución serial |
 
-Prioridad siguiente: resolver DB-04 con migraciones y pruebas de dominio; después configurar y ensayar DB-05/OPS-02 en el hosting elegido. Panel administrativo, política de retención y evaluación de privacidad siguen pendientes. Estos puntos impiden afirmar cumplimiento integral.
+Prioridad siguiente: revisar/aplicar 0002 y configurar/ensayar DB-05/OPS-02 en el hosting elegido. Panel administrativo, política de retención y evaluación de privacidad siguen pendientes. Estos puntos impiden afirmar cumplimiento integral. Aplicación del estándar integral del usuario y puerta de lanzamiento: [APLICACION-ESTANDAR-WEB.md](APLICACION-ESTANDAR-WEB.md).
