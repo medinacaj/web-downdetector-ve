@@ -1,4 +1,4 @@
-import { and, desc, eq, isNull, ne } from 'drizzle-orm';
+import { and, desc, eq, inArray, isNull, ne } from 'drizzle-orm';
 import { db } from '@/lib/db/client';
 import { incidents, aggregatedWindows } from '@/lib/db/schema';
 import { STATUS_LABELS_ES, type OperationalStatus } from '@/lib/engine/status-bands';
@@ -11,27 +11,24 @@ import { statusFromWindow } from '@/lib/engine/window-status';
  * incidente abierto, o insufficient_data si no hay ninguno.
  */
 export async function statusForService(serviceId: string): Promise<OperationalStatus> {
-  const [openIncident] = await db
-    .select({ status: incidents.status })
+  return (await statusesForServices([serviceId])).get(serviceId) ?? 'insufficient_data';
+}
+
+/** Una lectura por listado; cada servicio conserva su entrada aunque no tenga incidente. */
+export async function statusesForServices(serviceIds: string[]): Promise<Map<string, OperationalStatus>> {
+  const statuses = new Map<string, OperationalStatus>(serviceIds.map(id => [id, 'insufficient_data']));
+  if (!statuses.size) return statuses;
+
+  const openIncidents = await db
+    .selectDistinctOn([incidents.serviceId], { serviceId: incidents.serviceId, status: incidents.status })
     .from(incidents)
-    .where(and(eq(incidents.serviceId, serviceId), ne(incidents.status, 'resolved')))
-    .limit(1);
+    .where(and(inArray(incidents.serviceId, [...statuses.keys()]), ne(incidents.status, 'resolved')))
+    .orderBy(incidents.serviceId, desc(incidents.startedAt), desc(incidents.id));
 
-  if (!openIncident) return 'insufficient_data';
-
-  switch (openIncident.status) {
-    case 'possible':
-      return 'possible_outage';
-    case 'detected':
-      return 'outage_detected';
-    case 'high_confidence':
-    case 'confirmed':
-      return 'outage_high_confidence';
-    case 'recovering':
-      return 'possible_outage';
-    default:
-      return 'insufficient_data';
+  for (const incident of openIncidents) {
+    statuses.set(incident.serviceId, INCIDENT_STATUS_TO_OPERATIONAL[incident.status]);
   }
+  return statuses;
 }
 
 // incidents.status (brief, sección 7.5/9.6) -> OperationalStatus visible.
@@ -69,7 +66,7 @@ export async function getServiceStatusDetail(serviceId: string): Promise<Service
     .select()
     .from(incidents)
     .where(and(eq(incidents.serviceId, serviceId), ne(incidents.status, 'resolved')))
-    .orderBy(desc(incidents.startedAt))
+    .orderBy(desc(incidents.startedAt), desc(incidents.id))
     .limit(1);
 
   if (openIncident) {

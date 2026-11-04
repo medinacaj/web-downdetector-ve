@@ -1,7 +1,7 @@
 import { and, asc, eq, ilike, sql } from 'drizzle-orm';
 import { db } from '@/lib/db/client';
 import { services, categories, reports, incidents } from '@/lib/db/schema';
-import { statusForService } from './status';
+import { statusesForServices } from './status';
 import type { OperationalStatus } from '@/lib/engine/status-bands';
 
 export type DirectorySort = 'activity' | 'alphabetical' | 'stability';
@@ -52,9 +52,10 @@ export async function getDirectoryServices(params: {
     .groupBy(services.id, categories.slug, categories.name)
     .orderBy(asc(services.name));
 
-  let withStatus: DirectoryService[] = await Promise.all(
-    rows.map(async ({ id, ...rest }) => ({ ...rest, status: await statusForService(id) })),
-  );
+  const statuses = await statusesForServices(rows.map(row => row.id));
+  let withStatus: DirectoryService[] = rows.map(({ id, ...rest }) => ({
+    ...rest, status: statuses.get(id) ?? 'insufficient_data',
+  }));
 
   if (params.status) {
     withStatus = withStatus.filter((s) => s.status === params.status);

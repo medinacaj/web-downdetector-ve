@@ -1,7 +1,7 @@
 import { asc, desc, eq, gte, ne, sql } from 'drizzle-orm';
 import { db } from '@/lib/db/client';
 import { services, categories, reports, incidents } from '@/lib/db/schema';
-import { statusForService } from './status';
+import { statusesForServices } from './status';
 import type { OperationalStatus } from '@/lib/engine/status-bands';
 
 export interface ServiceSummary {
@@ -32,12 +32,11 @@ export async function getHomeData() {
     .groupBy(services.id, categories.slug, categories.name)
     .orderBy(asc(services.name));
 
-  const servicesWithStatus: ServiceSummary[] = await Promise.all(
-    serviceRows.map(async ({ id, ...rest }) => ({
-      ...rest,
-      status: await statusForService(id),
-    })),
-  );
+  const statuses = await statusesForServices(serviceRows.map(row => row.id));
+  const servicesWithStatus: ServiceSummary[] = serviceRows.map(({ id, ...rest }) => ({
+    ...rest,
+    status: statuses.get(id) ?? 'insufficient_data',
+  }));
 
   const hasAnyActivity = servicesWithStatus.some((s) => s.reportsLast24h > 0);
   const mostActive = hasAnyActivity

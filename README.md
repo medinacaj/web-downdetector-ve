@@ -347,6 +347,7 @@ Se configuran PRs de actualización semanales con Dependabot y una auditoría pr
 
 - `npm run test:unit`: pruebas aisladas; utiliza variables ficticias de CI solo para operaciones criptográficas. No llama a una base real.
 - `npm run test:integration`: requiere una instancia **independiente de PostgreSQL de pruebas**, migrada y sembrada con datos ficticios; no ejecutar contra producción.
+  La regresión de listados crea otra base temporal local: la URL debe terminar en `_test` y el rol necesita permiso para crear bases. Comprueba resultados y presupuesto SQL con PostgreSQL real, y elimina exclusivamente su fixture.
 - `npm run typecheck`: comprobación de tipos.
 - Las páginas de 4d leen la base en tiempo de ejecución: su fusión no prueba disponibilidad de la instancia desplegada.
 
