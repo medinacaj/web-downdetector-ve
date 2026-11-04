@@ -16,6 +16,7 @@ import { recomputeBaselines } from '../src/lib/engine/baseline';
 import { scoreWindow } from '../src/lib/engine/anomaly';
 import { updateIncidentLifecycle } from '../src/lib/engine/incident-lifecycle';
 import { parseRunOptions } from '../src/lib/engine/run-options';
+import { logServiceFailure } from '../src/lib/observability/events';
 
 async function main() {
   const { windowMinutes, at, windowStart } = parseRunOptions(process.argv.slice(2));
@@ -76,6 +77,6 @@ async function main() {
 }
 
 main().catch((err) => {
-  console.error('✗ Ciclo del motor falló:', err);
+  logServiceFailure('worker.cycle_failed', err);
   process.exit(1);
 });

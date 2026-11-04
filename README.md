@@ -314,6 +314,11 @@ antes de cualquier despliegue con datos reales (sección 4.2 del brief).
 
 ## Documentación
 
+Señales mínimas para operación: `/api/health/live` comprueba vida del proceso y
+`/api/health` comprueba lectura básica de PostgreSQL (200/503, sin detalles internos).
+`npm run smoke:health` prueba salud, recuperación y privacidad de errores con una base
+local temporal después del build. Configuración y límites: `docs/OPERACION-ITIL.md`.
+
 - `docs/ESTANDAR-WEB-INTEGRAL.md` — estándar proporcionado por el usuario, aplicado por contexto y riesgo; estado y límites en `docs/APLICACION-ESTANDAR-WEB.md`.
 
 - `docs/ESTANDARES-Y-CONTROLES.md` — nomenclatura, controles automáticos, clasificación de datos y excepciones conocidas; ejecutar `npm run check:standards` antes de entregar cambios.

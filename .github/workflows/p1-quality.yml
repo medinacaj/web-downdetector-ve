@@ -46,3 +46,6 @@ jobs:
         run: npm test
       - name: Instalación limpia y rechazo de migración incompatible (bases temporales locales)
         run: npm run smoke:migrations
+      - run: npm run build
+      - name: HTTP de salud, recuperación y privacidad de logs (base local temporal)
+        run: npm run smoke:health

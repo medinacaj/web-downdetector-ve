@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { logServiceFailure } from '../observability/events';
 
 /**
  * Sobre de respuesta consistente para toda la API pública (brief, sección
@@ -41,7 +42,7 @@ export function apiError(
 ) {
   return NextResponse.json(
     { error: { code, message, details: details ?? null } },
-    { status: STATUS_BY_CODE[code] },
+    { status: STATUS_BY_CODE[code], headers: { 'Cache-Control': 'no-store' } },
   );
 }
 
@@ -50,9 +51,8 @@ export function apiError(
  * (p. ej. Postgres caído, un bug no previsto) devuelva un error genérico y
  * consistente en vez de dejar escapar un stack trace — visto en vivo al
  * probar esta etapa: una conexión rechazada devolvía el mensaje interno
- * completo, incluyendo la consulta SQL. El detalle real queda en el log
- * del servidor, no en la respuesta HTTP (sección 21 del brief: no exponer
- * detalles internos).
+ * completo, incluyendo la consulta SQL. Se registra únicamente un evento
+ * estructurado con categoría y referencia, sin SQL ni datos del usuario.
  */
 export function withErrorHandling<Args extends unknown[]>(
   handler: (request: Request, ...args: Args) => Promise<Response>,
@@ -61,8 +61,8 @@ export function withErrorHandling<Args extends unknown[]>(
     try {
       return await handler(request, ...args);
     } catch (err) {
-      console.error('Error no manejado en ruta API:', err);
-      return apiError('internal_error', 'Ocurrió un error interno. Intenta de nuevo en unos momentos.');
+      const reference = logServiceFailure('api.request_failed', err);
+      return apiError('internal_error', 'Ocurrió un error interno. Intenta de nuevo en unos momentos.', { reference });
     }
   };
 }

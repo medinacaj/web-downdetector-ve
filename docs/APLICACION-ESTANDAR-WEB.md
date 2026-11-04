@@ -26,7 +26,7 @@ Amenazas priorizadas: inserción de registros inválidos o duplicados, agotamien
 | 9. SEO local y mapas | LocalBusiness/NAP/rutas a un local: no aplicables sin negocio con sede verificable. El mapa nacional de reportes sí aporta contexto; no se añadieron geolocalización precisa ni datos inventados. |
 | 10. CRO y confianza | Recorrido principal: consultar y reportar. Se mejora feedback y transparencia; no se añadieron testimonios ni métricas inventadas. Experimentación A/B no justificada con el tráfico actual. |
 | 11. Privacidad y legal | Se aclara seudonimización y se advierte contra introducir datos personales. Responsable, contacto, retención, eliminación y textos legales finales siguen pendientes de definición y revisión apropiada. |
-| 12. Analítica y observabilidad | No se agregan trackers ni banners decorativos. Métricas de operación/alertas siguen pendientes del hosting y de sus destinatarios; no hay resultados de analítica comercial. |
+| 12. Analítica y observabilidad | No se agregan trackers ni banners decorativos. Hay eventos de fallo mínimos y señales HTTP de vida/lectura DB, verificados localmente. Captura/retención de logs, alertas y destinatarios siguen pendientes del hosting; no hay analítica comercial. |
 | 13. QA | Suite funcional, pruebas de PostgreSQL, instalación limpia, rechazo por datos incompatibles y comprobaciones de navegador. Evidencia abajo; no equivalen a pentest ni prueba de carga. |
 | 14. DevOps/SRE/ITIL | Se amplía CI con ensayo de migraciones local. Procedimientos y roles definidos como funciones; personas, SLO, alertas y backup del hosting pendientes. |
 | 15. Priorización | P1: rangos/duplicados y límites de payload; avisos críticos/altos de dependencias atendidos prioritariamente sin afirmar explotación. P1 accesibilidad: contrastes detectados por herramienta. |
@@ -75,7 +75,7 @@ El selector rechaza parámetros y fragmentos de URL antes de crear cualquier cli
 
 ## Verificación local de esta entrega
 
-- `npm run check:standards`, tipos, 145 pruebas y build completados. Sin cambios en SQL ni snapshots históricos 0000/0001.
+- `npm run check:standards`, tipos, 153 pruebas y build completados. Sin cambios en SQL ni snapshots históricos 0000/0001.
 - Migración aplicada a bases locales de desarrollo/pruebas. Instalación vacía, actualización y rechazo transaccional de duplicados verificados; las filas incompatibles del ensayo permanecieron intactas hasta eliminar su base temporal.
 - Cabeceras comprobadas en HTTP para HTML/API y cuerpo grande rechazado con 413. La suite comprueba límites reales de bytes y timeout, y manipulación de campos protegidos.
 - `npm run smoke:accessibility`: siete rutas × dos temas × dos anchos, cero hallazgos automáticos en las reglas WCAG seleccionadas y salto de contenido por teclado verificado. Revisión visual de servicio en móvil claro y escritorio oscuro. No acredita WCAG completa.
@@ -87,6 +87,8 @@ CI añade `npm run audit:dependencies`, que evalúa también dependencias de des
 Para repetir la prueba de navegador, iniciar la aplicación con datos ficticios. Se necesitan Chromium y los paquetes opcionales `playwright-core` y `@axe-core/playwright`, instalados fuera de la aplicación (en este entorno, `NODE_PATH=/workspace/.cloud-setup/browser/node_modules`). Ejecutar `npm run smoke:accessibility`; `SMOKE_BASE_URL` permite seleccionar el servidor de pruebas y `CHROMIUM_PATH` el navegador. El reporte se guarda en `.runtime/accessibility-results.json`, ignorado por Git.
 
 Vitest 5 requiere Node 22.12+ de la serie 22 o una versión compatible de las series 24/26+. CI usa Node 22 actualizado y el entorno local usa 24.19.0. El config se expresa como ESM en `vitest.config.mts`. No se usaron `--force`, `--legacy-peer-deps`, verificaciones TLS deshabilitadas ni assertions omitidas para resolver compatibilidad.
+
+Ampliación operativa: pruebas de privacidad verifican que excepciones con SQL, parámetros y getters hostiles no se serializan y que un fallo del destino de logs no rompe la respuesta controlada. Las pruebas de salud cubren concurrencia, caducidad, timeout, recuperación y retroceso del reloj civil. `npm run smoke:health` verifica HTTP y worker con una base nueva de fixtures, sin modificar la fuente: 200→503→200, vida del proceso independiente y ninguna filtración de los canarios privados/SQL en los logs capturados. El alcance y las limitaciones se detallan en `OPERACION-ITIL.md`.
 
 ## Evidencia y siguientes pasos
 

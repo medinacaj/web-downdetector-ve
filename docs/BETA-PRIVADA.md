@@ -76,6 +76,7 @@ El script simula el widget y la respuesta del POST únicamente en el navegador: 
 - Claves Turnstile reales y comprobación desde navegador en el dominio aprobado.
 - Backup automático cifrado, retención y prueba de restauración.
 - Programador instalado y alerta por fallos/ausencia de ciclos.
+- Monitores configurados usando `/api/health/live` para vida y `/api/health` para lectura mínima de DB; no confundirlos con una prueba completa del servicio (ver `OPERACION-ITIL.md`).
 - Revisión de privacidad, contacto responsable y catálogo; no hay certificación legal.
 - Pruebas de despliegue: HTTPS, reportes, vistas, aislamiento de pruebas, recuperación y límites detrás del proxy.
 

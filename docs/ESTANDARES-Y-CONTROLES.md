@@ -46,7 +46,7 @@ npm run build
 
 `check:standards` ejecuta ESLint sin advertencias admitidas, validación de esquema de código, integridad del historial de migraciones y concordancia del diccionario con el esquema. Ninguno de esos comandos inspecciona por sí mismo el estado de una base de producción. Los tests de esquema y migraciones incluyen entradas defectuosas para comprobar que los controles pueden fallar.
 
-CI ejecuta esas puertas salvo build, que sigue siendo una comprobación local de release por su acceso a fuentes externas. Su configuración no demuestra que una ejecución remota o una protección de rama estén activas. Para proteger la rama remota se debe exigir PR, revisión y el estado CI del SHA de la entrega, limitar bypass y verificar permisos desde GitHub.
+CI configura esas puertas, el build (requiere acceso a las fuentes externas), el ensayo de migraciones y la prueba HTTP de salud/recuperación y privacidad de errores. Su configuración no demuestra que una ejecución remota o una protección de rama estén activas. Para proteger la rama remota se debe exigir PR, revisión y el estado CI del SHA de la entrega, limitar bypass y verificar permisos desde GitHub.
 
 ### Migraciones
 
@@ -87,7 +87,7 @@ En producción separar identidad de migraciones de la cuenta de aplicación, con
 | SEC-02 | evaluación completa de seguridad y accesos | referencia ASVS | Pendiente de matriz por requisito, pruebas y roles del panel |
 | UX-01 | accesibilidad AA | objetivo WCAG 2.2, teclado y análisis automatizado en navegador | Comprobación local de escenarios definidos; lector de pantalla y evaluación manual completa pendientes |
 | OPS-01 | cambios, incidentes y problemas | OPERACION-ITIL.md y plantillas | Procedimiento definido; personas, canal y ejercicios por asignar |
-| OPS-02 | monitoreo, capacidad y disponibilidad | web, PostgreSQL y worker identificados | SLO, alertas y guardia no configurados en hosting |
+| OPS-02 | monitoreo, capacidad y disponibilidad | señales HTTP de vida/lectura DB y eventos de fallo mínimos | Verificación local; SLO, captura/retención de logs, alertas y guardia aún no configurados en hosting |
 | GOV-01 | evidencia y revisión independiente | PR/RFC y política de excepciones | Depende de adopción y controles remotos; no se presume implantado |
 
 ## Excepciones y deuda controlada

@@ -81,6 +81,23 @@ Ensayo de desarrollo verificado el 2026-11-03: `pg_dump` en formato custom desde
 
 ## Objetivos, alertas y continuidad pendientes
 
+Se implementan dos señales HTTP mínimas, con respuestas genéricas y `Cache-Control: no-store`:
+
+| Ruta | Uso | Alcance |
+| --- | --- | --- |
+| `/api/health/live` | Vida del proceso: 200 si el handler responde | No contacta DB ni demuestra que reportes/worker funcionen |
+| `/api/health` | Disponibilidad mínima de lectura: 200 o 503 | Conexión PostgreSQL y lectura de `services.id`; no devuelve datos, versiones, host ni errores internos |
+
+La comprobación de DB comparte una sola consulta pendiente y cachea el resultado cinco segundos mediante reloj monotónico. Responde con presupuesto de dos segundos; si la consulta no termina, no acumula otras. El pool de salud añade como máximo una conexión por proceso, con límite de conexión de dos segundos y statement timeout de 1.5 segundos. Incorporar esa conexión al presupuesto de réplicas/hosting. No es un límite global entre instancias ni una garantía de latencia bajo saturación del proceso.
+
+Un fallo de DB no debe usarse por sí solo como orden de reinicio del proceso: separar readiness de liveness al configurar el proveedor. Estas señales no comprueban Redis, Turnstile, todas las tablas/migraciones, permisos de escritura, frescura del worker ni el recorrido completo de un reporte. Complementarlas con tasas de error y pruebas funcionales autorizadas. Detrás de una barrera de beta privada, configurar la identidad del monitor sin publicar credenciales ni introducir un bypass general.
+
+Los fallos no manejados de API y worker generan JSON con únicamente `timestamp`, `level`, `event`, `reference` y `category`. La API entrega esa referencia aleatoria en `error.details.reference` para relacionar un 500 con el evento del servidor. No se aceptan referencias externas ni se serializan la excepción, SQL, parámetros, mensajes, URL, cabeceras, IP o cuerpo. Las respuestas de error tampoco se cachean. Son categorías limitadas para triage, no trazas completas ni evidencia de auditoría inmutable.
+
+La captura, protección, retención y alertas sobre esos logs deben configurarse en el hosting. Si falla su destino, la API conserva una respuesta controlada; la referencia no garantiza que el evento haya sido retenido. Este control no sanea automáticamente logs del proveedor de DB, del proxy ni de herramientas CLI de desarrollo. Reproducir fallos en un entorno controlado con fixtures antes de añadir diagnósticos que puedan exponer datos reales.
+
+Ensayo reproducible: ejecutar build y luego `npm run smoke:health` con `DATABASE_URL` local terminada en `_test`, sin parámetros/fragmentos y con permiso para crear bases de fixtures. Crea una base y un servidor temporales, verifica 200→503→200 al retirar/restaurar una tabla, independencia de liveness y errores reales de API/worker sin SQL ni canarios privados en logs. Elimina únicamente sus recursos de ensayo; no modifica la base fuente. CI ejecuta esta prueba tras build; una ejecución local no acredita CI remoto ni monitoreo desplegado.
+
 Definir SLI/SLO antes de publicitar un nivel de servicio: proporción de solicitudes válidas atendidas, latencia, antigüedad de la última ventana procesada y posibilidad de recuperar datos. Distinguir error del producto de token inválido o cuota correctamente aplicada. Evitar métricas que registren identificadores personales.
 
 Configurar alertas por caída web/DB, error del worker, ausencia de ciclos, capacidad y backup fallido/antiguo. Las alertas necesitan destinatario, cobertura y escalamiento confirmados. El worker actual no recupera automáticamente ventanas perdidas ni coordina varios hosts. Falta validar esos controles en el hosting y ensayar recuperación, comunicación y gestión de incidentes con las personas asignadas.
