@@ -30,7 +30,8 @@
     "audit:production": "npm audit --omit=dev --audit-level=high",
     "smoke:accessibility": "node scripts/smoke-accessibility.cjs",
     "audit:dependencies": "npm audit --audit-level=high",
-    "smoke:health": "node scripts/smoke-health.cjs"
+    "smoke:health": "node scripts/smoke-health.cjs",
+    "perf:local": "node scripts/load-test.cjs"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",

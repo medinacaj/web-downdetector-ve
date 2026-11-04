@@ -314,6 +314,9 @@ antes de cualquier despliegue con datos reales (sección 4.2 del brief).
 
 ## Documentación
 
+- `docs/PRUEBAS-CARGA.md` — protocolo local y runner `npm run perf:local`; no ejecutar contra producción.
+- `docs/RESULTADOS-CARGA-2026-11-04.md` — resultados medidos de carga, estrés, pico y resistencia inicial de diez minutos, con CSV/JSON y figura.
+
 Señales mínimas para operación: `/api/health/live` comprueba vida del proceso y
 `/api/health` comprueba lectura básica de PostgreSQL (200/503, sin detalles internos).
 `npm run smoke:health` prueba salud, recuperación y privacidad de errores con una base
