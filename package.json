@@ -24,6 +24,7 @@
     "check:schema": "tsx scripts/check-schema.ts",
     "check:migrations": "tsx scripts/check-migrations.ts",
     "check:standards": "npm run lint && npm run check:schema && npm run check:migrations && npm run check:docs",
+    "check:secrets": "gitleaks git --redact=100 --ignore-gitleaks-allow --log-opts='--all --full-history' .",
     "docs:data": "tsx scripts/data-dictionary.ts",
     "check:docs": "tsx scripts/data-dictionary.ts --check",
     "smoke:migrations": "node scripts/smoke-migrations.cjs",

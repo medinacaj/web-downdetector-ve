@@ -314,6 +314,7 @@ antes de cualquier despliegue con datos reales (sección 4.2 del brief).
 
 ## Documentación
 
+- `docs/REVISION-SECRETOS-2026-11-09.md` — escaneo local de historial/archivos, controles positivos ficticios y workflow de secretos configurado; `npm run check:secrets` requiere Gitleaks 8.30.1.
 - `docs/PRUEBAS-CARGA.md` — protocolo local y runner `npm run perf:local`; no ejecutar contra producción.
 - `docs/RESULTADOS-CARGA-2026-11-04.md` — resultados medidos de carga, estrés, pico y resistencia inicial de diez minutos, con CSV/JSON y figura.
 - `docs/RESULTADOS-OPTIMIZACION-2026-11-04.md` — perfil SQL y repetición del mismo ensayo tras agrupar estados de listados; comparación antes/después con sus límites.
