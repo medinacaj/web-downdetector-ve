@@ -33,6 +33,8 @@
     "audit:dependencies": "npm audit --audit-level=high",
     "smoke:health": "node scripts/smoke-health.cjs",
     "smoke:client-secrets": "node scripts/smoke-client-secrets.cjs",
+    "smoke:browsers": "node scripts/smoke-browsers.cjs",
+    "smoke:browser-isolation": "node scripts/smoke-browser-isolation.cjs",
     "perf:local": "node scripts/load-test.cjs"
   },
   "dependencies": {
