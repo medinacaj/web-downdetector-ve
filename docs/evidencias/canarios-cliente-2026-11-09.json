@@ -1,0 +1,396 @@
+{
+  "runId": "61c1535c7b24f365",
+  "sourceCommit": "d796f5b0e7cd804e4ddd3dd15a01ee07963e3172",
+  "startedAt": "2026-11-09T11:52:11.011Z",
+  "status": "completed",
+  "privateEnvironmentVariables": [
+    "DATABASE_URL",
+    "ANONYMIZATION_SALT",
+    "JWT_SECRET",
+    "TURNSTILE_SECRET_KEY",
+    "REDIS_URL"
+  ],
+  "privateCanaries": [
+    "DATABASE_URL",
+    "ANONYMIZATION_SALT",
+    "JWT_SECRET",
+    "TURNSTILE_SECRET_KEY",
+    "REDIS_URL",
+    "DATABASE_NAME",
+    "REDIS_PASSWORD"
+  ],
+  "representations": [
+    "literal",
+    "URI component",
+    "JSON string",
+    "base64"
+  ],
+  "routes": [
+    {
+      "route": "/",
+      "method": "GET",
+      "rsc": false,
+      "status": 200
+    },
+    {
+      "route": "/servicios",
+      "method": "GET",
+      "rsc": false,
+      "status": 200
+    },
+    {
+      "route": "/mapa",
+      "method": "GET",
+      "rsc": false,
+      "status": 200
+    },
+    {
+      "route": "/estadisticas",
+      "method": "GET",
+      "rsc": false,
+      "status": 200
+    },
+    {
+      "route": "/incidentes",
+      "method": "GET",
+      "rsc": false,
+      "status": 200
+    },
+    {
+      "route": "/metodologia",
+      "method": "GET",
+      "rsc": false,
+      "status": 200
+    },
+    {
+      "route": "/servicios/movistar",
+      "method": "GET",
+      "rsc": false,
+      "status": 200
+    },
+    {
+      "route": "/servicios/movistar?_rsc=",
+      "method": "GET",
+      "rsc": true,
+      "status": 200
+    },
+    {
+      "route": "/api/health",
+      "method": "GET",
+      "rsc": false,
+      "status": 200
+    },
+    {
+      "route": "/api/health/live",
+      "method": "GET",
+      "rsc": false,
+      "status": 200
+    },
+    {
+      "route": "/api/services?limit=20",
+      "method": "GET",
+      "rsc": false,
+      "status": 200
+    },
+    {
+      "route": "/api/services/movistar",
+      "method": "GET",
+      "rsc": false,
+      "status": 200
+    },
+    {
+      "route": "/api/services/movistar/status",
+      "method": "GET",
+      "rsc": false,
+      "status": 200
+    },
+    {
+      "route": "/api/services/movistar/reports",
+      "method": "GET",
+      "rsc": false,
+      "status": 200
+    },
+    {
+      "route": "/api/incidents",
+      "method": "GET",
+      "rsc": false,
+      "status": 200
+    },
+    {
+      "route": "/api/map",
+      "method": "GET",
+      "rsc": false,
+      "status": 200
+    },
+    {
+      "route": "/api/statistics",
+      "method": "GET",
+      "rsc": false,
+      "status": 200
+    },
+    {
+      "route": "/api/reports",
+      "method": "POST",
+      "rsc": false,
+      "status": 422
+    },
+    {
+      "route": "/.env",
+      "method": "GET",
+      "rsc": false,
+      "status": 404
+    },
+    {
+      "route": "/.env.local",
+      "method": "GET",
+      "rsc": false,
+      "status": 404
+    },
+    {
+      "route": "/.env.production",
+      "method": "GET",
+      "rsc": false,
+      "status": 404
+    },
+    {
+      "route": "/.git/config",
+      "method": "GET",
+      "rsc": false,
+      "status": 404
+    },
+    {
+      "route": "/package.json",
+      "method": "GET",
+      "rsc": false,
+      "status": 404
+    },
+    {
+      "route": "/next.config.mjs",
+      "method": "GET",
+      "rsc": false,
+      "status": 404
+    },
+    {
+      "route": "/_next/server/app/page.js",
+      "method": "GET",
+      "rsc": false,
+      "status": 404
+    },
+    {
+      "route": "/_next/static/LyFS9IBUOYU4-zK-IhLFG/_buildManifest.js",
+      "method": "GET",
+      "rsc": false,
+      "status": 200
+    },
+    {
+      "route": "/_next/static/LyFS9IBUOYU4-zK-IhLFG/_clientMiddlewareManifest.js",
+      "method": "GET",
+      "rsc": false,
+      "status": 200
+    },
+    {
+      "route": "/_next/static/LyFS9IBUOYU4-zK-IhLFG/_ssgManifest.js",
+      "method": "GET",
+      "rsc": false,
+      "status": 200
+    },
+    {
+      "route": "/_next/static/chunks/08__iit77983m.css",
+      "method": "GET",
+      "rsc": false,
+      "status": 200
+    },
+    {
+      "route": "/_next/static/chunks/0cz1d0mv5g_q7.js",
+      "method": "GET",
+      "rsc": false,
+      "status": 200
+    },
+    {
+      "route": "/_next/static/chunks/0mimn4c8skt7j.js",
+      "method": "GET",
+      "rsc": false,
+      "status": 200
+    },
+    {
+      "route": "/_next/static/chunks/0uk63h0tuavo5.js",
+      "method": "GET",
+      "rsc": false,
+      "status": 200
+    },
+    {
+      "route": "/_next/static/chunks/0vfhot3aus-f9.js",
+      "method": "GET",
+      "rsc": false,
+      "status": 200
+    },
+    {
+      "route": "/_next/static/chunks/1jqpycmskyue7.js",
+      "method": "GET",
+      "rsc": false,
+      "status": 200
+    },
+    {
+      "route": "/_next/static/chunks/2-gnc_35g4p04.js",
+      "method": "GET",
+      "rsc": false,
+      "status": 200
+    },
+    {
+      "route": "/_next/static/chunks/2eoxeemjtegat.js",
+      "method": "GET",
+      "rsc": false,
+      "status": 200
+    },
+    {
+      "route": "/_next/static/chunks/2v3gohqin6zo-.js",
+      "method": "GET",
+      "rsc": false,
+      "status": 200
+    },
+    {
+      "route": "/_next/static/chunks/3qfy96eoyh-ek.js",
+      "method": "GET",
+      "rsc": false,
+      "status": 200
+    },
+    {
+      "route": "/_next/static/chunks/turbopack-2u1d16houkiyo.js",
+      "method": "GET",
+      "rsc": false,
+      "status": 200
+    },
+    {
+      "route": "/_next/static/media/07c7676b89ed2778-s.p.2bn3s6zvc0dyp.woff2",
+      "method": "GET",
+      "rsc": false,
+      "status": 200
+    },
+    {
+      "route": "/_next/static/media/237858b39a32779d-s.p.2cyn07wtgehh0.woff2",
+      "method": "GET",
+      "rsc": false,
+      "status": 200
+    },
+    {
+      "route": "/_next/static/media/258bd0ab5fdd762a-s.2f7nqdagzwx2-.woff2",
+      "method": "GET",
+      "rsc": false,
+      "status": 200
+    },
+    {
+      "route": "/_next/static/media/2fb76073e23fd9e4-s.3lvt2whj97whp.woff2",
+      "method": "GET",
+      "rsc": false,
+      "status": 200
+    },
+    {
+      "route": "/_next/static/media/44e0cb21b0d052b7-s.0bp8oijd_gu96.woff2",
+      "method": "GET",
+      "rsc": false,
+      "status": 200
+    },
+    {
+      "route": "/_next/static/media/45462fd7b7c12654-s.0k62hbripvv8p.woff2",
+      "method": "GET",
+      "rsc": false,
+      "status": 200
+    },
+    {
+      "route": "/_next/static/media/46a9e2f250689b4a-s.0-dom-5bn10r2.woff2",
+      "method": "GET",
+      "rsc": false,
+      "status": 200
+    },
+    {
+      "route": "/_next/static/media/53897e768d329f66-s.p.3t6q91iet4nsy.woff2",
+      "method": "GET",
+      "rsc": false,
+      "status": 200
+    },
+    {
+      "route": "/_next/static/media/6131cbbf5549afa2-s.2uwcyprjm3xu3.woff2",
+      "method": "GET",
+      "rsc": false,
+      "status": 200
+    },
+    {
+      "route": "/_next/static/media/76b70a1dbe058eb5-s.1y4-pdgsjb-pw.woff2",
+      "method": "GET",
+      "rsc": false,
+      "status": 200
+    },
+    {
+      "route": "/_next/static/media/92b6de9cb55945e2-s.2eksvhm1z0jwa.woff2",
+      "method": "GET",
+      "rsc": false,
+      "status": 200
+    },
+    {
+      "route": "/_next/static/media/954d21e04331b2ae-s.0vfdmo25voy_0.woff2",
+      "method": "GET",
+      "rsc": false,
+      "status": 200
+    },
+    {
+      "route": "/_next/static/media/99a2019bdfa8519b-s.176arc174-8zp.woff2",
+      "method": "GET",
+      "rsc": false,
+      "status": 200
+    },
+    {
+      "route": "/_next/static/media/ba63f6a0e436df8e-s.3-6t-g6q0vh0a.woff2",
+      "method": "GET",
+      "rsc": false,
+      "status": 200
+    },
+    {
+      "route": "/_next/static/media/edb5f85793adc1bb-s.1gepa_7fcx9fm.woff2",
+      "method": "GET",
+      "rsc": false,
+      "status": 200
+    },
+    {
+      "route": "/_next/static/media/f9cd5a77d065db98-s.1fby2rem9ngyr.woff2",
+      "method": "GET",
+      "rsc": false,
+      "status": 200
+    }
+  ],
+  "artifactFiles": 30,
+  "artifactBytes": 984186,
+  "servedStaticFiles": 30,
+  "sourceFiles": 159,
+  "sourceDigest": "d48e89ef12426b73691cb53de8da0f0b1af7553019840c16d00ed040448efee9",
+  "buildExitCode": 0,
+  "positiveControlRejected": true,
+  "htmlControl": {
+    "bytes": 28097,
+    "publicSiteKeySeen": true,
+    "propNameSeen": true
+  },
+  "rscControl": {
+    "bytes": 13084,
+    "publicSiteKeySeen": true,
+    "propNameSeen": true,
+    "contentType": "text/x-component"
+  },
+  "publicSiteKeySeen": true,
+  "cleanup": {
+    "serverStopped": true,
+    "databaseAbsent": true,
+    "projectRemoved": true,
+    "errorCount": 0
+  },
+  "endedAt": "2026-11-09T11:52:24.234Z",
+  "exitCode": 0,
+  "harnessSha256": "3e883cdd393b9549b2d0f6a2df7cd04e01cf258e545054ca1e3d8f02dbf5b4e3",
+  "verification": {
+    "databaseAbsent": true,
+    "serverPortClosed": true,
+    "projectRemovedReportedByHarness": true,
+    "processExitCodeObserved": 0
+  },
+  "scope": "Known synthetic marker representations in selected outputs; not a complete security audit",
+  "remoteCIExecuted": false
+}

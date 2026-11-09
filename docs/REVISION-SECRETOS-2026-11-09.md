@@ -43,3 +43,5 @@ Ante una coincidencia, no pegar su valor en Issues, PR ni chats. Confirmar en un
 ## Límites pendientes
 
 El escaneo cubre objetos alcanzables por las referencias del clon actual; no objetos eliminados/inaccesibles, ramas remotas no recuperadas ni sistemas externos. Las reglas detectan ciertos patrones y pueden producir falsos positivos o no reconocer otros secretos. No se inspeccionaron claves del hosting, secretos de ejecución, bundles generados del navegador ni todas las variantes de exposición. El examen del frontend y la configuración real de despliegue siguen pendientes, al igual que push protection y permisos remotos. No hay una auditoría exhaustiva ni certificación de seguridad.
+
+Comprobación posterior: [canarios privados en salidas del cliente](REVISION-CLIENTE-2026-11-09.md). Amplía la evidencia local de frontend; la configuración real de despliegue continúa pendiente.

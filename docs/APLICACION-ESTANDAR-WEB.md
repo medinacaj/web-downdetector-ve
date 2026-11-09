@@ -38,7 +38,7 @@ Amenazas priorizadas: inserción de registros inválidos o duplicados, agotamien
 
 | # | Control | Estado y alcance |
 | --- | --- | --- |
-| 1 | Secretos fuera del frontend | Pendiente de examen completo de bundle y configuración final del hosting; solo la site key pública se entrega intencionalmente al cliente. |
+| 1 | Secretos fuera del frontend | Canarios locales: siete valores privados ausentes en 30 artefactos y 55 respuestas comprobadas (HTML/RSC/API/recursos/errores); clave pública de Turnstile presente como control. Ver [REVISION-CLIENTE-2026-11-09.md](REVISION-CLIENTE-2026-11-09.md). No es una auditoría completa: secretos reales, configuración y entrega del hosting siguen pendientes. |
 | 2 | Git y filtraciones de secretos | `.env*` excluidos salvo `.env.example`; Gitleaks 8.30.1 revisó historial local y snapshot sin coincidencias, con controles positivos reales del detector. Ver [REVISION-SECRETOS-2026-11-09.md](REVISION-SECRETOS-2026-11-09.md). Workflow configurado; ejecución/protección de rama, push protection y permisos remotos pendientes. No se garantiza ausencia de secretos. |
 | 3 | Claves públicas sin privilegios | Verificado en tests: el servidor exige resultado Turnstile para hostname/acción esperados; claves reales pendientes. |
 | 4 | RLS cuando corresponda | No requerido para el diseño actual de acceso exclusivo por servidor. Revaluar si se permite acceso directo a DB, multi-tenancy o clientes con cuentas. |

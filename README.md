@@ -314,6 +314,7 @@ antes de cualquier despliegue con datos reales (sección 4.2 del brief).
 
 ## Documentación
 
+- `docs/REVISION-CLIENTE-2026-11-09.md` — build aislado con canarios privados, revisión de artefactos/HTML/RSC/API y limpieza; ensayo `npm run smoke:client-secrets`.
 - `docs/REVISION-SECRETOS-2026-11-09.md` — escaneo local de historial/archivos, controles positivos ficticios y workflow de secretos configurado; `npm run check:secrets` requiere Gitleaks 8.30.1.
 - `docs/PRUEBAS-CARGA.md` — protocolo local y runner `npm run perf:local`; no ejecutar contra producción.
 - `docs/RESULTADOS-CARGA-2026-11-04.md` — resultados medidos de carga, estrés, pico y resistencia inicial de diez minutos, con CSV/JSON y figura.
