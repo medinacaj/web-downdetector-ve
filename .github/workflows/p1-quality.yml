@@ -49,3 +49,5 @@ jobs:
       - run: npm run build
       - name: HTTP de salud, recuperación y privacidad de logs (base local temporal)
         run: npm run smoke:health
+      - name: Canarios privados fuera del cliente (build y base nuevos de fixtures)
+        run: npm run smoke:client-secrets
