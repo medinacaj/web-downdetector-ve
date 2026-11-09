@@ -314,6 +314,7 @@ antes de cualquier despliegue con datos reales (sección 4.2 del brief).
 
 ## Documentación
 
+- `docs/COMPATIBILIDAD-NAVEGADORES-2026-11-09.md` — recorridos de interfaz y accesibilidad en Chromium; matriz Firefox/WebKit pendiente de descarga permitida. Herramientas `smoke:browsers` y `smoke:browser-isolation`.
 - `docs/REVISION-CLIENTE-2026-11-09.md` — build aislado con canarios privados, revisión de artefactos/HTML/RSC/API y limpieza; ensayo `npm run smoke:client-secrets`.
 - `docs/REVISION-SECRETOS-2026-11-09.md` — escaneo local de historial/archivos, controles positivos ficticios y workflow de secretos configurado; `npm run check:secrets` requiere Gitleaks 8.30.1.
 - `docs/PRUEBAS-CARGA.md` — protocolo local y runner `npm run perf:local`; no ejecutar contra producción.

@@ -1,0 +1,376 @@
+{
+  "runId": "b7eb2225175d556c",
+  "sourceCommit": "2c487d9e4c020cfaf49ff6e7fb9d636afd7ec450",
+  "startedAt": "2026-11-09T12:10:38.524Z",
+  "requested": [
+    "chromium",
+    "firefox",
+    "webkit"
+  ],
+  "origin": "http://127.0.0.1:41353",
+  "engines": [
+    {
+      "name": "chromium",
+      "status": "passed",
+      "pages": [
+        {
+          "route": "/",
+          "theme": "light",
+          "width": 320,
+          "status": 200,
+          "overflow": false,
+          "violations": []
+        },
+        {
+          "route": "/servicios",
+          "theme": "light",
+          "width": 320,
+          "status": 200,
+          "overflow": false,
+          "violations": []
+        },
+        {
+          "route": "/servicios/movistar",
+          "theme": "light",
+          "width": 320,
+          "status": 200,
+          "overflow": false,
+          "violations": []
+        },
+        {
+          "route": "/mapa",
+          "theme": "light",
+          "width": 320,
+          "status": 200,
+          "overflow": false,
+          "violations": []
+        },
+        {
+          "route": "/incidentes",
+          "theme": "light",
+          "width": 320,
+          "status": 200,
+          "overflow": false,
+          "violations": []
+        },
+        {
+          "route": "/estadisticas",
+          "theme": "light",
+          "width": 320,
+          "status": 200,
+          "overflow": false,
+          "violations": []
+        },
+        {
+          "route": "/metodologia",
+          "theme": "light",
+          "width": 320,
+          "status": 200,
+          "overflow": false,
+          "violations": []
+        },
+        {
+          "route": "/",
+          "theme": "light",
+          "width": 1280,
+          "status": 200,
+          "overflow": false,
+          "violations": []
+        },
+        {
+          "route": "/servicios",
+          "theme": "light",
+          "width": 1280,
+          "status": 200,
+          "overflow": false,
+          "violations": []
+        },
+        {
+          "route": "/servicios/movistar",
+          "theme": "light",
+          "width": 1280,
+          "status": 200,
+          "overflow": false,
+          "violations": []
+        },
+        {
+          "route": "/mapa",
+          "theme": "light",
+          "width": 1280,
+          "status": 200,
+          "overflow": false,
+          "violations": []
+        },
+        {
+          "route": "/incidentes",
+          "theme": "light",
+          "width": 1280,
+          "status": 200,
+          "overflow": false,
+          "violations": []
+        },
+        {
+          "route": "/estadisticas",
+          "theme": "light",
+          "width": 1280,
+          "status": 200,
+          "overflow": false,
+          "violations": []
+        },
+        {
+          "route": "/metodologia",
+          "theme": "light",
+          "width": 1280,
+          "status": 200,
+          "overflow": false,
+          "violations": []
+        },
+        {
+          "route": "/",
+          "theme": "dark",
+          "width": 320,
+          "status": 200,
+          "overflow": false,
+          "violations": []
+        },
+        {
+          "route": "/servicios",
+          "theme": "dark",
+          "width": 320,
+          "status": 200,
+          "overflow": false,
+          "violations": []
+        },
+        {
+          "route": "/servicios/movistar",
+          "theme": "dark",
+          "width": 320,
+          "status": 200,
+          "overflow": false,
+          "violations": []
+        },
+        {
+          "route": "/mapa",
+          "theme": "dark",
+          "width": 320,
+          "status": 200,
+          "overflow": false,
+          "violations": []
+        },
+        {
+          "route": "/incidentes",
+          "theme": "dark",
+          "width": 320,
+          "status": 200,
+          "overflow": false,
+          "violations": []
+        },
+        {
+          "route": "/estadisticas",
+          "theme": "dark",
+          "width": 320,
+          "status": 200,
+          "overflow": false,
+          "violations": []
+        },
+        {
+          "route": "/metodologia",
+          "theme": "dark",
+          "width": 320,
+          "status": 200,
+          "overflow": false,
+          "violations": []
+        },
+        {
+          "route": "/",
+          "theme": "dark",
+          "width": 1280,
+          "status": 200,
+          "overflow": false,
+          "violations": []
+        },
+        {
+          "route": "/servicios",
+          "theme": "dark",
+          "width": 1280,
+          "status": 200,
+          "overflow": false,
+          "violations": []
+        },
+        {
+          "route": "/servicios/movistar",
+          "theme": "dark",
+          "width": 1280,
+          "status": 200,
+          "overflow": false,
+          "violations": []
+        },
+        {
+          "route": "/mapa",
+          "theme": "dark",
+          "width": 1280,
+          "status": 200,
+          "overflow": false,
+          "violations": []
+        },
+        {
+          "route": "/incidentes",
+          "theme": "dark",
+          "width": 1280,
+          "status": 200,
+          "overflow": false,
+          "violations": []
+        },
+        {
+          "route": "/estadisticas",
+          "theme": "dark",
+          "width": 1280,
+          "status": 200,
+          "overflow": false,
+          "violations": []
+        },
+        {
+          "route": "/metodologia",
+          "theme": "dark",
+          "width": 1280,
+          "status": 200,
+          "overflow": false,
+          "violations": []
+        }
+      ],
+      "interactions": [
+        {
+          "theme": "light",
+          "width": 320,
+          "keyboardSkip": true,
+          "themeTogglePersisted": true,
+          "navigationSearchCategory": true,
+          "success": true,
+          "rate_limited": true,
+          "offline": true,
+          "interceptedPostRequests": 3
+        },
+        {
+          "theme": "light",
+          "width": 1280,
+          "keyboardSkip": true,
+          "themeTogglePersisted": true,
+          "navigationSearchCategory": true,
+          "success": true,
+          "rate_limited": true,
+          "offline": true,
+          "interceptedPostRequests": 3
+        },
+        {
+          "theme": "dark",
+          "width": 320,
+          "keyboardSkip": true,
+          "themeTogglePersisted": true,
+          "navigationSearchCategory": true,
+          "success": true,
+          "rate_limited": true,
+          "offline": true,
+          "interceptedPostRequests": 3
+        },
+        {
+          "theme": "dark",
+          "width": 1280,
+          "keyboardSkip": true,
+          "themeTogglePersisted": true,
+          "navigationSearchCategory": true,
+          "success": true,
+          "rate_limited": true,
+          "offline": true,
+          "interceptedPostRequests": 3
+        }
+      ],
+      "pageErrors": [],
+      "hydrationErrors": [],
+      "externalRequestsBlocked": 0,
+      "unexpectedWritesBlocked": 0,
+      "redirectsBlocked": 0,
+      "routingErrors": 0,
+      "version": "154.0.8037.57"
+    },
+    {
+      "name": "firefox",
+      "status": "unavailable",
+      "pages": [],
+      "interactions": [],
+      "pageErrors": [],
+      "hydrationErrors": [],
+      "externalRequestsBlocked": 0,
+      "unexpectedWritesBlocked": 0,
+      "redirectsBlocked": 0,
+      "routingErrors": 0,
+      "reason": "browser_binary_missing"
+    },
+    {
+      "name": "webkit",
+      "status": "unavailable",
+      "pages": [],
+      "interactions": [],
+      "pageErrors": [],
+      "hydrationErrors": [],
+      "externalRequestsBlocked": 0,
+      "unexpectedWritesBlocked": 0,
+      "redirectsBlocked": 0,
+      "routingErrors": 0,
+      "reason": "browser_binary_missing"
+    }
+  ],
+  "status": "incomplete",
+  "limits": [
+    "UI con respuestas POST simuladas; no prueba envío real",
+    "Solo perfiles y motores ejecutados; no Safari/iOS/Edge reales",
+    "axe no acredita WCAG completa"
+  ],
+  "playwright": "1.64.1",
+  "endedAt": "2026-11-09T12:11:05.770Z",
+  "harnessSha256": "abe2dbebbeeaca4bd76834279306a42923f9723228e2f2bfdd0fd4837b510e0b",
+  "isolationProbe": {
+    "sha256": "79aa960060675bc1e1998a56724ef6ce790fb7d82acec6b6518737e7aecddbe9",
+    "before": {
+      "redirectTargetHits": 1,
+      "redirectsBlocked": 0,
+      "exitCode": 1
+    },
+    "after": {
+      "redirectTargetHits": 0,
+      "redirectsBlocked": 1,
+      "exitCode": 0
+    }
+  },
+  "browserProcessExitCode": 1,
+  "fixture": {
+    "runId": "f383cd75f0fa2166",
+    "buildExitCode": 0,
+    "sourceFiles": 163,
+    "sourceDigest": "87cf664b4c26c491e5fa4efa500ada31733a2a545ffa4bb4987366cfac87e1d6",
+    "reportsAfter": 0,
+    "status": "completed",
+    "cleanup": {
+      "serverStopped": true,
+      "databaseAbsent": true,
+      "projectRemoved": true,
+      "errorCount": 0
+    }
+  },
+  "network": {
+    "probeHost": "cdn.playwright.dev",
+    "response": 403,
+    "firefoxInstalled": false,
+    "webkitInstalled": false,
+    "draftSaved": true,
+    "draftApplied": false,
+    "draftRequiresPublish": true,
+    "addedDomains": [
+      "cdn.playwright.dev",
+      "playwright.download.prss.microsoft.com"
+    ],
+    "preservedCustomDomains": [
+      "fonts.googleapis.com",
+      "fonts.gstatic.com"
+    ]
+  }
+}
