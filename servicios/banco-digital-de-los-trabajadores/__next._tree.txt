@@ -1,0 +1,8 @@
+:HL["/web-downdetector-ve/_next/static/media/36966cca54120369-s.p.woff2","font",{"crossOrigin":"","type":"font/woff2"}]
+:HL["/web-downdetector-ve/_next/static/media/bb3ef058b751a6ad-s.p.woff2","font",{"crossOrigin":"","type":"font/woff2"}]
+:HL["/web-downdetector-ve/_next/static/media/e4af272ccee01ff0-s.p.woff2","font",{"crossOrigin":"","type":"font/woff2"}]
+:HL["/web-downdetector-ve/_next/static/css/4ef399773639deb5.css","style"]
+3:[["children",{"s":"__PAGE__","h":160}]]
+2:[["children",{"s":{"n":"slug","t":"d","k":"banco-digital-de-los-trabajadores","s":[]},"h":96,"c":"$Q3"}]]
+1:[["children",{"s":"servicios","h":64,"c":"$Q2"}]]
+0:{"b":"-avz-5d4qguo51u2B485m","t":{"t":{"s":"","h":16,"c":"$Q1"}}}
