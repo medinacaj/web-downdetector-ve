@@ -37,3 +37,9 @@ La dirección esperada es `https://medinacaj.github.io/web-downdetector-ve/`. La
 Esta publicación fue solicitada por el propietario para evaluar el proyecto. No requiere credenciales de aplicación ni nuevos proveedores de datos. GitHub entrega la página y sus recursos; los campos de la demo no se transmiten al servidor. El tema se conserva localmente en el navegador. La ubicación y condiciones de la infraestructura de una futura producción siguen pendientes; esta vista previa no acredita cumplimiento legal, ITIL, ISO o disponibilidad de producción.
 
 Para retirar la vista previa, el propietario puede deshabilitar Pages desde la misma configuración. No se necesitan cambios en la base de datos ni en `main`.
+
+## Evidencia de esta entrega
+
+La exportación fue subida a `gh-pages` (`37ee248`), desde la implementación `7a14a9a`. Se descargó su `index.html` desde GitHub y coincidió byte a byte con el artefacto probado. Pasaron 150 pruebas unitarias, TypeScript, controles y el recorrido Chromium, incluido un canario que comprueba que los campos no viajan por GET cuando JavaScript está deshabilitado. El análisis Gitleaks del artefacto no detectó secretos. Las pruebas DB no se repitieron porque esta entrega no cambia producción ni utiliza una base.
+
+El proxy de red del entorno devuelve `CONNECT 403` para `api.github.com` y `medinacaj.github.io`: no se pudo consultar o modificar la configuración de Pages ni verificar su disponibilidad pública. Este bloqueo de comprobación no demuestra que GitHub Pages falle. El propietario debe comprobar la configuración anterior. Véase [registro de pruebas](evidencias/pages-demo-2026-11-10.json).

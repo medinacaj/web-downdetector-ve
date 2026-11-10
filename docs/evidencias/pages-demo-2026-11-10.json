@@ -34,6 +34,11 @@
   "deploymentVerification": {
     "githubApi": "CONNECT 403 blocked by environment proxy",
     "githubPagesHost": "CONNECT 403 blocked by environment proxy",
-    "publicAvailabilityVerified": false
-  }
+    "publicAvailabilityVerified": false,
+    "sourceCommit": "7a14a9a62cc69ed31bdb05f259bb06174f517234",
+    "pagesBranchCommit": "37ee248aefe2ed064c69720e7c8eb7d06a7c65bf",
+    "githubBranchIndexDownloadedAndMatched": true,
+    "requiredOwnerCheck": "Settings > Pages: Deploy from a branch, gh-pages, / (root)"
+  },
+  "generatedVendorWhitespace": "Framework bundle trailing whitespace preserved; source diff whitespace check passed"
 }

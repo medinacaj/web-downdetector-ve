@@ -28,5 +28,5 @@
 
 ### Task 2: Publicación
 - [x] Revisión independiente del cambio; corregir hallazgos demostrables.
-- [ ] Analizar secretos y publicar rama fuente y rama gh-pages con solo exportación.
-- [ ] Comprobar sitio público o identificar paso de activación faltante con evidencia.
+- [x] Analizar secretos y publicar rama fuente y rama gh-pages con solo exportación.
+- [x] Comprobar sitio público o identificar paso de activación faltante con evidencia.
