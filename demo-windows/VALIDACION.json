@@ -1,0 +1,14 @@
+{
+  "linuxDockerStarted": true,
+  "initializationRecoveryVerified": true,
+  "recoveredReports": 132,
+  "restartPreservesReports": true,
+  "realPostStatus": 201,
+  "individualReportPersisted": true,
+  "webUid": "1000",
+  "nodeVersion": "v24.22.2",
+  "nativeWindowsLauncherExecuted": false,
+  "windowsLauncherStaticallyReviewed": true,
+  "sourceCommit": "6946e5c138ab5333d51f60499b8e4305230a3ebd",
+  "validatedAt": "2026-11-10T17:55:29.267Z"
+}
