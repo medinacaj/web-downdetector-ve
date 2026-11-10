@@ -1,0 +1,39 @@
+{
+  "baseCommit": "6946e5c138ab5333d51f60499b8e4305230a3ebd",
+  "kind": "static-demo",
+  "build": "npm run build:demo",
+  "buildPassed": true,
+  "typecheckPassed": true,
+  "standardsPassed": true,
+  "unitTestsPassed": 150,
+  "unitTestFilesPassed": 21,
+  "databaseIntegrationTestsRerun": false,
+  "browser": "Chromium",
+  "browserSmoke": {
+    "navigation": true,
+    "directReload": true,
+    "searchAndFilters": true,
+    "historyBack": true,
+    "theme": true,
+    "mobile": true,
+    "noIndex": true,
+    "noHttpWrites": true,
+    "noScriptFormDoesNotTransmit": true,
+    "noBrowserErrors": true
+  },
+  "artifactFiles": 521,
+  "serverApiEnvSourcesAbsent": true,
+  "gitleaksArtifactLeaks": 0,
+  "independentReview": {
+    "findings": 1,
+    "severity": "P1",
+    "finding": "Native form GET transmitted inputs with JavaScript disabled",
+    "fix": "No form element; group container and type=button",
+    "regression": "Chromium canary transmission assertion failed before fix and passed after fix"
+  },
+  "deploymentVerification": {
+    "githubApi": "CONNECT 403 blocked by environment proxy",
+    "githubPagesHost": "CONNECT 403 blocked by environment proxy",
+    "publicAvailabilityVerified": false
+  }
+}

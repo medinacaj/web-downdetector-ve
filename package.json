@@ -35,7 +35,9 @@
     "smoke:client-secrets": "node scripts/smoke-client-secrets.cjs",
     "smoke:browsers": "node scripts/smoke-browsers.cjs",
     "smoke:browser-isolation": "node scripts/smoke-browser-isolation.cjs",
-    "perf:local": "node scripts/load-test.cjs"
+    "perf:local": "node scripts/load-test.cjs",
+    "build:demo": "node scripts/build-pages-demo.cjs",
+    "smoke:demo": "node scripts/smoke-pages-demo.cjs"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
