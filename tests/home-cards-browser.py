@@ -18,8 +18,19 @@ with sync_playwright() as playwright:
     grid = page.locator("section[aria-labelledby='home-services-title'] ul")
     cards = grid.locator(":scope > li")
     assert cards.count() == 12, "12 featured services must be shown"
-    assert page.get_by_text("Sin reportes recientes").count() == 12, "No fake sparklines in empty CI database"
-    assert page.locator("section[aria-labelledby='home-services-title'] svg[role='img']").count() == 0
+    # Integration tests may have created disposable reports. Validate each
+    # card against its REAL numeric total, rather than assuming an empty DB.
+    for index in range(cards.count()):
+        card = cards.nth(index)
+        count = int(card.locator("span.font-mono.font-semibold").inner_text())
+        chart = card.locator("svg[role='img']")
+        empty = card.get_by_text("Sin reportes recientes")
+        if count == 0:
+            assert chart.count() == 0, "Zero-report service cannot show a fabricated curve"
+            assert empty.count() == 1, "Zero-report service must show an honest empty state"
+        else:
+            assert chart.count() == 1, "Recorded activity must have a sparkline"
+            assert empty.count() == 0, "Activity cannot be labelled as empty"
 
     for width in (320, 390, 768):
         page.set_viewport_size({"width": width, "height": 844})
@@ -41,5 +52,5 @@ with sync_playwright() as playwright:
     link = page.get_by_role("link", name="Ver estado y reportes de CANTV")
     assert link.get_attribute("href") == "/servicios/cantv"
     assert page.get_by_text("Servicio en catálogo de demostración").count() == 12
-    print("Mobile 320/390/768px: 2 columns, 12 real-data cards, no overflow, accessible favorites persist.")
+    print("Mobile 320/390/768px: 2 columns, 12 real-data cards, no overflow, no false curves; favorites persist.")
     browser.close()
