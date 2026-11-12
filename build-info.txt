@@ -1,0 +1,3 @@
+mode=synthetic-public-demo
+catalogue=142
+source-commit=969d433a69ba644fca7609151b9182f5474eba58
