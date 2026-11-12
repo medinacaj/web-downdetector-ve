@@ -74,4 +74,11 @@ jobs:
             sleep 2
           done
           python tests/home-cards-browser.py
+      - name: Store actual mobile screenshots
+        uses: actions/upload-artifact@v4
+        with:
+          name: pulsove-home-mobile-preview
+          path: artifacts/pulsove-home-*.png
+          if-no-files-found: error
+          retention-days: 7
 
