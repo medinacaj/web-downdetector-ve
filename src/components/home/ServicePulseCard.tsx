@@ -3,29 +3,13 @@ import { StatusBadge } from '@/components/ui/StatusBadge';
 import { sparklinePolyline } from '@/lib/queries/home-trends';
 import type { ServiceSummary } from '@/lib/queries/home';
 import { FavoriteButton } from './FavoriteButton';
-
-const MARK_COLORS: Record<string, { background: string; foreground: string }> = {
-  'telecomunicaciones': { background: 'bg-sky-50 dark:bg-sky-950', foreground: 'text-sky-700 dark:text-sky-300' },
-  'banca-y-pagos': { background: 'bg-emerald-50 dark:bg-emerald-950', foreground: 'text-emerald-700 dark:text-emerald-300' },
-  'servicios-publicos': { background: 'bg-amber-50 dark:bg-amber-950', foreground: 'text-amber-700 dark:text-amber-300' },
-  'plataformas-digitales': { background: 'bg-violet-50 dark:bg-violet-950', foreground: 'text-violet-700 dark:text-violet-300' },
-  'streaming': { background: 'bg-rose-50 dark:bg-rose-950', foreground: 'text-rose-700 dark:text-rose-300' },
-  'videojuegos': { background: 'bg-indigo-50 dark:bg-indigo-950', foreground: 'text-indigo-700 dark:text-indigo-300' },
-};
-const FALLBACK_COLORS = { background: 'bg-brand-50 dark:bg-brand-900', foreground: 'text-brand-700 dark:text-brand-200' };
-
-function serviceMonogram(name: string) {
-  const words = name.trim().split(/\s+/);
-  if (words.length > 1) return words.slice(0, 2).map((word) => word[0] ?? '').join('').toLocaleUpperCase('es-VE');
-  return name.replace(/[^\p{L}\p{N}]/gu, '').slice(0, 2).toLocaleUpperCase('es-VE') || 'VE';
-}
+import { BrandMark } from './BrandMark';
 
 export function ServicePulseCard({
   service,
 }: {
   service: ServiceSummary & { hourlyReports: number[] };
 }) {
-  const tone = MARK_COLORS[service.categorySlug] ?? FALLBACK_COLORS;
   const line = sparklinePolyline(service.hourlyReports);
   const reports = service.hourlyReports.reduce((sum, count) => sum + count, 0);
 
@@ -43,14 +27,8 @@ export function ServicePulseCard({
             <p className="mt-1 line-clamp-1 text-[11px] text-ink-muted sm:text-xs">{service.categoryName}</p>
           </div>
 
-          {/* Identificador tipográfico original: no suplantar los logos oficiales. */}
-          <div className="flex flex-1 flex-col items-center justify-center gap-2 py-3">
-            <span aria-hidden="true" className={`flex h-[68px] w-[68px] items-center justify-center rounded-[20px] text-3xl font-bold tracking-tight sm:h-20 sm:w-20 sm:text-4xl ${tone.background} ${tone.foreground}`}>
-              {serviceMonogram(service.name)}
-            </span>
-            <span aria-hidden="true" className={`line-clamp-2 max-w-full text-center text-xs font-bold tracking-tight sm:text-sm ${tone.foreground}`}>
-              {service.name}
-            </span>
+          <div className="flex flex-1 items-center justify-center py-4">
+            <BrandMark slug={service.slug} name={service.name} categorySlug={service.categorySlug} />
           </div>
 
           <div className="mt-auto">
