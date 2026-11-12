@@ -10,7 +10,9 @@ on:
       - 'src/lib/brand-logos.ts'
       - 'src/lib/db/seed-data/**'
       - 'public/brands/**'
-      - 'scripts/build-pages-global-demo.ts'
+      - 'scripts/build-pages-global-demo.mjs'
+      - 'scripts/check-pages-global-demo.mjs'
+      - 'tests/global-pages-browser.py'
       - 'tests/global-platforms.test.ts'
       - 'tests/home-*.test.ts'
       - 'tests/home-cards-browser.py'
@@ -84,6 +86,37 @@ jobs:
         with:
           name: pulsove-home-mobile-preview
           path: artifacts/pulsove-home-*.png
+          if-no-files-found: error
+          retention-days: 7
+      - name: Generate worldwide static preview from canonical seed data
+        run: npx tsx scripts/build-pages-global-demo.mjs
+      - name: Verify global preview safety, assets and script syntax
+        run: node scripts/check-pages-global-demo.mjs
+      - name: Verify static GitHub Pages directory in browser
+        run: |
+          mkdir -p /tmp/pulsove-public/web-downdetector-ve
+          cp -a pages-global-demo/. /tmp/pulsove-public/web-downdetector-ve/
+          python -m http.server 3434 --directory /tmp/pulsove-public >/tmp/pulsove-preview.log 2>&1 &
+          server_pid=$!
+          trap 'kill "$server_pid" || true' EXIT
+          for attempt in $(seq 1 40); do
+            if curl -fsS http://127.0.0.1:3434/web-downdetector-ve/ >/dev/null; then break; fi
+            sleep 1
+          done
+          python tests/global-pages-browser.py
+      - name: Store worldwide demo bundle for release
+        uses: actions/upload-artifact@v4
+        with:
+          name: pulsove-worldwide-gh-pages
+          path: pages-global-demo/
+          if-no-files-found: error
+          include-hidden-files: true
+          retention-days: 7
+      - name: Store international catalogue browser previews
+        uses: actions/upload-artifact@v4
+        with:
+          name: pulsove-global-mobile-screenshots
+          path: artifacts/global-pages-*.png
           if-no-files-found: error
           retention-days: 7
 
