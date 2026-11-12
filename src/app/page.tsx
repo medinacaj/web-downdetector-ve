@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { getHomeData } from '@/lib/queries/home';
 import { StatusBadge } from '@/components/ui/StatusBadge';
+import { ServicePulseCard } from '@/components/home/ServicePulseCard';
 import { ROUTE, isRouteAvailable } from '@/lib/nav';
 
 function formatUpdatedAt(date: Date) {
@@ -124,33 +125,33 @@ export default async function HomePage() {
         </section>
       )}
 
-      {/* Servicios */}
-      <section className="mx-auto max-w-6xl px-4 py-12 sm:px-6">
-        <div className="flex items-baseline justify-between">
-          <h2 className="font-display text-lg font-semibold">
-            {data.hasAnyActivity ? 'Servicios con mayor actividad' : 'Servicios'}
-          </h2>
-          <Link href="/servicios" className="text-sm text-ink-muted hover:text-ink">
+      {/* Servicios de interés: cuadrícula responsive y tendencias reales de reportes. */}
+      <section className="mx-auto max-w-6xl px-3 py-12 sm:px-6" aria-labelledby="home-services-title">
+        <div className="flex items-start justify-between gap-3 px-1 sm:items-center">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-pulse-600">Explora el pulso</p>
+            <h2 id="home-services-title" className="mt-1 font-display text-xl font-semibold tracking-tight sm:text-2xl">
+              {data.hasAnyActivity ? 'Servicios con más reportes recientes' : 'Servicios de interés en Venezuela'}
+            </h2>
+            <p className="mt-1 max-w-lg text-xs text-ink-muted sm:text-sm">
+              Consulta el estado, guarda favoritos en este navegador y revisa reportes de las últimas 24 horas.
+              Los gráficos reflejan datos registrados, no mediciones inventadas.
+            </p>
+          </div>
+          <Link href="/servicios" className="shrink-0 pt-1 text-xs font-medium text-brand-600 underline-offset-4 hover:underline sm:text-sm">
             Ver todos
           </Link>
         </div>
 
-        <ul className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {data.mostActive.map((s) => (
-            <li key={s.slug}>
-              <Link
-                href={`/servicios/${s.slug}`}
-                className="flex items-center justify-between gap-3 rounded-lg border border-border p-4 transition-colors hover:border-brand-400"
-              >
-                <div>
-                  <p className="font-medium">{s.name}</p>
-                  <p className="text-xs text-ink-muted">{s.categoryName}</p>
-                </div>
-                <StatusBadge status={s.status} size="sm" />
-              </Link>
-            </li>
+        <ul className="mt-6 grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-3 xl:grid-cols-4">
+          {data.featuredServices.map((service) => (
+            <ServicePulseCard key={service.slug} service={service} />
           ))}
         </ul>
+        <p className="mt-4 px-1 text-xs text-ink-muted">
+          Las estrellas guardan preferencias solo en este dispositivo. Los monogramas son identificadores
+          referenciales, no logotipos oficiales ni aval de los proveedores.
+        </p>
       </section>
 
       {/* Problemas más reportados — vacío hoy, honesto al respecto */}
