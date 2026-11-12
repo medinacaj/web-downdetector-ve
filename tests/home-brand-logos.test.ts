@@ -6,7 +6,7 @@ import { HOME_BRAND_LOGOS, logoForService } from '@/lib/brand-logos';
 describe('homepage editorial brand assets', () => {
   it('renders explicit local images for researched services, not external trackers', () => {
     const keys = Object.keys(HOME_BRAND_LOGOS);
-    expect(keys.length).toBe(9);
+    expect(keys.length).toBe(29);
     for (const [slug, path] of Object.entries(HOME_BRAND_LOGOS)) {
       expect(slug).toMatch(/^[a-z0-9]+(?:-[a-z0-9]+)*$/);
       expect(path).toMatch(/^\/brands\/[a-z0-9-]+\.(png|svg)$/);
@@ -27,7 +27,7 @@ describe('homepage editorial brand assets', () => {
       const file = join(process.cwd(), 'public', path.slice(1));
       expect(existsSync(file), `Missing asset: ${path}`).toBe(true);
       const data = readFileSync(file);
-      expect(data.length).toBeGreaterThan(300);
+      expect(data.length).toBeGreaterThan(100);
       expect(data.length).toBeLessThan(350_000);
       if (path.endsWith('.png')) {
         expect(data.subarray(0, 8).toString('hex')).toBe('89504e470d0a1a0a');

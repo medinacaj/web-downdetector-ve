@@ -72,6 +72,18 @@ export const issueTypesSeed = [
     categorySlug: 'apuestas-y-loterias',
   },
 
+
+  // Global categories.
+  { slug: "correo-no-sincroniza", name: "Correos no se sincronizan", categorySlug: "correo-y-productividad" },
+  { slug: "reunion-no-conecta", name: "No conecta a videollamada", categorySlug: "correo-y-productividad" },
+  { slug: "archivos-no-cargan", name: "Archivos no cargan", categorySlug: "correo-y-productividad" },
+  { slug: "error-dns-cdn", name: "DNS o CDN con errores", categorySlug: "nube-e-infraestructura" },
+  { slug: "deploy-no-disponible", name: "Despliegue no disponible", categorySlug: "nube-e-infraestructura" },
+  { slug: "api-no-responde", name: "API no responde", categorySlug: "nube-e-infraestructura" },
+  { slug: "respuesta-ia-falla", name: "Respuestas del asistente fallan", categorySlug: "inteligencia-artificial" },
+  { slug: "ia-no-conecta", name: "No conecta al servicio de IA", categorySlug: "inteligencia-artificial" },
+  { slug: "compra-no-procesa", name: "Compra o pedido no se procesa", categorySlug: "comercio-global" },
+  { slug: "checkout-fallido", name: "Pago o checkout fallido", categorySlug: "comercio-global" },
   // Transversal (sin categoría fija)
   { slug: 'otro', name: 'Otro', categorySlug: null },
 ] as const;

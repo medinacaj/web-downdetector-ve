@@ -77,4 +77,9 @@ export const categoriesSeed = [
     icon: 'dices',
     sortOrder: 8,
   },
+  // Global services requested for international coverage (Nov 2026).
+  { slug: "correo-y-productividad", name: "Correo y productividad", description: "Correo electrónico, colaboración, reuniones y almacenamiento de archivos.", icon: "mail", sortOrder: 9 },
+  { slug: "nube-e-infraestructura", name: "Nube e infraestructura", description: "CDN, DNS, hosting, servidores, repositorios de código y herramientas de desarrollo.", icon: "cloud", sortOrder: 10 },
+  { slug: "inteligencia-artificial", name: "Inteligencia artificial", description: "Servicios y asistentes de inteligencia artificial accesibles en línea.", icon: "brain-circuit", sortOrder: 11 },
+  { slug: "comercio-global", name: "Comercio global", description: "Mercados, tiendas y plataformas internacionales de comercio y pagos.", icon: "shopping-bag", sortOrder: 12 },
 ] as const;

@@ -19,6 +19,15 @@ with sync_playwright() as playwright:
     cards = grid.locator(":scope > li")
     assert cards.count() == 12, "12 featured services must be shown"
 
+    # The international catalogue is visible on the index, not just in seed files.
+    global_section = page.locator("section[aria-labelledby='global-platforms-title']")
+    assert global_section.count() == 1
+    assert global_section.locator("ul > li").count() == 30, "30 global services must appear in the homepage"
+    for name in ("Cloudflare", "Gmail", "Outlook", "Fortnite"):
+        assert global_section.get_by_role("link", name="Ver estado y reportes de " + name).count() == 1
+    assert global_section.locator("img[alt^='Logotipo identificativo de']").count() >= 15
+
+
     # Logos come from a reviewed, self-hosted allowlist; the browser must
     # never receive a broken external logo or a third-party tracking request.
     logo_images = grid.locator('img[alt^="Logotipo identificativo de"]')
@@ -78,6 +87,6 @@ with sync_playwright() as playwright:
 
     link = page.get_by_role("link", name="Ver estado y reportes de CANTV")
     assert link.get_attribute("href") == "/servicios/cantv"
-    assert page.get_by_text("Servicio en catálogo de demostración").count() == 12
+    assert grid.get_by_text("Servicio en catálogo de demostración").count() == 12
     print("Mobile 320/390/768px: 2 columns, 12 real-data cards, no overflow, no false curves; favorites persist.")
     browser.close()

@@ -21,3 +21,11 @@ Para Banesco: imagen adaptada solo de formato y resolución mediante rasterizaci
 **Pendientes:** Mercantil, SENIAT y Sistema Patria conservan el identificador tipográfico cuando no se verificó un archivo e importación local. Los logos de otras marcas del directorio de 71 servicios aún no están incorporados; no cargar favicon genérico, logotipo de empresa distinta ni recursos obtenidos sin procedencia.
 
 **Control editorial:** las marcas pueden actualizar su identidad sin previo aviso; revisar archivos y condiciones de uso antes de sustituciones. Si el titular solicita retirar su logo, retirar el archivo y su entrada de la lista; el componente utiliza el monograma seguro como reserva. No recoger datos privados ni añadir herramientas de analítica al cargar imágenes.
+
+## Ampliación de iconografía global · noviembre de 2026
+
+Se añaden 20 iconos vectoriales de marcas como Cloudflare, Gmail, Fortnite, Discord, GitHub, Google Cloud, Vercel, Epic Games, Steam, Roblox, VALORANT, Google Gemini, PayPal, Shopify, Stripe, Reddit, Twitch, Claude, Zoom y Google Drive. El código usa una lista fija en `src/lib/brand-logos.ts`; todos los SVG están alojados en el propio dominio bajo `public/brands/`, sin rastreadores o imágenes de terceros.
+
+**Autoría de las representaciones SVG:** colaboradores de [Simple Icons](https://github.com/simple-icons/simple-icons), disponibles bajo [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/) para los gráficos distribuidos en el proyecto. Las **marcas y logotipos pertenecen a sus titulares**: estar en PulsoVE no implica asociación, patrocinio o certificado de disponibilidad. Las referencias específicas de cada icono figuran en [la página pública de créditos](/creditos-marcas).
+
+Las plataformas para las que no existe un recurso de uso verificable, como Outlook y Minecraft en esta ampliación, usan un identificador tipográfico propio, no una representación falsa del logo oficial. El catálogo es de interés internacional, pero el motor de reportes de PulsoVE continúa centrado en Venezuela.
