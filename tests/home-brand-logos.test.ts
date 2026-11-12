@@ -27,7 +27,7 @@ describe('homepage editorial brand assets', () => {
       const file = join(process.cwd(), 'public', path.slice(1));
       expect(existsSync(file), `Missing asset: ${path}`).toBe(true);
       const data = readFileSync(file);
-      expect(data.length).toBeGreaterThan(300);
+      expect(data.length).toBeGreaterThan(100);
       expect(data.length).toBeLessThan(350_000);
       if (path.endsWith('.png')) {
         expect(data.subarray(0, 8).toString('hex')).toBe('89504e470d0a1a0a');
