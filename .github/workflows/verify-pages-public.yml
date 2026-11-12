@@ -1,0 +1,32 @@
+name: Validate public worldwide PulsoVE Pages HTTP
+on:
+  push:
+    branches: ['verify/pulsove-pages-http-20261112']
+permissions:
+  contents: read
+jobs:
+  public-smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - name: Verify site, directory, build source and logos are publicly accessible
+        run: |
+          set -euo pipefail
+          base='https://medinacaj.github.io/web-downdetector-ve'
+          for attempt in $(seq 1 12); do
+            if curl --location --fail --silent --show-error --max-time 15 "$base/" -o /tmp/pulsove-index.html; then break; fi
+            sleep 5
+          done
+          grep -q 'VISTA PREVIA PÚBLICA' /tmp/pulsove-index.html
+          grep -q 'Cloudflare' /tmp/pulsove-index.html
+          grep -q 'Gmail' /tmp/pulsove-index.html
+          grep -q 'Outlook' /tmp/pulsove-index.html
+          grep -q 'Fortnite' /tmp/pulsove-index.html
+          curl --location --fail --silent --show-error --max-time 20 "$base/servicios/" -o /tmp/pulsove-directory.html
+          grep -q '142 servicios' /tmp/pulsove-directory.html
+          curl --location --fail --silent --show-error --max-time 20 "$base/build-info.txt" -o /tmp/pulsove-build-info.txt
+          grep -q 'catalogue=142' /tmp/pulsove-build-info.txt
+          grep -q 'source-commit=969d433a69ba644fca7609151b9182f5474eba58' /tmp/pulsove-build-info.txt
+          curl --location --fail --silent --show-error --max-time 20 "$base/brands/cloudflare.svg" -o /tmp/cloudflare-logo.svg
+          grep -q '<svg ' /tmp/cloudflare-logo.svg
+          echo 'PUBLIC HTTP VERIFIED: $base with 142 services, required brands, and exact source commit'
