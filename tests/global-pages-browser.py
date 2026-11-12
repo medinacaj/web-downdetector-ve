@@ -1,10 +1,13 @@
 """Synthetic GitHub Pages preview: real Chromium navigation and mobile rendering."""
 from pathlib import Path
+import shutil
 from playwright.sync_api import sync_playwright
 
 ROOT = "http://127.0.0.1:3434/web-downdetector-ve/"
 with sync_playwright() as playwright:
-    browser = playwright.chromium.launch(headless=True, args=["--no-sandbox"])
+    chrome = shutil.which("google-chrome") or shutil.which("google-chrome-stable") or shutil.which("chromium")
+    assert chrome, "Chromium executable unavailable"
+    browser = playwright.chromium.launch(executable_path=chrome, headless=True, args=["--no-sandbox"])
     context = browser.new_context(viewport={"width": 390, "height": 844})
     page = context.new_page()
     remote = []
