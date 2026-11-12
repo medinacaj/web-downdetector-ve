@@ -7,10 +7,8 @@ export const HOME_BRAND_LOGOS: Readonly<Record<string, string>> = Object.freeze(
   'corpoelec': '/brands/corpoelec.png',
   'banco-de-venezuela': '/brands/banco-de-venezuela.png',
   'banesco': '/brands/banesco.png',
-  'mercantil': '/brands/mercantil.png',
-  'whatsapp': '/brands/whatsapp.png',
-  'instagram': '/brands/instagram.png',
-  'seniat': '/brands/seniat.png',
+  'whatsapp': '/brands/whatsapp.svg',
+  'instagram': '/brands/instagram.svg',
 });
 
 export function logoForService(slug: string): string | null {
