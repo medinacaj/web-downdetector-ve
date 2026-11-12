@@ -71,6 +71,8 @@ jobs:
         run: |
           npm run db:migrate:deploy
           npm run db:seed
+      - name: Run API integration tests against disposable PostgreSQL
+        run: npm run test:integration
       - name: Build with seeded disposable PostgreSQL
         run: npm run build
         env:
