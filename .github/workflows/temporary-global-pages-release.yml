@@ -1,0 +1,46 @@
+name: TEMP publish reviewed PulsoVE global demo to GitHub Pages
+on:
+  push:
+    branches: ['release/pulsove-global-pages-20261112']
+permissions:
+  contents: write
+jobs:
+  publish-static-demo:
+    if: github.repository == 'medinacaj/web-downdetector-ve'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+          persist-credentials: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - name: Confirm exact merged source SHA
+        run: |
+          test "$(git rev-parse HEAD^)" = "969d433a69ba644fca7609151b9182f5474eba58"
+      - name: Install locked dependencies
+        run: npm ci --no-audit --no-fund
+      - name: Verify catalogue and brand tests again
+        run: npm run test:unit
+      - name: Generate static Pages demo without database or backend requests
+        run: |
+          GITHUB_SHA="$(git rev-parse HEAD^)" npx tsx scripts/build-pages-global-demo.mjs
+          node scripts/check-pages-global-demo.mjs
+      - name: Deploy static verified allowlist to existing gh-pages branch
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch --no-tags origin refs/heads/gh-pages:refs/remotes/origin/gh-pages
+          git worktree add --detach /tmp/pulsove-global-pages refs/remotes/origin/gh-pages
+          git -C /tmp/pulsove-global-pages rm -r -q --ignore-unmatch -- .
+          cp -a pages-global-demo/. /tmp/pulsove-global-pages/
+          git -C /tmp/pulsove-global-pages add -A
+          git -C /tmp/pulsove-global-pages diff --cached --check
+          git -C /tmp/pulsove-global-pages config user.name 'github-actions[bot]'
+          git -C /tmp/pulsove-global-pages config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git -C /tmp/pulsove-global-pages commit -m 'deploy(demo): PulsoVE 142 service worldwide catalogue from 969d433a'
+          git -C /tmp/pulsove-global-pages push origin HEAD:refs/heads/gh-pages
+          echo 'Published synthetic catalogue to gh-pages; separate Pages status verification required.' >> "$GITHUB_STEP_SUMMARY"
