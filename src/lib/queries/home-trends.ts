@@ -53,3 +53,38 @@ export function pickFeaturedServices<T extends { slug: string; reportsLast24h: n
     || a.name.localeCompare(b.name, 'es')
   ).slice(0, limit);
 }
+
+/**
+ * Global catalogue spotlight. Explicitly grouped so popular cloud, mail and
+ * gaming platforms remain discoverable even when Venezuela has no reports.
+ * Editorial order is not a worldwide usage ranking.
+ */
+export const WORLDWIDE_SPOTLIGHT = [
+  { id: 'nube', title: 'Nube e infraestructura', description: 'Cloudflare, infraestructura, repositorios y despliegues.', slugs: [
+    'cloudflare', 'amazon-web-services', 'google-cloud', 'microsoft-azure', 'github', 'vercel',
+  ] },
+  { id: 'correo', title: 'Correo y productividad', description: 'Correo, reuniones y herramientas de trabajo.', slugs: [
+    'gmail', 'outlook', 'microsoft-365', 'google-drive', 'microsoft-teams', 'zoom',
+  ] },
+  { id: 'juegos', title: 'Videojuegos y plataformas de juego', description: 'Títulos multijugador y plataformas de acceso.', slugs: [
+    'fortnite', 'roblox', 'steam', 'valorant', 'minecraft', 'epic-games-store',
+  ] },
+  { id: 'ia-comunidad', title: 'Inteligencia artificial y comunidades', description: 'Asistentes, mensajería y comunidades en línea.', slugs: [
+    'chatgpt', 'google-gemini', 'claude', 'discord', 'reddit', 'twitch',
+  ] },
+  { id: 'comercio', title: 'Comercio y pagos internacionales', description: 'Tiendas y servicios de transacciones globales.', slugs: [
+    'amazon', 'paypal', 'shopify', 'stripe', 'aliexpress', 'ebay',
+  ] },
+] as const;
+
+export function selectWorldwideSpotlights<T extends { slug: string }>(
+  services: readonly T[],
+): { id: string; title: string; description: string; services: T[] }[] {
+  const lookup = new Map(services.map((service) => [service.slug, service]));
+  return WORLDWIDE_SPOTLIGHT.map((section) => ({
+    id: section.id,
+    title: section.title,
+    description: section.description,
+    services: section.slugs.map((slug) => lookup.get(slug)).filter((service): service is T => !!service),
+  })).filter((section) => section.services.length > 0);
+}
