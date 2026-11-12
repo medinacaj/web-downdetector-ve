@@ -9,6 +9,7 @@ import { servicesSeed } from '../src/lib/db/seed-data/services.ts';
 import { categoriesSeed } from '../src/lib/db/seed-data/categories.ts';
 import { HOME_SERVICE_SLUGS, WORLDWIDE_SPOTLIGHT } from '../src/lib/queries/home-trends.ts';
 import { HOME_BRAND_LOGOS, logoForService } from '../src/lib/brand-logos.ts';
+import { MICROSOFT_FEEDS } from '../src/lib/official-status/microsoft-rss.ts';
 
 const BASE='/web-downdetector-ve';
 const OUTPUT='pages-global-demo';
@@ -95,6 +96,11 @@ const hero='<div class="wrap hero"><div class="eyebrow">Monitorea las plataforma
 '<div class="filters"><input id="quicksearch" type="search" class="input" placeholder="Buscar Gmail, Cloudflare, Fortnite…" aria-label="Buscar entre tarjetas visibles">'+
 '<a class="chip" href="'+BASE+'/servicios/">Abrir directorio de 142 servicios</a></div>'+
 '<div class="filters">'+homeSections.map((s)=>'<a class="chip" href="#'+escape(s.id)+'">'+escape(s.title)+'</a>').join('')+'</div></div>';
+const officialSourcesPanel='<section class="group" id="microsoft-status"><div class="section-title"><h2>Estado oficial de Microsoft</h2></div>'+
+'<p class="hint">En esta vista previa estática no se consulta el RSS ni se afirman estados actuales. La aplicación conectada actualiza las fuentes cada cinco minutos.</p>'+
+'<ul class="cards">'+MICROSOFT_FEEDS.map((feed)=>'<li class="card"><div class="card-link"><strong class="name">'+escape(feed.name)+'</strong>'+
+'<p class="category">'+escape(feed.scope)+'</p><div class="logo-area"><span class="monogram">MS</span></div>'+
+'<span class="signal">Estado actual: no consultado en esta demo</span><a class="chip" target="_blank" rel="noopener noreferrer" href="'+escape(feed.statusUrl)+'">Fuente oficial</a></div></li>').join('')+'</ul></section>';
 const indexBody=hero+'<div class="wrap">'+group('Destacados de Venezuela','Servicios tradicionales del catálogo, con identificadores de marca cuando hay archivos verificados.',homeSelected,'ve')+
 homeSections.map((s)=>group(s.title,s.description,s.items,s.id)).join('')+
 '<p class="legal">Esta demo no inventa gráficos, números de reportes ni porcentajes de disponibilidad. Los botones de favoritos solo guardan slugs en este navegador. No se envían datos al servidor.</p></div>';
