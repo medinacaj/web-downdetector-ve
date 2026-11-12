@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Real Chromium smoke test for PulsoVE service tiles on mobile."""
 import shutil
-import re
+from pathlib import Path
 from playwright.sync_api import sync_playwright
 
 chrome = shutil.which("google-chrome") or shutil.which("google-chrome-stable") or shutil.which("chromium")
@@ -48,6 +48,16 @@ with sync_playwright() as playwright:
     assert page.evaluate("JSON.parse(localStorage.getItem('pulsove:favorites:v1'))") == ["cantv"]
     page.reload(wait_until="networkidle")
     assert page.get_by_role("button", name="Quitar CANTV de favoritos").get_attribute("aria-pressed") == "true"
+
+    # Keep visual evidence from the exact tested build, not mocked screenshots.
+    Path("artifacts").mkdir(exist_ok=True)
+    page.locator("section[aria-labelledby='home-services-title']").screenshot(
+        path="artifacts/pulsove-home-390.png", animations="disabled"
+    )
+    page.set_viewport_size({"width": 320, "height": 844})
+    page.locator("section[aria-labelledby='home-services-title']").screenshot(
+        path="artifacts/pulsove-home-320.png", animations="disabled"
+    )
 
     link = page.get_by_role("link", name="Ver estado y reportes de CANTV")
     assert link.get_attribute("href") == "/servicios/cantv"
