@@ -7,11 +7,16 @@ on:
       - 'src/lib/queries/home.ts'
       - 'src/lib/queries/home-trends.ts'
       - 'src/lib/favorites.ts'
+      - 'src/lib/brand-logos.ts'
+      - 'src/lib/db/seed-data/**'
+      - 'public/brands/**'
+      - 'scripts/build-pages-global-demo.ts'
+      - 'tests/global-platforms.test.ts'
       - 'tests/home-*.test.ts'
       - 'tests/home-cards-browser.py'
       - '.github/workflows/home-cards-ci.yml'
   push:
-    branches: [main, 'feat/home-service-pulse-cards-20261112']
+    branches: [main, 'feat/home-service-pulse-cards-20261112', 'feat/global-platforms-catalog-20261112']
 permissions:
   contents: read
 jobs:
