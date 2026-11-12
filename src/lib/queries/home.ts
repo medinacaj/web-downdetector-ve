@@ -3,7 +3,7 @@ import { db } from '@/lib/db/client';
 import { services, categories, reports, incidents } from '@/lib/db/schema';
 import { statusForService } from './status';
 import type { OperationalStatus } from '@/lib/engine/status-bands';
-import { pickFeaturedServices, toHourlySeries, type HourlyReportRow } from './home-trends';
+import { pickFeaturedServices, selectWorldwideSpotlights, toHourlySeries, type HourlyReportRow } from './home-trends';
 
 export interface ServiceSummary {
   slug: string;
@@ -47,8 +47,13 @@ export async function getHomeData() {
   // Activity is real data, not fabricated example curves. With no reports, show
   // a curated cross-category selection of services relevant to Venezuela.
   const mostActive = pickFeaturedServices(servicesWithStatus);
+  const worldwideServices = selectWorldwideSpotlights(servicesWithStatus);
   const idBySlug = new Map(serviceRows.map((row) => [row.slug, row.id]));
-  const selectedIds = mostActive.map((s) => idBySlug.get(s.slug)).filter((id): id is string => !!id);
+  const chartSlugs = new Set([
+    ...mostActive.map((service) => service.slug),
+    ...worldwideServices.flatMap((section) => section.services.map((service) => service.slug)),
+  ]);
+  const selectedIds = [...chartSlugs].map((slug) => idBySlug.get(slug)).filter((id): id is string => !!id);
   const hourBucket = sql<Date>`date_trunc('hour', ${reports.createdAt})`;
   const activityRows = selectedIds.length
     ? await db.select({
@@ -67,9 +72,14 @@ export async function getHomeData() {
     entries.push({ hour: row.hour, count: row.count });
     byService.set(row.serviceId, entries);
   }
-  const featuredServices = mostActive.map((service) => ({
+  const withTrend = (service: ServiceSummary) => ({
     ...service,
     hourlyReports: toHourlySeries(byService.get(idBySlug.get(service.slug) ?? '') ?? [], now),
+  });
+  const featuredServices = mostActive.map(withTrend);
+  const globalServiceSections = worldwideServices.map((section) => ({
+    ...section,
+    services: section.services.map(withTrend),
   }));
 
   const [reportsAllTime] = await db.select({ n: sql<number>`count(*)::int` }).from(reports);
@@ -95,6 +105,7 @@ export async function getHomeData() {
     services: servicesWithStatus,
     mostActive,
     featuredServices,
+    globalServiceSections,
     hasAnyActivity,
     totals: {
       reportsAllTime: reportsAllTime?.n ?? 0,
