@@ -15,6 +15,23 @@ jobs:
   validate-next:
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: ci
+          POSTGRES_PASSWORD: ci
+          POSTGRES_DB: pulsove_ci
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U ci -d pulsove_ci"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      DATABASE_URL: postgresql://ci:ci@localhost:5432/pulsove_ci
+      ANONYMIZATION_SALT: CI_UNIT_TEST_ONLY_NOT_FOR_REAL_TRAFFIC_1234567890
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -48,7 +65,11 @@ jobs:
         env:
           DATABASE_URL: postgresql://ci:ci@localhost:5432/pulsove_unit_only
           ANONYMIZATION_SALT: CI_UNIT_TEST_ONLY_NOT_FOR_REAL_TRAFFIC_1234567890
-      - name: Build with synthetic CI environment
+      - name: Initialize disposable CI database
+        run: |
+          npm run db:migrate:deploy
+          npm run db:seed
+      - name: Build with seeded disposable PostgreSQL
         run: npm run build
         env:
           DATABASE_URL: postgresql://ci:ci@localhost:5432/pulsove_unit_only
