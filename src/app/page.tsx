@@ -149,8 +149,12 @@ export default async function HomePage() {
           ))}
         </ul>
         <p className="mt-4 px-1 text-xs text-ink-muted">
-          Las estrellas guardan preferencias solo en este dispositivo. Los monogramas son identificadores
-          referenciales, no logotipos oficiales ni aval de los proveedores.
+          Las estrellas guardan preferencias solo en este dispositivo. Los logotipos identifican a sus
+          respectivos titulares y no implican afiliación, patrocinio ni validación de disponibilidad.
+          Los servicios sin archivo verificado muestran un identificador tipográfico.{' '}
+          <Link href="/creditos-marcas" className="underline underline-offset-2 hover:text-ink">
+            Fuentes y créditos de logotipos
+          </Link>.
         </p>
       </section>
 
