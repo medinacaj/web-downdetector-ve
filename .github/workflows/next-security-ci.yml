@@ -63,7 +63,7 @@ jobs:
       - name: Isolated unit tests
         run: npm run test:unit
         env:
-          DATABASE_URL: postgresql://ci:ci@localhost:5432/pulsove_unit_only
+          DATABASE_URL: postgresql://ci:ci@localhost:5432/pulsove_ci
           ANONYMIZATION_SALT: CI_UNIT_TEST_ONLY_NOT_FOR_REAL_TRAFFIC_1234567890
       - name: Initialize disposable CI database
         run: |
@@ -72,7 +72,7 @@ jobs:
       - name: Build with seeded disposable PostgreSQL
         run: npm run build
         env:
-          DATABASE_URL: postgresql://ci:ci@localhost:5432/pulsove_unit_only
+          DATABASE_URL: postgresql://ci:ci@localhost:5432/pulsove_ci
           ANONYMIZATION_SALT: CI_UNIT_TEST_ONLY_NOT_FOR_REAL_TRAFFIC_1234567890
       - name: Production dependency audit
         run: npm audit --omit=dev --audit-level=critical
