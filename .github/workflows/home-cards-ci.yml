@@ -8,9 +8,10 @@ on:
       - 'src/lib/queries/home-trends.ts'
       - 'src/lib/favorites.ts'
       - 'tests/home-*.test.ts'
+      - 'tests/home-cards-browser.py'
       - '.github/workflows/home-cards-ci.yml'
   push:
-    branches: ['feat/home-service-pulse-cards-20261112']
+    branches: [main, 'feat/home-service-pulse-cards-20261112']
 permissions:
   contents: read
 jobs:
@@ -56,3 +57,21 @@ jobs:
         run: npm run build
       - name: Audit runtime dependencies
         run: npm audit --omit=dev --audit-level=high
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Prepare Chromium smoke test
+        run: |
+          command -v google-chrome || command -v google-chrome-stable || command -v chromium
+          python -m pip install --disable-pip-version-check playwright==1.56.0
+      - name: Verify homepage responsive cards in Chrome
+        run: |
+          npm run start -- --hostname 127.0.0.1 --port 3000 >/tmp/pulsove-home.log 2>&1 &
+          server_pid=$!
+          trap 'kill "$server_pid" || true' EXIT
+          for attempt in $(seq 1 40); do
+            if curl -fsS http://127.0.0.1:3000/ >/dev/null; then break; fi
+            sleep 2
+          done
+          python tests/home-cards-browser.py
+
