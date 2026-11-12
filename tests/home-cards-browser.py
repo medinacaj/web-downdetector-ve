@@ -87,6 +87,6 @@ with sync_playwright() as playwright:
 
     link = page.get_by_role("link", name="Ver estado y reportes de CANTV")
     assert link.get_attribute("href") == "/servicios/cantv"
-    assert page.get_by_text("Servicio en catálogo de demostración").count() == 12
+    assert grid.get_by_text("Servicio en catálogo de demostración").count() == 12
     print("Mobile 320/390/768px: 2 columns, 12 real-data cards, no overflow, no false curves; favorites persist.")
     browser.close()
