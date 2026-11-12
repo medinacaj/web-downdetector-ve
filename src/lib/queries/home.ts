@@ -16,7 +16,8 @@ export interface ServiceSummary {
 }
 
 export async function getHomeData() {
-  const since24h = new Date(Date.now() - 24 * 60 * 60 * 1000);
+  const now = new Date();
+  const since24h = new Date(now.getTime() - 24 * 60 * 60 * 1000);
 
   const serviceRows = await db
     .select({
@@ -68,7 +69,7 @@ export async function getHomeData() {
   }
   const featuredServices = mostActive.map((service) => ({
     ...service,
-    hourlyReports: toHourlySeries(byService.get(idBySlug.get(service.slug) ?? '') ?? [], new Date()),
+    hourlyReports: toHourlySeries(byService.get(idBySlug.get(service.slug) ?? '') ?? [], now),
   }));
 
   const [reportsAllTime] = await db.select({ n: sql<number>`count(*)::int` }).from(reports);
