@@ -18,6 +18,23 @@ with sync_playwright() as playwright:
     grid = page.locator("section[aria-labelledby='home-services-title'] ul")
     cards = grid.locator(":scope > li")
     assert cards.count() == 12, "12 featured services must be shown"
+
+    # Logos come from a reviewed, self-hosted allowlist; the browser must
+    # never receive a broken external logo or a third-party tracking request.
+    logo_images = grid.locator('img[alt^="Logotipo identificativo de"]')
+    card_brands = grid.locator("h3").all_inner_texts()
+    logo_sources = logo_images.evaluate_all("(nodes) => nodes.map(el => el.getAttribute('src'))")
+    print("BRAND CARD DEBUG:", {"names": card_brands, "logo_src": logo_sources}, flush=True)
+    assert logo_images.count() >= 5, "Expected verified company logos instead of monograms"
+    for i in range(logo_images.count()):
+        img = logo_images.nth(i)
+        img.scroll_into_view_if_needed()
+        img.evaluate("(el) => el.loading = 'eager'")
+        img.evaluate("(el) => el.decode()")
+        assert img.evaluate("(el) => el.complete && el.naturalWidth > 0"), (
+            "Company logo failed to load: " + str(img.get_attribute("src"))
+        )
+
     # Integration tests may have created disposable reports. Validate each
     # card against its REAL numeric total, rather than assuming an empty DB.
     for index in range(cards.count()):
