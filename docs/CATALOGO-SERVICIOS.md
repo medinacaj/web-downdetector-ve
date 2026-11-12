@@ -4,8 +4,8 @@ Qué servicios monitorea PulsoVE, por qué cada uno está aquí y cómo añadir 
 retirar otros. Los datos viven en `src/lib/db/seed-data/` (categorías, tipos de
 problema, servicios) y se cargan con `npm run db:seed`.
 
-- **Estado actual:** 71 servicios en 8 categorías, 25 tipos de problema.
-- **Última revisión de fuentes:** 10 de octubre de 2026.
+- **Estado actual:** 142 servicios en 12 categorías, 35 tipos de problema.
+- **Última revisión de fuentes:** 12 de noviembre de 2026 (expansión internacional solicitada por el propietario).
 - **Naturaleza de los datos:** todos los servicios son **demostrativos**
   (`is_demo = true`) y ninguno tiene `official_url` (queda `null` hasta que una
   persona la verifique). Estar en el catálogo **no** afirma que el servicio
@@ -15,7 +15,7 @@ problema, servicios) y se cargan con `npm run db:seed`.
 
 Un servicio entra al catálogo si cumple las tres condiciones:
 
-1. **Evidencia pública y fechada de uso o disponibilidad en Venezuela**: al menos
+1. **Evidencia pública y fechada de uso o disponibilidad en Venezuela, o acceso internacional solicitado explícitamente**: al menos
    una fuente (medio, estudio, informe de mercado) anotada en la sección 4. Un
    nombre que "suena conocido" no basta.
 2. **Algo que un usuario pueda reportar**: depende de un servicio en línea
@@ -251,3 +251,24 @@ a ninguna de ellas.
   de disponibilidad; por ejemplo, HBO Max/Max) al menos una vez al año.
 - Mecanismo de redirección de slugs (no existe hoy) antes de permitir editarlos.
 - Páginas de categoría indexables y su SEO (hoy el filtro es `?category=`).
+
+
+## 7. Ampliación internacional · 12 de noviembre de 2026
+
+El propietario solicitó que PulsoVE incluya servicios que se utilizan de manera frecuente en el mundo, además de su catálogo venezolano. Se añadieron **71 entradas**, manteniendo los 71 originales, y cuatro categorías nuevas:
+
+- **Correo y productividad** (17): Gmail, Outlook, Yahoo Mail, Proton Mail, Microsoft 365, Google Workspace, Drive, Teams, Zoom, Slack, etc.
+- **Nube e infraestructura** (15): Cloudflare, AWS, Google Cloud, Azure, GitHub, GitLab, Vercel, Netlify, Supabase, Firebase, etc.
+- **Inteligencia artificial** (7): ChatGPT, Claude, Gemini, Microsoft Copilot, Perplexity, DeepSeek y Grok.
+- **Comercio global** (7): Amazon, PayPal, Shopify, Stripe, AliExpress, eBay y Temu.
+- **Videojuegos** (17 adicionales): Fortnite, Epic Games Store, VALORANT, League of Legends, Minecraft, Rocket League, Fall Guys, PUBG, Genshin Impact, Apex Legends, Counter-Strike 2, Warzone, Battle.net, World of Warcraft, Nintendo Switch Online, EA app y GeForce NOW.
+- **Plataformas digitales** (6 adicionales): Discord, Reddit, Snapchat, Pinterest, Threads y Google Search.
+- **Streaming** (2 adicionales): Twitch y Kick.
+
+**Evidencia de existencia y utilidad técnica para monitorización:** las páginas de incidentes de [Cloudflare](https://www.cloudflarestatus.com/services), [Epic Games](https://status.epicgames.com/), [Google Workspace](https://www.google.com/appsstatus/dashboard/) y [Google Cloud](https://status.cloud.google.com/) permiten distinguir plataformas y componentes. Directorios independientes de incidencias como [Downdetector Chile](https://downdetector.cl/) y [UtiBox](https://utibox.io/status) muestran interés en servicios internacionales, aunque sus reportes **no se importan** y sus mediciones **no** representan un ranking de uso global.
+
+**Precisión geográfica:** el motor de reportes ciudadanos de PulsoVE sigue teniendo un diseño **centrado en Venezuela**. Incluir una plataforma internacional permite encontrarla y reportar problemas conforme a las funciones ya existentes, pero **no implica monitorización global, disponibilidad de todas las regiones, ni incorporación de reportes de terceros**. Hasta recibir evidencia suficiente, el estado debe indicar **«Sin datos suficientes»**; nunca presentar cero reportes como garantía de funcionamiento normal.
+
+**Logos y licencias:** se sumaron 20 logotipos SVG locales de [Simple Icons](https://github.com/simple-icons/simple-icons) con representación vectorial bajo CC0, sin que ello elimine los derechos sobre las marcas comerciales. [Créditos locales](LOGOS_EMPRESAS.md). Las marcas sin archivo verificado usan monogramas tipográficos. No se descargan imágenes desde servicios externos en el navegador.
+
+**Vista previa pública:** GitHub Pages es exclusivamente una demo sintética estática; no acepta reportes ni sustituye el backend de Next.js/PostgreSQL. El catálogo internacional aparecerá en producción solo cuando la rama se integre, el servicio se despliegue y se ejecute npm run db:seed con autorización y credenciales de la base de datos. Ese paso no puede inferirse de un CI verde en PostgreSQL temporal.
