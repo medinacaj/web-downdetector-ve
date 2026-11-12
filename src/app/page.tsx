@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { getHomeData } from '@/lib/queries/home';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { ServicePulseCard } from '@/components/home/ServicePulseCard';
+import { OfficialMicrosoftStatus } from '@/components/home/OfficialMicrosoftStatus';
 import { ROUTE, isRouteAvailable } from '@/lib/nav';
 
 function formatUpdatedAt(date: Date) {
@@ -207,6 +208,8 @@ export default async function HomePage() {
           </p>
         </div>
       </section>
+
+      <OfficialMicrosoftStatus />
 
       {/* Problemas más reportados — vacío hoy, honesto al respecto */}
       <section className="border-y border-border bg-surface">
