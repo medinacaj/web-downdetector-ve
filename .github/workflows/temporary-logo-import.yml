@@ -1,0 +1,35 @@
+name: TEMPORARY audited brand import (no deployment)
+on:
+  push:
+    branches: ['feat/home-company-logos-20261112']
+permissions:
+  contents: write
+jobs:
+  import-logo-assets:
+    if: github.repository == 'medinacaj/web-downdetector-ve'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - name: Install locked rasterizer
+        run: npm ci --no-audit --no-fund
+      - name: Import explicit Wikimedia Commons marks and remove all active SVG
+        run: node scripts/import-brand-logos.mjs
+      - name: Commit only local PNG artifacts to isolated feature branch
+        run: |
+          test "${GITHUB_REF_NAME}" = "feat/home-company-logos-20261112"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -- public/brands
+          if git diff --cached --quiet; then
+            echo "No changes"
+          else
+            git commit -m "assets(brand): add vetted self-hosted raster company logos"
+            git push origin HEAD:refs/heads/feat/home-company-logos-20261112
+          fi
