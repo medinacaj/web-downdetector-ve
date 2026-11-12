@@ -57,9 +57,15 @@ jobs:
         run: npm ci --ignore-scripts --no-audit --no-fund
       - name: Run typecheck
         run: npm run typecheck
-      - name: Run tests
-        run: npm test
-      - name: Build
+      - name: Run isolated unit tests (no production database)
+        run: npm run test:unit
+        env:
+          DATABASE_URL: postgresql://ci:ci@localhost:5432/pulsove_unit_only
+          ANONYMIZATION_SALT: CI_UNIT_TEST_ONLY_NOT_FOR_REAL_TRAFFIC_1234567890
+      - name: Build with synthetic CI variables
         run: npm run build
+        env:
+          DATABASE_URL: postgresql://ci:ci@localhost:5432/pulsove_unit_only
+          ANONYMIZATION_SALT: CI_UNIT_TEST_ONLY_NOT_FOR_REAL_TRAFFIC_1234567890
       - name: Production dependency audit
         run: npm audit --omit=dev --audit-level=critical
