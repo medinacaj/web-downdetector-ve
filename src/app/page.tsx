@@ -31,7 +31,7 @@ export default async function HomePage() {
         <div className="mx-auto grid max-w-6xl gap-10 px-4 py-14 sm:px-6 lg:grid-cols-[1.1fr_0.9fr] lg:items-center lg:py-20">
           <div>
             <h1 className="font-display text-3xl font-semibold leading-tight tracking-tight sm:text-4xl">
-              Consulta si un servicio está presentando problemas en Venezuela
+              Consulta reportes de servicios en Venezuela y plataformas de todo el mundo
             </h1>
             <p className="mt-4 max-w-md text-ink-muted">
               Reportes ciudadanos anónimos y mediciones técnicas, combinados con un motor
@@ -46,7 +46,7 @@ export default async function HomePage() {
                 id="hero-search"
                 name="q"
                 type="search"
-                placeholder="CANTV, Banesco, WhatsApp…"
+                placeholder="Cloudflare, Gmail, Fortnite…"
                 className="w-full rounded-md border border-border bg-surface px-4 py-2.5 text-sm text-ink placeholder:text-ink-muted focus:border-pulse-500"
               />
               <button
@@ -156,6 +156,56 @@ export default async function HomePage() {
             Fuentes y créditos de logotipos
           </Link>.
         </p>
+      </section>
+
+      {/* International services: curated groups, real data only; not an uptime guarantee. */}
+      <section className="border-t border-border bg-surface/50" aria-labelledby="global-platforms-title">
+        <div className="mx-auto max-w-6xl px-3 py-12 sm:px-6">
+          <div className="px-1">
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-pulse-600">
+              Plataformas internacionales
+            </p>
+            <h2 id="global-platforms-title" className="mt-1 font-display text-xl font-semibold sm:text-2xl">
+              Correo, nube, juegos y servicios del mundo
+            </h2>
+            <p className="mt-2 max-w-3xl text-xs text-ink-muted sm:text-sm">
+              Explora Cloudflare, Gmail, Outlook, Fortnite y otras plataformas globales.
+              La inclusión en el catálogo no significa que tengamos mediciones de todos los países.
+              Sin reportes suficientes mostraremos «Sin datos suficientes».
+            </p>
+            <div className="mt-4 flex flex-wrap gap-2" aria-label="Ir a una categoría de plataformas globales">
+              {data.globalServiceSections.map((section) => (
+                <a key={section.id} href={`#global-${section.id}`}
+                  className="rounded-full border border-border bg-surface px-3 py-1.5 text-xs font-medium text-ink hover:border-pulse-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-pulse-500">
+                  {section.title}
+                </a>
+              ))}
+            </div>
+          </div>
+          {data.globalServiceSections.map((section) => (
+            <div key={section.id} id={`global-${section.id}`} className="mt-10 scroll-mt-24">
+              <div className="flex flex-wrap items-end justify-between gap-2 px-1">
+                <div>
+                  <h3 className="font-display text-lg font-semibold sm:text-xl">{section.title}</h3>
+                  <p className="mt-1 text-xs text-ink-muted sm:text-sm">{section.description}</p>
+                </div>
+                <Link href="/servicios" className="text-xs font-medium text-brand-600 underline-offset-4 hover:underline">
+                  Directorio completo
+                </Link>
+              </div>
+              <ul className="mt-4 grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-3 xl:grid-cols-6">
+                {section.services.map((service) => (
+                  <ServicePulseCard key={service.slug} service={service} />
+                ))}
+              </ul>
+            </div>
+          ))}
+          <p className="mt-10 px-1 text-xs text-ink-muted">
+            Las gráficas solo representan reportes efectivamente registrados.
+            PulsoVE es independiente de los titulares de estas marcas.
+            Consulta <Link href="/creditos-marcas" className="underline underline-offset-2">créditos de logotipos</Link>.
+          </p>
+        </div>
       </section>
 
       {/* Problemas más reportados — vacío hoy, honesto al respecto */}
