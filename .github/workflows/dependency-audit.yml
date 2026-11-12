@@ -3,6 +3,14 @@ on:
   schedule:
     - cron: '15 10 * * 1'
   workflow_dispatch:
+  pull_request:
+    paths:
+      - 'package.json'
+      - 'package-lock.json'
+      - 'scripts/report-dependencies.mjs'
+      - 'scripts/production-audit-report.mjs'
+      - 'tests/production-audit-report.test.mjs'
+      - '.github/workflows/dependency-audit.yml'
 permissions:
   contents: read
 jobs:
@@ -16,6 +24,8 @@ jobs:
           node-version: '22'
           cache: npm
       - run: npm ci --ignore-scripts
+      - name: Verificar formato del informe con casos sintéticos
+        run: node --test tests/production-audit-report.test.mjs
       - name: Leer avisos de dependencias de producción
         run: npm audit --json --omit=dev > dependency-audit.json || true
       - name: Resumir severidades (sin declarar explotación)
