@@ -25,11 +25,20 @@ async function acquire(slug, filename) {
   const hash=createHash('md5').update(filename,'utf8').digest('hex');
   const url='https://upload.wikimedia.org/wikipedia/commons/'
     +hash[0]+'/'+hash.slice(0,2)+'/'+encodeURIComponent(filename);
-  const response=await fetch(url,{
-    headers:{'User-Agent':'PulsoVE-logo-import/1.0 (GitHub Actions; non-commercial informational catalog)'},
-    signal:AbortSignal.timeout(25000)
-  });
-  if(!response.ok)throw Error(slug+': HTTP '+response.status+' from '+url);
+  let response;
+  for (let attempt=0;attempt<6;attempt++){
+    response=await fetch(url,{
+      headers:{'User-Agent':'PulsoVE-logo-import/1.0 (GitHub Actions; informational brand directory)'},
+      signal:AbortSignal.timeout(25000)
+    });
+    if (response.ok)break;
+    if (response.status!==429&&response.status<500)
+      throw Error(slug+': HTTP '+response.status+' from '+url);
+    const seconds=Math.min(45,5*Math.pow(2,attempt));
+    console.log(slug+': source throttled with HTTP '+response.status+'; retry '+(attempt+1)+' after '+seconds+'s');
+    await new Promise(resolve=>setTimeout(resolve,seconds*1000));
+  }
+  if(!response?.ok)throw Error(slug+': source blocked; HTTP '+response?.status);
   const type=response.headers.get('content-type')||'';
   if(!/^image\/(svg\+xml|png|jpeg)(?:\s*;|$)/i.test(type))throw Error(slug+': unexpected mime '+type);
   const payload=Buffer.from(await response.arrayBuffer());
@@ -47,5 +56,8 @@ async function acquire(slug, filename) {
 }
 
 await mkdir('public/brands',{recursive:true});
-for(const [slug,filename] of logos)await acquire(slug,filename);
+for(const [slug,filename] of logos){
+  await acquire(slug,filename);
+  await new Promise(resolve=>setTimeout(resolve,2200));
+}
 console.log('Imported '+logos.length+' explicit, locally served trademarks; no official affiliation implied.');
