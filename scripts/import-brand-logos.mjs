@@ -56,8 +56,9 @@ async function acquire(slug, filename) {
 }
 
 await mkdir('public/brands',{recursive:true});
-for(const [slug,filename] of logos){
+const batch = logos.slice(0, 7); // staged batch; later marks are imported separately
+for(const [slug,filename] of batch){
   await acquire(slug,filename);
   await new Promise(resolve=>setTimeout(resolve,2200));
 }
-console.log('Imported '+logos.length+' explicit, locally served trademarks; no official affiliation implied.');
+console.log('Imported '+batch.length+' explicit, locally served trademarks; no official affiliation implied.');
