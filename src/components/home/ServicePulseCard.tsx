@@ -44,9 +44,12 @@ export function ServicePulseCard({
           </div>
 
           {/* Identificador tipográfico original: no suplantar los logos oficiales. */}
-          <div className="flex flex-1 items-center justify-center py-4">
-            <span aria-hidden="true" className={`flex h-[78px] w-[78px] items-center justify-center rounded-[22px] text-3xl font-bold tracking-tight sm:h-24 sm:w-24 sm:text-4xl ${tone.background} ${tone.foreground}`}>
+          <div className="flex flex-1 flex-col items-center justify-center gap-2 py-3">
+            <span aria-hidden="true" className={`flex h-[68px] w-[68px] items-center justify-center rounded-[20px] text-3xl font-bold tracking-tight sm:h-20 sm:w-20 sm:text-4xl ${tone.background} ${tone.foreground}`}>
               {serviceMonogram(service.name)}
+            </span>
+            <span aria-hidden="true" className={`line-clamp-2 max-w-full text-center text-xs font-bold tracking-tight sm:text-sm ${tone.foreground}`}>
+              {service.name}
             </span>
           </div>
 
