@@ -1,0 +1,58 @@
+name: Home service cards — checks and PostgreSQL build
+on:
+  pull_request:
+    paths:
+      - 'src/app/page.tsx'
+      - 'src/components/home/**'
+      - 'src/lib/queries/home.ts'
+      - 'src/lib/queries/home-trends.ts'
+      - 'src/lib/favorites.ts'
+      - 'tests/home-*.test.ts'
+      - '.github/workflows/home-cards-ci.yml'
+  push:
+    branches: ['feat/home-service-pulse-cards-20261112']
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: pulsove_ci
+          POSTGRES_USER: ci
+          POSTGRES_PASSWORD: ci
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U ci -d pulsove_ci"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      DATABASE_URL: postgresql://ci:ci@localhost:5432/pulsove_ci
+      ANONYMIZATION_SALT: CI_ONLY_NO_REAL_USERS_2345678901234567890
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - name: Install locked dependencies
+        run: npm ci --no-audit --no-fund
+      - name: Check types
+        run: npm run typecheck
+      - name: Run unit and component logic tests
+        run: npm run test:unit
+      - name: Initialize temporary PostgreSQL
+        run: |
+          npm run db:migrate:deploy
+          npm run db:seed
+      - name: Run API integration tests
+        run: npm run test:integration
+      - name: Build mobile activity index with actual seeded database
+        run: npm run build
+      - name: Audit runtime dependencies
+        run: npm audit --omit=dev --audit-level=high
