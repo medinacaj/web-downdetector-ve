@@ -1,0 +1,78 @@
+name: Next.js security patch validation
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - package.json
+      - package-lock.json
+      - .github/workflows/next-security-ci.yml
+  push:
+    branches: [fix/security-next-16-4-1-20261112]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  validate-next:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: ci
+          POSTGRES_PASSWORD: ci
+          POSTGRES_DB: pulsove_ci
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U ci -d pulsove_ci"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      DATABASE_URL: postgresql://ci:ci@localhost:5432/pulsove_ci
+      ANONYMIZATION_SALT: CI_UNIT_TEST_ONLY_NOT_FOR_REAL_TRAFFIC_1234567890
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - name: Install the exact npm lockfile
+        run: npm ci --no-audit --no-fund
+      - name: Verify patched runtime dependency versions
+        run: |
+          node --input-type=module <<'NODE'
+          import {readFileSync} from 'node:fs';
+          const pkg=JSON.parse(readFileSync('package.json','utf8'));
+          const lock=JSON.parse(readFileSync('package-lock.json','utf8'));
+          const v=(name)=>lock.packages['node_modules/'+name]?.version;
+          const atLeast=(value,minimum)=>{
+            if(!value) return false;
+            const a=value.split('.').map(Number),b=minimum.split('.').map(Number);
+            for(let i=0;i<3;i++){if(a[i]>b[i])return true;if(a[i]<b[i])return false}
+            return true;
+          };
+          if(pkg.dependencies.next!=='16.4.1' || lock.packages[''].dependencies.next!=='16.4.1' || v('next')!=='16.4.1') throw Error('Next.js is not pinned and locked at 16.4.1');
+          if(!atLeast(v('sharp'),'0.35.5')) throw Error('sharp below 0.35.5');
+          if(!atLeast(v('source-map-js'),'1.2.2')) throw Error('source-map-js below 1.2.2');
+          console.log('Patched versions:',{next:v('next'),sharp:v('sharp'),sourceMap:v('source-map-js')});
+          NODE
+      - name: Typecheck
+        run: npm run typecheck
+      - name: Isolated unit tests
+        run: npm run test:unit
+        env:
+          DATABASE_URL: postgresql://ci:ci@localhost:5432/pulsove_ci
+          ANONYMIZATION_SALT: CI_UNIT_TEST_ONLY_NOT_FOR_REAL_TRAFFIC_1234567890
+      - name: Initialize disposable CI database
+        run: |
+          npm run db:migrate:deploy
+          npm run db:seed
+      - name: Build with seeded disposable PostgreSQL
+        run: npm run build
+        env:
+          DATABASE_URL: postgresql://ci:ci@localhost:5432/pulsove_ci
+          ANONYMIZATION_SALT: CI_UNIT_TEST_ONLY_NOT_FOR_REAL_TRAFFIC_1234567890
+      - name: Production dependency audit
+        run: npm audit --omit=dev --audit-level=critical
