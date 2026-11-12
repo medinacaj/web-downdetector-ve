@@ -25,7 +25,7 @@ export function formatProductionAudit(data){
   '### Paquetes para triage (máximo 30)',
   '| Paquete | Severidad | Directa | Rango afectado | Ruta de dependencia | Corrección sugerida |',
   '|---|---|---|---|---|---|',
-  ...vulnerabilities.slice(0,30).map(v=>['|',clean(v.name),clean(v.severity),v.direct?'Sí':'No',clean(v.range),clean(v.via||'no indicada'),clean(v.fix),'|'].join(' | ').replace(/^\| \|/,'|'))
+  ...vulnerabilities.slice(0,30).map(v=>'| '+[clean(v.name),clean(v.severity),v.direct?'Sí':'No',clean(v.range),clean(v.via||'no indicada'),clean(v.fix)].join(' | ')+' |')
  ];
  if(vulnerabilities.length===0)heading.push('| Ningún aviso reportado | — | — | — | — | — |');
  if(vulnerabilities.length>30)heading.push('',`Otros ${vulnerabilities.length-30} paquetes en el JSON adjunto.`);
