@@ -1,8 +1,9 @@
-import { and, asc, desc, eq, gte, ne, sql } from 'drizzle-orm';
+import { and, asc, desc, eq, gte, inArray, ne, sql } from 'drizzle-orm';
 import { db } from '@/lib/db/client';
 import { services, categories, reports, incidents } from '@/lib/db/schema';
 import { statusForService } from './status';
 import type { OperationalStatus } from '@/lib/engine/status-bands';
+import { pickFeaturedServices, toHourlySeries, type HourlyReportRow } from './home-trends';
 
 export interface ServiceSummary {
   slug: string;
@@ -11,6 +12,7 @@ export interface ServiceSummary {
   categoryName: string;
   reportsLast24h: number;
   status: OperationalStatus;
+  isDemo: boolean;
 }
 
 export async function getHomeData() {
@@ -21,6 +23,7 @@ export async function getHomeData() {
       id: services.id,
       slug: services.slug,
       name: services.name,
+      isDemo: services.isDemo,
       categorySlug: categories.slug,
       categoryName: categories.name,
       reportsLast24h: sql<number>`count(${reports.id}) filter (where ${reports.createdAt} >= ${since24h.toISOString()})::int`,
@@ -40,9 +43,33 @@ export async function getHomeData() {
   );
 
   const hasAnyActivity = servicesWithStatus.some((s) => s.reportsLast24h > 0);
-  const mostActive = hasAnyActivity
-    ? [...servicesWithStatus].sort((a, b) => b.reportsLast24h - a.reportsLast24h).slice(0, 6)
-    : servicesWithStatus.slice(0, 6);
+  // Activity is real data, not fabricated example curves. With no reports, show
+  // a curated cross-category selection of services relevant to Venezuela.
+  const mostActive = pickFeaturedServices(servicesWithStatus);
+  const idBySlug = new Map(serviceRows.map((row) => [row.slug, row.id]));
+  const selectedIds = mostActive.map((s) => idBySlug.get(s.slug)).filter((id): id is string => !!id);
+  const hourBucket = sql<Date>`date_trunc('hour', ${reports.createdAt})`;
+  const activityRows = selectedIds.length
+    ? await db.select({
+        serviceId: reports.serviceId,
+        hour: hourBucket,
+        count: sql<number>`count(*)::int`,
+      })
+      .from(reports)
+      .where(and(gte(reports.createdAt, since24h), inArray(reports.serviceId, selectedIds)))
+      .groupBy(reports.serviceId, hourBucket)
+    : [];
+
+  const byService = new Map<string, HourlyReportRow[]>();
+  for (const row of activityRows) {
+    const entries = byService.get(row.serviceId) ?? [];
+    entries.push({ hour: row.hour, count: row.count });
+    byService.set(row.serviceId, entries);
+  }
+  const featuredServices = mostActive.map((service) => ({
+    ...service,
+    hourlyReports: toHourlySeries(byService.get(idBySlug.get(service.slug) ?? '') ?? [], new Date()),
+  }));
 
   const [reportsAllTime] = await db.select({ n: sql<number>`count(*)::int` }).from(reports);
   const [reportsLast24h] = await db.select({ n: sql<number>`count(*)::int` }).from(reports).where(gte(reports.createdAt, since24h));
@@ -66,6 +93,7 @@ export async function getHomeData() {
   return {
     services: servicesWithStatus,
     mostActive,
+    featuredServices,
     hasAnyActivity,
     totals: {
       reportsAllTime: reportsAllTime?.n ?? 0,
