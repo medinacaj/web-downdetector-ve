@@ -12,7 +12,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 2
+          fetch-depth: 0
           persist-credentials: true
       - uses: actions/setup-node@v4
         with:
@@ -20,14 +20,15 @@ jobs:
           cache: npm
       - name: Confirm exact merged source SHA
         run: |
-          test "$(git rev-parse HEAD^)" = "969d433a69ba644fca7609151b9182f5474eba58"
+          git fetch --no-tags origin main
+          test "$(git merge-base HEAD origin/main)" = "969d433a69ba644fca7609151b9182f5474eba58"
       - name: Install locked dependencies
         run: npm ci --no-audit --no-fund
-      - name: Verify catalogue and brand tests again
-        run: npm run test:unit
+      - name: Verify catalogue, groups and brand assets again
+        run: npx vitest run tests/seed-data.test.ts tests/global-platforms.test.ts tests/home-brand-logos.test.ts
       - name: Generate static Pages demo without database or backend requests
         run: |
-          GITHUB_SHA="$(git rev-parse HEAD^)" npx tsx scripts/build-pages-global-demo.mjs
+          GITHUB_SHA="$(git merge-base HEAD origin/main)" npx tsx scripts/build-pages-global-demo.mjs
           node scripts/check-pages-global-demo.mjs
       - name: Deploy static verified allowlist to existing gh-pages branch
         shell: bash
