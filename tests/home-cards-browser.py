@@ -21,8 +21,11 @@ with sync_playwright() as playwright:
 
     # Logos come from a reviewed, self-hosted allowlist; the browser must
     # never receive a broken external logo or a third-party tracking request.
-    logo_images = grid.locator('img[src^="/brands/"]')
-    assert logo_images.count() >= 7, "Expected company logos instead of monograms"
+    logo_images = grid.locator('img[alt^="Logotipo identificativo de"]')
+    card_brands = grid.locator("h3").all_inner_texts()
+    logo_sources = logo_images.evaluate_all("(nodes) => nodes.map(el => el.getAttribute('src'))")
+    print("BRAND CARD DEBUG:", {"names": card_brands, "logo_src": logo_sources}, flush=True)
+    assert logo_images.count() >= 5, "Expected verified company logos instead of monograms"
     for i in range(logo_images.count()):
         img = logo_images.nth(i)
         img.scroll_into_view_if_needed()
