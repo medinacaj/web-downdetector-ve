@@ -79,6 +79,8 @@ const CSS=[
 ".card .logo-area{background:#fff;border-radius:9px;margin:4px 5px 0;box-sizing:border-box;padding:6px 8px;height:76px}.card .logo{display:block;width:100%;max-width:170px;height:64px;max-height:100%;object-fit:contain;object-position:center}.profile-logo .logo{max-width:100%;height:80px;object-fit:contain;object-position:center} @media(max-width:375px){.card .logo-area{height:68px;padding:5px 6px}.card .logo{height:58px}}"
 ,
 "/* One accessible anchor covers the entire catalog tile; only the separate action buttons intercept clicks. */\n.card{position:relative}\n.card>a.card-link::after{content:\"\";position:absolute;inset:0;z-index:2;border-radius:13px;cursor:pointer}\n.card>a.card-link:focus-visible{outline:none}\n.card>a.card-link:focus-visible::after{outline:3px solid var(--cyan);outline-offset:-3px}\n.card>.card-actions{position:relative;z-index:3;pointer-events:none}\n.card>.card-actions button{pointer-events:auto}"
+,
+"/* First-visit guidance for the public static preview: native links, no onboarding modal. */\n.intro-lead{font-size:15px!important;color:#e1f4f0!important;max-width:680px!important}\n.intro-disclaimer{margin-top:12px!important;color:#d7eee9!important;font-size:12px!important;line-height:1.6!important}\n.intro-disclaimer strong{color:#fff}\n.intro-actions{display:flex;flex-wrap:wrap;align-items:center;gap:12px;margin:20px 0 12px}\n.intro-primary{display:inline-flex;min-height:42px;align-items:center;justify-content:center;padding:10px 16px;border-radius:9px;background:#73e4ce;color:#113b35;font-size:14px;font-weight:800;text-decoration:none}\n.intro-primary:hover,.intro-primary:focus-visible{background:#a1f3e3}\n.intro-secondary{display:inline-flex;min-height:40px;align-items:center;color:#e1f5ef;font-size:13px;font-weight:700;text-underline-offset:4px;text-decoration:underline}\n.intro-guide{scroll-margin-top:90px;margin-top:18px;padding-top:16px;border-top:1px solid #3c585c}\n.intro-guide h2{font-size:13px;font-weight:800;color:#fff;margin:0 0 11px}\n.intro-steps{list-style:none;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:13px;margin:0;padding:0}\n.intro-steps li{display:flex;min-width:0;flex-direction:column;gap:4px;line-height:1.55}\n.intro-steps strong{color:#84e7d5;font-size:12px}\n.intro-steps span{color:#e5f6f2;font-size:12px}\n@media(max-width:760px){.intro-steps{grid-template-columns:1fr;gap:9px}.intro-steps li{flex-direction:row;gap:9px}.intro-steps strong{flex:0 0 76px}.intro-steps span{min-width:0}.intro-actions{margin:14px 0 9px}}\n"
 ].join('\n');
 
 function monogram(name){const parts=name.trim().split(/\s+/);return parts.length>1?parts.slice(0,2).map((s)=>s[0]).join('').toUpperCase():name.slice(0,2).toUpperCase();}
@@ -163,9 +165,16 @@ const homeSections=WORLDWIDE_SPOTLIGHT.map((section)=>({
 }));
 if(homeSections.length!==8||homeSections.some((s)=>s.items.length!==6))throw Error('All eight global spotlight groups need 6 items');
 
-const hero='<div class="wrap hero"><div class="hero-top"><div class="hero-copy"><div class="eyebrow">EL PULSO DE TUS SERVICIOS</div>'+
-'<h1>Todo lo que usas, en un solo lugar.</h1>'+
-'<p>Explora plataformas de Venezuela y el mundo, conoce sus perfiles y guarda tus favoritas para volver rápidamente.</p></div>'+
+const hero='<div class="wrap hero"><div class="hero-top"><div class="hero-copy"><div class="eyebrow">PULSOVE · FALLAS DE SERVICIOS Y APLICACIONES</div>'+
+'<h1>¿Tu internet, banco o aplicación está fallando?</h1>'+
+'<p class="intro-lead">PulsoVE te ayuda a consultar reportes de otras personas sobre servicios de Venezuela y plataformas internacionales. En la aplicación operativa también podrás informar una falla.</p>'+
+'<p class="intro-disclaimer"><strong>Estás viendo una demostración:</strong> aquí puedes explorar el catálogo y probar sus funciones, pero no se consultan fallas en tiempo real ni se envían reportes.</p>'+
+'<div class="intro-actions"><a class="intro-primary" href="'+BASE+'/servicios/">Explorar servicios</a><a class="intro-secondary" href="#como-funciona">Cómo se usa</a></div>'+
+'<div class="intro-guide" id="como-funciona"><h2>En tres pasos</h2><ol class="intro-steps">'+
+'<li><strong>1 · Busca</strong><span>Elige tu internet, banco, juego o aplicación.</span></li>'+
+'<li><strong>2 · Revisa</strong><span>Abre su ficha; los gráficos de esta versión son ejemplos.</span></li>'+
+'<li><strong>3 · Reporta</strong><span>Prueba el botón rojo; en esta demo no se envían datos.</span></li>'+
+'</ol></div></div>'+
 '<div class="stats"><div class="stat"><strong>'+catalog.length+'</strong><small>Servicios del catálogo</small></div>'+
 '<div class="stat"><strong>'+categoriesSeed.length+'</strong><small>Categorías</small></div>'+
 '<div class="stat"><strong>'+homeSections.length*6+'</strong><small>Plataformas internacionales destacadas</small></div></div>'+
