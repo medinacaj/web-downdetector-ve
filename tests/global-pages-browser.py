@@ -165,7 +165,7 @@ with sync_playwright() as playwright:
     page.locator("#demo-range").select_option("30d")
     assert page.locator("#demo-point option").count() == 30
     assert page.get_by_role("link", name="Consultar la fuente").count() == 1
-    assert "datos simulados" in page.locator(".profile-panel.profile-wide").first.inner_text()
+    assert "datos simulados" in page.locator(".profile-panel.profile-wide").nth(1).inner_text()
     for width in (320, 390, 768, 1280):
         page.set_viewport_size({"width": width, "height": 844})
         assert page.evaluate("document.documentElement.scrollWidth <= window.innerWidth + 2"), ("detail overflow", width)
