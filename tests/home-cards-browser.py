@@ -159,6 +159,16 @@ with sync_playwright() as playwright:
     page.reload(wait_until="networkidle")
     assert page.get_by_role("button", name="Quitar CANTV de favoritos").get_attribute("aria-pressed") == "true"
 
+    # Same-document storage writes do not trigger the browser's 'storage'
+    # event. A second control (or another widget) can announce the change.
+    page.evaluate("""() => {
+      localStorage.setItem('pulsove:favorites:v1', JSON.stringify([]));
+      window.dispatchEvent(new Event('pulsove:favorites:change'));
+    }""")
+    assert page.get_by_role("button", name="Añadir CANTV a favoritos").get_attribute("aria-pressed") == "false"
+    page.get_by_role("button", name="Añadir CANTV a favoritos").click()
+    assert page.get_by_role("button", name="Quitar CANTV de favoritos").get_attribute("aria-pressed") == "true"
+
     # Keep visual evidence from the exact tested build, not mocked screenshots.
     Path("artifacts").mkdir(exist_ok=True)
     page.locator("section[aria-labelledby='home-services-title']").screenshot(
