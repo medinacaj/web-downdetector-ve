@@ -1,0 +1,46 @@
+name: Verify PUBLIC 211-platform synthetic PulsoVE preview
+on:
+  push:
+    branches: ['verify/public-211-demo-charts-20261112']
+permissions:
+  contents: read
+jobs:
+  verify-live:
+    runs-on: ubuntu-latest
+    timeout-minutes: 14
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify deployed catalog version and HTTP routes
+        run: |
+          set -euo pipefail
+          base='https://medinacaj.github.io/web-downdetector-ve'
+          for attempt in $(seq 1 12); do
+            curl -fsSL --max-time 20 "$base/build-info.txt" -o /tmp/pulsove-release.txt || true
+            if grep -q 'source-commit=1760d06b2907e93d39be56f96901ef0f44f65182' /tmp/pulsove-release.txt; then break; fi
+            sleep 5
+          done
+          grep -q 'catalogue=211' /tmp/pulsove-release.txt
+          grep -q 'source-commit=1760d06b2907e93d39be56f96901ef0f44f65182' /tmp/pulsove-release.txt
+          curl -fsSL --max-time 20 "$base/" -o /tmp/pulsove-home.html
+          grep -q 'Ejemplo visual · datos simulados' /tmp/pulsove-home.html
+          grep -q 'data-report=' /tmp/pulsove-home.html
+          curl -fsSL --max-time 20 "$base/servicios/" -o /tmp/pulsove-directory.html
+          grep -q '211 servicios' /tmp/pulsove-directory.html
+          curl -fsSL --max-time 20 "$base/brands/signal.svg" -o /tmp/pulsove-signal.svg
+          grep -q '<svg ' /tmp/pulsove-signal.svg
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install Playwright for system Chrome
+        run: |
+          command -v google-chrome || command -v google-chrome-stable || command -v chromium
+          python -m pip install --disable-pip-version-check playwright==1.56.0
+      - name: Inspect the live public release in Chrome
+        run: python tests/verify-public-211-browser.py
+      - name: Save actual public screenshots
+        uses: actions/upload-artifact@v4
+        with:
+          name: pulsove-211-public-mobile-evidence
+          path: artifacts/pulsove-global-public-*.png
+          if-no-files-found: error
+          retention-days: 7
