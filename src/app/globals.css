@@ -255,3 +255,22 @@ body {
 @media (max-width: 639px) {
   .home-hero > div { padding-top: 16px; padding-bottom: 16px; }
 }
+
+
+/* PulsoVE map: the desktop grid reflects relative adjacency, not geometry.
+ * Mobile keeps regions in a simple two/four-column accessible reading order.
+ */
+@media (min-width: 1024px) {
+  .regional-cartogram-cell {
+    grid-column: var(--region-col);
+    grid-row: var(--region-row);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .regional-cartogram-cell {
+    transition: none;
+  }
+  .regional-cartogram-cell:hover {
+    transform: none;
+  }
+}
