@@ -95,3 +95,9 @@ Se incorporan cinco ilustraciones vectoriales comunitarias, autohospedadas y sin
 - **Zupper:** [Arcticons](https://github.com/deathrashed/iconography/blob/main/iconify/arcticons/zupper.svg), licencia indicada arriba.
 
 Estas imágenes sirven como referencias editoriales de terceros, **no** como avales ni como logos oficiales garantizados. Marcas reservadas a sus propietarios. El inventario pasa a **175 de 211 servicios (82,9 %)** y **36 monogramas** para entradas aún sin recurso adecuadamente verificado.
+
+## Identificador comunitario para Call of Duty: Warzone · noviembre de 2026
+
+Se añadió un SVG local de [Icons Plus](https://github.com/chouhan-rahul/icons_plus/blob/main/assets/images/logos/video-games/call-of-duty-warzone.svg), biblioteca de iconografía bajo [licencia MIT](https://github.com/chouhan-rahul/icons_plus/blob/main/LICENSE), atribuido a Rahul Chouhan (2022). Es una **ilustración comunitaria del videojuego**, no su logotipo oficial ni una asociación o aval de Activision. Se publica sin recursos remotos y con alternativa tipográfica cuando el archivo falla. Las marcas son propiedad de sus titulares.
+
+La cobertura alcanza **176 de 211 servicios (83,4 %)**, quedando 35 monogramas sin recurso verificado.
