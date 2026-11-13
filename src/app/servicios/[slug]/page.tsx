@@ -7,6 +7,7 @@ import { StatusBadge } from '@/components/ui/StatusBadge';
 import { ReportForm } from '@/components/service/ReportForm';
 import { BrandMark } from '@/components/home/BrandMark';
 import { ServiceHistoryChart } from '@/components/service/ServiceHistoryChart';
+import { ServiceComments } from '@/components/service/ServiceComments';
 import { getServiceProfile } from '@/lib/catalog/service-profiles';
 
 function formatDateTime(date: Date | null) {
@@ -47,7 +48,7 @@ export default async function ServiceDetailPage({ params }: { params: Promise<{ 
   const data = await getServiceDetailData(slug);
   if (!data) notFound();
 
-  const { service, statusDetail, issueTypeOptions, issueBreakdown, recentIncidents, timelineIncidents, affectedStates, allStates, history } = data;
+  const { service, statusDetail, issueTypeOptions, issueBreakdown, recentIncidents, timelineIncidents, affectedStates, allStates, history, approvedComments } = data;
   const profile = getServiceProfile({slug: service.slug, name: service.name, categorySlug: service.category.slug, categoryName: service.category.name, description: service.description});
 
   return (
@@ -89,7 +90,12 @@ export default async function ServiceDetailPage({ params }: { params: Promise<{ 
             <dd className="mt-1 font-semibold">{formatDateTime(statusDetail.lastUpdated) ?? 'Sin registros'}</dd></div>
         </dl>
         {statusDetail.officiallyConfirmed && <p className="mt-4 text-sm font-semibold text-status-incident">Incidente confirmado por el proveedor.</p>}
-        {service.officialUrl && <a href={service.officialUrl} target="_blank" rel="noopener noreferrer" className="mt-4 inline-block text-sm text-brand-600 underline-offset-2 hover:underline">Visitar sitio oficial verificado</a>}
+        <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm">
+          {service.officialUrl && <a href={service.officialUrl} target="_blank" rel="noopener noreferrer" className="text-brand-600 underline-offset-2 hover:underline">Visitar sitio oficial verificado</a>}
+          <a href="#comentarios" className="font-semibold text-brand-600 underline-offset-2 hover:underline">
+            Leer o escribir comentarios
+          </a>
+        </div>
         {service.isDemo && <p className="mt-4 rounded-md border border-border px-3 py-2 text-xs text-ink-muted">Servicio del catálogo demostrativo: no confirma que PulsoVE disponga de mediciones técnicas de este proveedor.</p>}
         {service.category.slug === 'apuestas-y-loterias' && (
           <p className="mt-3 rounded border border-border bg-bg px-3 py-2 text-xs text-ink-muted">
@@ -132,6 +138,12 @@ export default async function ServiceDetailPage({ params }: { params: Promise<{ 
           officiallyConfirmed: incident.officiallyConfirmed,
         }))} />
       </div>
+
+      <ServiceComments serviceSlug={service.slug} comments={approvedComments.map((comment) => ({
+        id: comment.id,
+        body: comment.body,
+        createdAt: comment.createdAt.toISOString(),
+      }))} />
 
       {/* Reportar */}
       <section id="reportar" className="mt-8 scroll-mt-24" aria-labelledby="reportar-title">
