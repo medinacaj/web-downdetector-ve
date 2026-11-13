@@ -136,7 +136,7 @@ with sync_playwright() as playwright:
     assert page.url.endswith("/web-downdetector-ve/servicios/outlook/")
     assert page.get_by_role("heading", name="Outlook", exact=True).count() == 1
     assert "Microsoft" in page.locator(".profile-panel").first.inner_text()
-    assert page.get_by_text("Historial de incidentes").count() == 1
+    assert page.get_by_role("heading", name="Historial de incidentes", exact=True).count() == 1
     assert page.locator(".profile-chart svg").count() == 1
     assert "datos simulados" in page.locator(".profile-panel.profile-wide").first.inner_text()
     for width in (320, 390, 768, 1280):
