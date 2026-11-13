@@ -93,13 +93,13 @@ body {
   border-radius: 13px !important;
   background: rgb(var(--surface));
   background-image: none;
-  box-shadow: 0 3px 12px rgb(19 39 44 / .11) !important;
+  box-shadow: 0 2px 5px rgb(19 39 44 / .07), 0 9px 22px rgb(19 39 44 / .09) !important;
   transition: background .18s ease, box-shadow .18s ease, transform .18s ease;
 }
 .service-tile:hover, .service-tile:focus-within {
   background: #e4f0ee;
   transform: translateY(-2px);
-  box-shadow: 0 8px 23px rgb(19 39 44 / .17) !important;
+  box-shadow: 0 4px 10px rgb(19 39 44 / .10), 0 16px 32px rgb(19 39 44 / .13) !important;
 }
 .dark .service-tile { box-shadow: 0 4px 15px rgb(0 0 0 / .23) !important; }
 .dark .service-tile:hover, .dark .service-tile:focus-within {
@@ -109,7 +109,12 @@ body {
 .service-tile-chart, .service-tile-cta { color: var(--tile-accent); }
 .service-tile-cta { white-space: nowrap; }
 .service-tile-actions { border: 0; background: transparent; }
-.service-tile-actions button { border-radius: 0; }
+.service-tile-actions button { border-radius: 9px; }
+.service-tile-actions a:active, .service-tile-actions button:active { transform: scale(.95); }
+@media (prefers-reduced-motion: reduce) {
+  .service-tile:hover, .service-tile:focus-within { transform: none; }
+  .service-tile-actions a:active, .service-tile-actions button:active { transform: none; }
+}
 .service-tile[data-category="telecomunicaciones"],
 .service-tile[data-category="nube-e-infraestructura"] { --tile-accent: #146e97; }
 .service-tile[data-category="correo-y-productividad"],
