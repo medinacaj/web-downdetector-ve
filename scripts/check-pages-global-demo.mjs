@@ -32,7 +32,13 @@ if((directory.match(/class="demo-chart"/g)||[]).length!==211)throw Error('Every 
 if((homepage.match(/Ejemplo visual · datos simulados/g)||[]).length!==60)throw Error('Illustrative chart disclosure missing');
 if((directory.match(/Ejemplo visual · datos simulados/g)||[]).length!==211)throw Error('Catalogue chart disclosure missing');
 if((directory.match(/class="report-quick"/g)||[]).length!==211)throw Error('Expected one compact red report icon per card');
-if(!homepage.includes('.report-quick{position:absolute')||!homepage.includes('background:#dc2626'))throw Error('Report icon must be compact and red');
+if((homepage.match(/class="card-actions"/g)||[]).length!==60)throw Error('Expected isolated toolbar on each index card');
+if((directory.match(/class="card-actions"/g)||[]).length!==211)throw Error('Expected isolated toolbar on each directory card');
+if(!homepage.includes('.card-header{display:flex')||!homepage.includes('.demo-chart{display:block;flex:none;width:100%'))
+  throw Error('Uniform, full-width card layout CSS missing');
+if(homepage.includes('padding-right:75px')||homepage.includes('padding-right:88px'))
+  throw Error('Whole-card right padding would shrink charts behind action icons');
+if(!homepage.includes('.card-actions{display:flex')||!homepage.includes('.report-quick{border:1px solid #b91c1c;background:#dc2626'))throw Error('Report icon must be compact, red, and inside its toolbar');
 if(!directory.includes('id="directory-cards"'))throw Error('Interactive directory missing');
 if(!credits.includes('Banesco'))throw Error('Brand credits missing');
 const files = readdirSync(join(root,'brands'));
