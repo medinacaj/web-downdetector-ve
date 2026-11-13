@@ -18,6 +18,13 @@ jobs:
       - run: npm ci --ignore-scripts
       - name: Leer avisos de dependencias de producción
         run: npm audit --json --omit=dev > dependency-audit.json || true
+      - name: Leer avisos de dependencias incluyendo herramientas de desarrollo
+        run: npm audit --json > dependency-audit-all.json || true
+      - name: Resumir avisos completos sin bloquear por dependencias de desarrollo
+        env:
+          AUDIT_SCOPE: all
+          FAIL_ON_HIGH: 'false'
+        run: node scripts/report-dependencies.mjs dependency-audit-all.json
       - name: Resumir avisos y fallar ante riesgos altos o críticos
         env:
           FAIL_ON_HIGH: 'true'
@@ -26,5 +33,7 @@ jobs:
         if: always()
         with:
           name: dependency-audit
-          path: dependency-audit.json
+          path: |
+            dependency-audit.json
+            dependency-audit-all.json
           retention-days: 21
