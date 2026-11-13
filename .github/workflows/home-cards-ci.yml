@@ -43,7 +43,7 @@ jobs:
       DATABASE_URL: postgresql://ci:ci@localhost:5432/pulsove_ci
       ANONYMIZATION_SALT: CI_ONLY_NO_REAL_USERS_2345678901234567890
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
