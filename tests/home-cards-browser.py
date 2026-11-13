@@ -90,6 +90,9 @@ with sync_playwright() as playwright:
     quick = page.get_by_role("link", name="Reportar falla de CANTV")
     assert quick.count() == 1
     assert quick.get_attribute("href") == "/servicios/cantv#reportar"
+    assert "bg-red-600" in (quick.get_attribute("class") or ""), "Alert must have red danger styling"
+    assert quick.evaluate("(el) => Math.round(el.getBoundingClientRect().width)") <= 40, "Quick report icon must be small"
+    assert quick.inner_text().strip() == "!", "Exclamation icon should replace large report button"
     quick.click()
     page.wait_for_url("**/servicios/cantv*", timeout=30000)
     print("QUICK REPORT TARGET:", page.url, flush=True)
