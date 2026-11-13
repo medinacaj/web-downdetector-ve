@@ -7,6 +7,7 @@ import { StatusBadge } from '@/components/ui/StatusBadge';
 import { ReportForm } from '@/components/service/ReportForm';
 import { BrandMark } from '@/components/home/BrandMark';
 import { ServiceHistoryChart } from '@/components/service/ServiceHistoryChart';
+import { ServiceComments } from '@/components/service/ServiceComments';
 import { getServiceProfile } from '@/lib/catalog/service-profiles';
 
 function formatDateTime(date: Date | null) {
@@ -47,7 +48,7 @@ export default async function ServiceDetailPage({ params }: { params: Promise<{ 
   const data = await getServiceDetailData(slug);
   if (!data) notFound();
 
-  const { service, statusDetail, issueTypeOptions, issueBreakdown, recentIncidents, timelineIncidents, affectedStates, allStates, history } = data;
+  const { service, statusDetail, issueTypeOptions, issueBreakdown, recentIncidents, timelineIncidents, affectedStates, allStates, history, approvedComments } = data;
   const profile = getServiceProfile({slug: service.slug, name: service.name, categorySlug: service.category.slug, categoryName: service.category.name, description: service.description});
 
   return (
@@ -132,6 +133,12 @@ export default async function ServiceDetailPage({ params }: { params: Promise<{ 
           officiallyConfirmed: incident.officiallyConfirmed,
         }))} />
       </div>
+
+      <ServiceComments serviceSlug={service.slug} comments={approvedComments.map((comment) => ({
+        id: comment.id,
+        body: comment.body,
+        createdAt: comment.createdAt.toISOString(),
+      }))} />
 
       {/* Reportar */}
       <section id="reportar" className="mt-8 scroll-mt-24" aria-labelledby="reportar-title">
