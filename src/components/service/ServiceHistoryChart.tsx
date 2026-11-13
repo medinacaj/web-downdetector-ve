@@ -2,7 +2,7 @@
 
 import { useId, useState } from 'react';
 import {
-  Area, Bar, CartesianGrid, ComposedChart, Line, ReferenceLine,
+  Area, Bar, Brush, CartesianGrid, ComposedChart, Line, ReferenceLine,
   ResponsiveContainer, Tooltip, XAxis, YAxis,
 } from 'recharts';
 import {
@@ -44,6 +44,7 @@ export function ServiceHistoryChart({
   const [period, setPeriod] = useState<HistoryPeriod>('24h');
   const [mode, setMode] = useState<ChartMode>('line');
   const [selected, setSelected] = useState(23);
+  const [zoomEnabled, setZoomEnabled] = useState(false);
   const points = history[period];
   const selectedIndex = Math.max(0, Math.min(points.length - 1, selected));
   const selectedPoint = points[selectedIndex];
@@ -55,6 +56,7 @@ export function ServiceHistoryChart({
   function choosePeriod(value: HistoryPeriod) {
     setPeriod(value);
     setSelected(history[value].length - 1);
+    setZoomEnabled(false);
   }
 
   return (
@@ -100,7 +102,14 @@ export function ServiceHistoryChart({
           <dd className="mt-1 font-mono text-xl font-semibold tabular-nums">{annotatedPoints.length}</dd></div>
       </dl>
 
-      <div className="mt-5">
+      <div className="mt-5 flex flex-wrap items-center justify-between gap-2">
+        <p className="text-xs text-ink-muted">Selecciona un punto para consultar el intervalo y sus incidentes.</p>
+        <button type="button" aria-pressed={zoomEnabled} onClick={() => setZoomEnabled((current) => !current)}
+          className="rounded-md border border-border px-3 py-2 text-xs font-semibold text-ink hover:bg-bg focus-visible:outline-pulse-500">
+          {zoomEnabled ? 'Ocultar selector de zoom' : 'Explorar rango / zoom'}
+        </button>
+      </div>
+      <div className="mt-3">
         {total === 0 ? (
           <div className="flex min-h-[230px] flex-col items-center justify-center rounded-xl border border-dashed border-border p-5 text-center" role="status">
             <p className="font-medium">Sin reportes registrados en este periodo</p>
@@ -122,6 +131,9 @@ export function ServiceHistoryChart({
                   <stop offset="0%" stopColor="#00a994" stopOpacity={0.32}/>
                   <stop offset="100%" stopColor="#00a994" stopOpacity={0.02}/>
                 </linearGradient></defs>
+                {zoomEnabled && <Brush dataKey="label" height={26} stroke="#008a79" travellerWidth={10}
+                  startIndex={Math.max(0, points.length - (period === '24h' ? 12 : 14))}
+                  endIndex={points.length - 1} />}
                 <CartesianGrid strokeDasharray="3 5" stroke="#94a3b8" strokeOpacity={0.25} vertical={false}/>
                 <XAxis dataKey="label" minTickGap={23} tick={{ fontSize: 11 }} axisLine={false} tickLine={false}/>
                 <YAxis allowDecimals={false} domain={[0, 'dataMax + 1']} tick={{ fontSize: 11 }} axisLine={false} tickLine={false}/>
