@@ -19,6 +19,9 @@ const DASHBOARD_ALIASES: Record<string, string> = {
   "yahoo-mail": "yahoo"
 };
 const CUSTOM_SOURCES: Record<string, LogoProvenance> = {
+  'aol-mail': {provider: 'Arcticons (ilustración comunitaria)', url: 'https://github.com/deathrashed/iconography/blob/main/iconify/arcticons/aol.svg', licenseUrl: 'https://github.com/deathrashed/iconography/blob/main/LICENSE'},
+  'bbva-provincial': {provider: 'Lawnicons (marca matriz BBVA, ilustración comunitaria)', url: 'https://github.com/LawnchairLauncher/lawnicons/blob/develop/svgs/bbva.svg', licenseUrl: 'https://github.com/LawnchairLauncher/lawnicons/blob/develop/LICENSE'},
+  'mobile-legends': {provider: 'Arcticons (ilustración comunitaria)', url: 'https://github.com/deathrashed/iconography/blob/main/iconify/arcticons/mobile-legends-bang-bang.svg', licenseUrl: 'https://github.com/deathrashed/iconography/blob/main/LICENSE'},
   'pokemon-go': {provider: "Material Design Icons", url: 'https://github.com/Templarian/MaterialDesign/blob/master/svg/pokemon-go.svg', licenseUrl: "https://github.com/Templarian/MaterialDesign/blob/master/LICENSE"},
   'gta-online': {provider: "Recurso de comunidad GTA", url: 'https://github.com/devemdobro/projeto-gta/blob/main/src/imagens/logo-gta-online.svg'},
   'among-us': {provider: "Tabler Icons", url: 'https://github.com/tabler/tabler-icons/blob/main/icons/outline/brand-among-us.svg', licenseUrl: "https://github.com/tabler/tabler-icons/blob/main/LICENSE"},

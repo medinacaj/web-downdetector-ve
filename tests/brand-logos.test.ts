@@ -64,6 +64,22 @@ describe('Local brand logo inventory', () => {
     }
   });
 
+  it('keeps precise attribution for three new community illustrations', () => {
+    const cases = [
+      ['bbva-provincial', 'Lawnicons', 'bbva.svg'],
+      ['aol-mail', 'Arcticons', 'aol.svg'],
+      ['mobile-legends', 'Arcticons', 'mobile-legends-bang-bang.svg'],
+    ];
+    for (const [slug, provider, filename] of cases) {
+      const path = logoForService(slug);
+      expect(path).toBe('/brands/' + slug + '.svg');
+      const source = brandLogoSource(slug, path!);
+      expect(source.provider).toContain(provider);
+      expect(source.url).toContain(filename);
+      expect(source.licenseUrl).toMatch(/^https:\/\/github\.com\//);
+    }
+  });
+
   it('keeps an honest fallback for missing/unchecked brands', () => {
     expect(logoForService('seniat')).toBeNull();
     expect(logoForService('no-existe')).toBeNull();

@@ -73,3 +73,13 @@ La cobertura pasa de **164 a 165 recursos locales de 211 servicios (78,2 %)**; *
 Se incorporaron dos ilustraciones vectoriales locales de [Lawnicons](https://github.com/LawnchairLauncher/lawnicons), con licencia de repositorio [Apache-2.0](https://github.com/LawnchairLauncher/lawnicons/blob/develop/LICENSE): [PedidosYa](https://github.com/LawnchairLauncher/lawnicons/blob/develop/svgs/pedidosya.svg) y [Yango](https://github.com/LawnchairLauncher/lawnicons/blob/develop/svgs/yango.svg). Son **representaciones comunitarias de identificación**, no se anuncian como logotipos oficiales ni implican afiliación. Las marcas siguen siendo de sus titulares. Los SVG son locales, sin scripts ni solicitudes a servidores externos.
 
 Con estos dos recursos, el catálogo dispone de **167 imágenes locales entre 211 servicios (79,1 %)**, y **44 servicios** conservan un monograma por falta de activos adecuados verificados. Las cifras anteriores se mantienen como historial de incorporación.
+
+## Tres representaciones comunitarias verificadas · 13 de noviembre de 2026
+
+Se agregan recursos locales para **BBVA Provincial**, **AOL Mail** y **Mobile Legends: Bang Bang**, obtenidos de proyectos de iconografía con archivos identificados:
+
+- **BBVA Provincial:** [BBVA en Lawnicons](https://github.com/LawnchairLauncher/lawnicons/blob/develop/svgs/bbva.svg) bajo la licencia de repositorio [Apache-2.0](https://github.com/LawnchairLauncher/lawnicons/blob/develop/LICENSE). Es un símbolo **del grupo BBVA**, no un logotipo específico verificado del banco venezolano.
+- **AOL Mail:** [AOL en Arcticons](https://github.com/deathrashed/iconography/blob/main/iconify/arcticons/aol.svg), licencia del [repositorio de iconografía](https://github.com/deathrashed/iconography/blob/main/LICENSE). Es una ilustración del identificador AOL, no aval ni certificación del servicio de correo.
+- **Mobile Legends:** [Mobile Legends Bang Bang en Arcticons](https://github.com/deathrashed/iconography/blob/main/iconify/arcticons/mobile-legends-bang-bang.svg), licencia del [repositorio](https://github.com/deathrashed/iconography/blob/main/LICENSE). Es una representación comunitaria, no se afirma que sea el logo oficial del juego.
+
+Las marcas siguen siendo propiedad de sus titulares. Los SVG se sirven desde `public/brands`, sin contenido activo ni enlaces remotos. **Cobertura total: 170/211 servicios (80,6 %); 41 pendientes de imagen validada.** Los monogramas continúan para los servicios restantes.
