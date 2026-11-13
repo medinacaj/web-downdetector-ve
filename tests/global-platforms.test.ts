@@ -59,7 +59,8 @@ describe('worldwide platform catalogue', () => {
     for (const slug of ['cloudflare', 'gmail', 'fortnite', 'discord', 'github', 'google-cloud', 'roblox']) {
       expect(logoForService(slug)).toBe(`/brands/${slug}.svg`);
     }
-    expect(logoForService('outlook')).toBeNull();
-    expect(logoForService('minecraft')).toBeNull();
+    expect(logoForService('outlook')).toBe('/brands/outlook.svg');
+    expect(logoForService('minecraft')).toBe('/brands/minecraft.svg');
+    expect(logoForService('seniat')).toBeNull();
   });
 });

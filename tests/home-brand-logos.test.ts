@@ -6,7 +6,7 @@ import { HOME_BRAND_LOGOS, logoForService } from '@/lib/brand-logos';
 describe('homepage editorial brand assets', () => {
   it('renders explicit local images for researched services, not external trackers', () => {
     const keys = Object.keys(HOME_BRAND_LOGOS);
-    expect(keys.length).toBe(50);
+    expect(keys.length).toBe(164);
     for (const [slug, path] of Object.entries(HOME_BRAND_LOGOS)) {
       expect(slug).toMatch(/^[a-z0-9]+(?:-[a-z0-9]+)*$/);
       expect(path).toMatch(/^\/brands\/[a-z0-9-]+\.(png|svg)$/);
@@ -33,8 +33,8 @@ describe('homepage editorial brand assets', () => {
         expect(data.subarray(0, 8).toString('hex')).toBe('89504e470d0a1a0a');
       } else {
         const svg = data.toString('utf8');
-        expect(svg).toMatch(/^<svg /);
-        expect(svg).toContain('<path ');
+        expect(svg).toMatch(/^<svg\s/);
+        expect(svg).toMatch(/<(?:path|rect|polygon|circle|g|ellipse|line)\b/);
         expect(svg).not.toMatch(/<script|<foreignObject|<image|onload=|href=/i);
       }
     }
