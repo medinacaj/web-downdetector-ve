@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Real Chromium smoke test for PulsoVE service tiles on mobile."""
 import shutil
+import re
 from pathlib import Path
 from playwright.sync_api import sync_playwright
 
@@ -403,6 +404,31 @@ with sync_playwright() as playwright:
         page.set_viewport_size({"width": width, "height": 844})
         assert page.evaluate("document.documentElement.scrollWidth <= window.innerWidth + 2"), ("real detail overflow", width)
 
+
+    # Real activity can exist after the API integration tests; never assume zero.
+    regional = page.goto("http://127.0.0.1:3000/mapa", wait_until="networkidle", timeout=60000)
+    assert regional and regional.status == 200
+    assert page.get_by_role("heading", name="Actividad por estado").count() == 1
+    assert page.locator(".regional-cartogram-cell").count() == 24
+    zulia = page.get_by_role("button", name=re.compile(r"^Zulia: \d+ reportes en 24 horas$"))
+    assert zulia.count() == 1
+    for label in ("7 días", "30 días", "24 horas"):
+        chosen = page.get_by_role("button", name=label, exact=True)
+        chosen.click()
+        assert chosen.get_attribute("aria-pressed") == "true"
+        assert page.locator(".regional-cartogram-cell").count() == 24
+        assert page.locator(".regional-cartogram-cell[aria-label*='reportes en']").count() == 24
+    zulia.click()
+    assert page.get_by_role("button", name="Cerrar selección").count() == 1
+    page.locator("select[name='service']").select_option("cantv")
+    page.get_by_role("button", name="Aplicar filtro").click()
+    page.wait_for_url("**/mapa?service=cantv", timeout=30000)
+    assert page.get_by_text("Servicio: CANTV.", exact=False).count() == 1
+    for width in (320, 390, 768, 1280):
+        page.set_viewport_size({"width": width, "height": 844})
+        assert page.evaluate("document.documentElement.scrollWidth <= window.innerWidth + 2"), ("map horizontal overflow", width)
+    page.set_viewport_size({"width": 390, "height": 844})
+    page.screenshot(path="artifacts/pulsove-regional-map-390.png", full_page=False, animations="disabled")
 
     # Directory favorites use the same browser-local storage as home cards.
     # All directory entries can now be starred, including those not featured.
