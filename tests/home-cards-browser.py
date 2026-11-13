@@ -14,10 +14,24 @@ with sync_playwright() as playwright:
     page = context.new_page()
     response = page.goto("http://127.0.0.1:3000/", wait_until="networkidle", timeout=45000)
     assert response and response.status == 200, "Home must serve HTTP 200"
+    # A first-time visitor can discover the site's purpose and primary actions
+    # without prior explanation, a walkthrough modal or misleading uptime claims.
+    hero = page.locator("section.home-hero")
+    assert hero.get_by_role("heading", name="¿Internet, tu banco o una aplicación están fallando?").count() == 1
+    assert hero.get_by_text("PulsoVE reúne reportes en Venezuela", exact=False).count() == 1
+    assert hero.get_by_text("no significa que el servicio funcione", exact=False).count() == 1
+    assert hero.get_by_role("button", name="Buscar servicio").count() == 1
+    assert hero.get_by_role("link", name="¿Cómo funciona?").get_attribute("href") == "/metodologia"
+    quick_steps = hero.locator("[aria-labelledby='getting-started-title'] ol > li")
+    assert quick_steps.count() == 3
+    for word in ("Busca", "Revisa", "Reporta"):
+        assert quick_steps.get_by_text(word, exact=True).count() == 1
+    assert hero.get_by_text("Reporta un problema", exact=False).count() >= 1
+
     # The complete seed catalogue is not synonymous with technical monitoring.
     assert page.get_by_text("Servicios en catálogo", exact=True).count() == 1
     assert page.get_by_text("Servicios monitoreados", exact=True).count() == 0
-    assert page.get_by_text("señales técnicas cuando están disponibles", exact=False).count() >= 1
+    assert hero.get_by_text("si no hay reportes suficientes, no significa que el servicio funcione", exact=False).count() == 1
     assert page.get_by_text("Consulta:", exact=False).count() >= 1
     zero_incidents = page.locator("section.home-hero dt").filter(has_text="Incidentes activos").locator("xpath=following-sibling::dd")
     if zero_incidents.count() and zero_incidents.inner_text().strip() == "0":
@@ -226,6 +240,12 @@ with sync_playwright() as playwright:
 
     # Keep visual evidence from the exact tested build, not mocked screenshots.
     Path("artifacts").mkdir(exist_ok=True)
+    for width in (320, 390, 768, 1280):
+        page.set_viewport_size({"width": width, "height": 844})
+        assert page.evaluate("document.documentElement.scrollWidth <= window.innerWidth + 2"), ("onboarding overflow", width)
+        hero.screenshot(path=f"artifacts/pulsove-onboarding-{width}.png", animations="disabled")
+    page.set_viewport_size({"width": 390, "height": 844})
+
     page.locator("section[aria-labelledby='home-services-title']").screenshot(
         path="artifacts/pulsove-home-390.png", animations="disabled"
     )

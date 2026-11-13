@@ -31,12 +31,19 @@ export default async function HomePage() {
       <section className="home-hero border-b border-border">
         <div className="mx-auto grid max-w-6xl gap-10 px-4 py-14 sm:px-6 lg:grid-cols-[1.1fr_0.9fr] lg:items-center lg:py-20">
           <div>
+            <p className="mb-3 text-xs font-bold uppercase tracking-[0.19em] text-[#84ded0]">
+              PulsoVE · Reportes de servicios
+            </p>
             <h1 className="font-display text-3xl font-semibold leading-tight tracking-tight sm:text-4xl">
-              Consulta reportes de servicios en Venezuela y plataformas de todo el mundo
+              ¿Internet, tu banco o una aplicación están fallando?
             </h1>
-            <p className="mt-4 max-w-md text-ink-muted">
-              Reportes ciudadanos y señales técnicas cuando están disponibles, interpretados
-              con un motor estadístico explicable. Independiente de cualquier proveedor.
+            <p className="mt-4 max-w-xl text-base leading-relaxed text-[#e0eeeb]">
+              Busca el servicio, revisa los reportes de otras personas y cuenta si a ti también te falla.
+              PulsoVE reúne reportes en Venezuela y de plataformas internacionales.
+            </p>
+            <p className="mt-3 max-w-xl text-sm leading-relaxed text-[#bdd4cf]">
+              Los datos son orientativos: si no hay reportes suficientes, no significa que el servicio funcione.
+              No somos el soporte oficial de las empresas.
             </p>
 
             <form action="/servicios" className="mt-7 flex max-w-md gap-2">
@@ -47,20 +54,23 @@ export default async function HomePage() {
                 id="hero-search"
                 name="q"
                 type="search"
-                placeholder="Cloudflare, Gmail, Fortnite…"
+                placeholder="Ej. CANTV, Banesco, WhatsApp…"
                 className="w-full rounded-md border border-border bg-surface px-4 py-2.5 text-sm text-ink placeholder:text-ink-muted focus:border-pulse-500"
               />
               <button
                 type="submit"
                 className="shrink-0 rounded-md bg-brand-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-brand-700"
               >
-                Buscar
+                Buscar servicio
               </button>
             </form>
 
             <div className="mt-5 flex flex-wrap gap-x-6 gap-y-2 text-sm">
               <Link href="/servicios" className="text-ink-muted underline-offset-4 hover:text-ink hover:underline">
                 Explorar todos los servicios
+              </Link>
+              <Link href={ROUTE.methodology.href} className="text-ink-muted underline-offset-4 hover:text-ink hover:underline">
+                ¿Cómo funciona?
               </Link>
               <span className="text-ink-muted">·</span>
               <span className="text-ink-muted">
@@ -104,6 +114,23 @@ export default async function HomePage() {
               </p>
             )}
           </div>
+        </div>
+        <div className="home-intro-steps mx-auto max-w-6xl border-t border-white/15 px-4 sm:px-6" aria-labelledby="getting-started-title">
+          <h2 id="getting-started-title" className="text-sm font-bold text-white">¿Qué puedes hacer aquí?</h2>
+          <ol className="mt-4 grid gap-4 sm:grid-cols-3 sm:gap-7">
+            <li className="flex items-start gap-3">
+              <span aria-hidden="true" className="font-mono text-lg font-bold text-[#84ded0]">01</span>
+              <p className="text-sm leading-6 text-[#e0eeeb]"><strong className="text-white">Busca</strong> tu servicio por su nombre.</p>
+            </li>
+            <li className="flex items-start gap-3">
+              <span aria-hidden="true" className="font-mono text-lg font-bold text-[#84ded0]">02</span>
+              <p className="text-sm leading-6 text-[#e0eeeb]"><strong className="text-white">Revisa</strong> reportes, fechas y el historial disponible.</p>
+            </li>
+            <li className="flex items-start gap-3">
+              <span aria-hidden="true" className="font-mono text-lg font-bold text-[#84ded0]">03</span>
+              <p className="text-sm leading-6 text-[#e0eeeb]"><strong className="text-white">Reporta</strong> un problema desde el botón rojo de la ficha.</p>
+            </li>
+          </ol>
         </div>
       </section>
 

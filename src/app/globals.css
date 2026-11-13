@@ -70,6 +70,7 @@ body {
 .home-hero p { color: #bdd4cf; }
 .home-hero a:not([class*="bg-"]) { color: #84ded0; }
 .home-hero > div { padding-top: 52px; padding-bottom: 52px; }
+.home-hero > .home-intro-steps { padding-top: 20px; padding-bottom: 28px; }
 .home-hero > div > div:last-child {
   border: 0;
   border-radius: 0;
