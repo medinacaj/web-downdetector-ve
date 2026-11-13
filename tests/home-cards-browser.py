@@ -44,6 +44,30 @@ with sync_playwright() as playwright:
     banking = page.locator('article.service-tile[data-category="banca-y-pagos"]').first
     assert telecom.count() and banking.count()
     assert telecom.evaluate("(el) => getComputedStyle(el).getPropertyValue('--tile-accent')") != banking.evaluate("(el) => getComputedStyle(el).getPropertyValue('--tile-accent')")
+    # Ensure small category labels and "Ver ficha" accents stay readable,
+    # including the highlighted tile surface, without decorative top stripes.
+    contrast_js = """(card) => {
+      const channels = value => (value.match(/[0-9.]+/g) || []).slice(0, 3).map(Number);
+      const luminance = value => {
+        const rgb = channels(value).map(n => {
+          const v = n / 255;
+          return v <= 0.04045 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
+        });
+        return 0.2126 * rgb[0] + 0.7152 * rgb[1] + 0.0722 * rgb[2];
+      };
+      const foreground = luminance(getComputedStyle(card.querySelector('[data-card-title] p')).color);
+      const background = luminance(getComputedStyle(card).backgroundColor);
+      return (Math.max(foreground, background) + .05) / (Math.min(foreground, background) + .05);
+    }"""
+    for theme in ("light", "dark"):
+        page.evaluate("(theme) => document.documentElement.classList.toggle('dark', theme === 'dark')", theme)
+        page.wait_for_timeout(250)
+        for article in grid.locator("article.service-tile").all():
+            ratio = article.evaluate(contrast_js)
+            assert ratio >= 4.5, ("Category label contrast", theme, round(ratio, 2))
+    page.evaluate("document.documentElement.classList.remove('dark')")
+    page.wait_for_timeout(250)
+
     for article in grid.locator("article.service-tile").all():
         assert article.locator("[data-card-title]").first.is_visible()
         assert article.locator("[data-card-actions]").first.is_visible()
@@ -149,11 +173,14 @@ with sync_playwright() as playwright:
     page.wait_for_timeout(300)
     raised_shadow = article.evaluate("(el) => getComputedStyle(el).boxShadow")
     assert raised_shadow != default_shadow, "Hover must provide tactile elevation"
+    assert article.evaluate(contrast_js) >= 4.5, "Hover category label must retain contrast"
     article.locator('a[aria-label^="Ver estado y reportes"]').focus()
     assert article.evaluate("(el) => el.matches(':focus-within')"), "Keyboard focus must reach the card"
     page.evaluate("document.documentElement.classList.add('dark')")
     dark_shadow = article.evaluate("(el) => getComputedStyle(el).boxShadow")
     assert dark_shadow != "none", "Dark mode should keep depth"
+    page.wait_for_timeout(250)
+    assert article.evaluate(contrast_js) >= 4.5, "Dark hover category must retain contrast"
     page.evaluate("document.documentElement.classList.remove('dark')")
 
     page.set_viewport_size({"width": 390, "height": 844})
