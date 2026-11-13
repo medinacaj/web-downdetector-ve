@@ -30,6 +30,29 @@ export const HOME_BRAND_LOGOS: Readonly<Record<string, string>> = Object.freeze(
   'claude': '/brands/claude.svg',
   'zoom': '/brands/zoom.svg',
   'google-drive': '/brands/google-drive.svg',
+
+  // International additions from audited Simple Icons vector files.
+  'signal': '/brands/signal.svg',
+  'wechat': '/brands/wechat.svg',
+  'bluesky': '/brands/bluesky.svg',
+  'figma': '/brands/figma.svg',
+  'apple-music': '/brands/apple-music.svg',
+  'crunchyroll': '/brands/crunchyroll.svg',
+  'dota-2': '/brands/dota-2.svg',
+  'uber': '/brands/uber.svg',
+  'railway': '/brands/railway.svg',
+  'render': '/brands/render.svg',
+  'fastly': '/brands/fastly.svg',
+  'mongodb-atlas': '/brands/mongodb-atlas.svg',
+  'soundcloud': '/brands/soundcloud.svg',
+  'deezer': '/brands/deezer.svg',
+  'airbnb': '/brands/airbnb.svg',
+  'wise': '/brands/wise.svg',
+  'etsy': '/brands/etsy.svg',
+  'line': '/brands/line.svg',
+  'mastodon': '/brands/mastodon.svg',
+  'trello': '/brands/trello.svg',
+  'asana': '/brands/asana.svg',
 });
 
 export function logoForService(slug: string): string | null {
