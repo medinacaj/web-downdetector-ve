@@ -13,7 +13,7 @@ const requested = [
 describe('Local brand logo inventory', () => {
   it('maps at least 167 reviewed files into real catalogue entries, never remote runtime links', () => {
     const slugs = new Set<string>(servicesSeed.map((service) => service.slug));
-    expect(servicesSeed).toHaveLength(211);
+    expect(servicesSeed).toHaveLength(579);
     expect(Object.keys(HOME_BRAND_LOGOS).length).toBeGreaterThanOrEqual(167);
     expect(Object.keys(HOME_BRAND_LOGOS).filter(isAdditionalLogo).length).toBeGreaterThanOrEqual(117);
 
