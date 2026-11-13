@@ -15,6 +15,10 @@ for(const file of [homepage,directory]){
   if(!file.includes('VISTA PREVIA PÚBLICA')||!file.includes('sin reportes reales'))
     throw Error('Demo warning absent');
   if(!file.includes('noindex,nofollow'))throw Error('Demo must not be search-indexed');
+  if(!file.includes('.monogram[hidden]{display:none!important}')) throw Error('Logo and monogram visibility must be mutually exclusive');
+  if(!file.includes('id="demo-report-dialog"')||!file.includes('data-report=')||!file.includes('no envía ni almacena reportes'))
+    throw Error('Missing explicit non-transmitting quick report demo');
+  if(!file.includes('PREVIEW_ISSUES=')) throw Error('Missing per-category issue options');
   if(/DATABASE_URL|ANONYMIZATION_SALT|postgresql:|authorization:\s*Bearer/i.test(file))
     throw Error('Secret or server reference leaked');
   const script=file.match(/<script>([\s\S]*?)<\/script>/)?.[1];
