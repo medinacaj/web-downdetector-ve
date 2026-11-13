@@ -9,7 +9,7 @@ const directory = html('servicios/index.html');
 const credits = html('creditos-marcas/index.html');
 const info = html('build-info.txt');
 if(!info.includes('catalogue=211')) throw Error('Unexpected catalogue size in public output');
-const EXPECTED_LOGOS = 164;
+const EXPECTED_LOGOS = 165;
 const actualLogos = Number(info.match(/^logos=(\d+)$/m)?.[1]);
 if(actualLogos !== EXPECTED_LOGOS) throw Error('Logo inventory mismatch: '+actualLogos);
 for(const file of [homepage,directory]){
