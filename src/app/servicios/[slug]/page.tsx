@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { getServiceDetailData } from '@/lib/queries/service-detail';
+import { getServiceBySlug } from '@/lib/queries/services';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { ReportForm } from '@/components/service/ReportForm';
 import { BrandMark } from '@/components/home/BrandMark';
@@ -32,12 +33,12 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const data = await getServiceDetailData(slug);
-  if (!data) return { title: 'Servicio no encontrado' };
+  const service = await getServiceBySlug(slug);
+  if (!service || !service.active) return { title: 'Servicio no encontrado' };
   return {
-    title: `Estado de ${data.service.name} en Venezuela`,
-    alternates: { canonical: `/servicios/${encodeURIComponent(data.service.slug)}` },
-    description: `${data.service.name}: ${data.service.description || data.service.category.name}. Consulta reportes e incidentes registrados, sin confundirlos con disponibilidad confirmada.`,
+    title: `Estado de ${service.name} en Venezuela`,
+    alternates: { canonical: `/servicios/${encodeURIComponent(service.slug)}` },
+    description: `${service.name}: ${service.description || service.category.name}. Consulta reportes e incidentes registrados, sin confundirlos con disponibilidad confirmada.`,
   };
 }
 
