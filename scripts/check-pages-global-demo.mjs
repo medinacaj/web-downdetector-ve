@@ -24,8 +24,8 @@ if(actualLogos !== expectedLogos) throw Error('Logo inventory mismatch: build='+
 for(const file of [homepage,directory]){
   if(!file.includes('Cloudflare')||!file.includes('Gmail')||!file.includes('Outlook')||!file.includes('Fortnite'))
     throw Error('Required global services absent');
-  if(!file.includes('Gráficos ilustrativos, no indicadores de disponibilidad actual'))
-    throw Error('Neutral disclosure of illustrative charts missing');
+  if(!file.includes('Los gráficos ilustrativos no muestran disponibilidad actual'))
+    throw Error('Compact disclosure of illustrative charts missing in site footer');
   if(!file.includes('noindex,nofollow'))throw Error('Demo must not be search-indexed');
   if(!file.includes('.monogram[hidden]{display:none!important}')) throw Error('Logo and monogram visibility must be mutually exclusive');
   if(!file.includes('id="demo-report-dialog"')||!file.includes('data-report=')||!file.includes('no envía ni almacena reportes'))
