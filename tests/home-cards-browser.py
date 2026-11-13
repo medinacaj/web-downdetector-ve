@@ -34,29 +34,25 @@ with sync_playwright() as playwright:
     page.get_by_role("button", name="Cambiar a modo claro").click()
     assert not page.locator("html").evaluate("(el) => el.classList.contains('dark')")
 
-    # A first-time visitor can discover the site's purpose and primary actions
-    # without prior explanation, a walkthrough modal or misleading uptime claims.
+    # The first screen is short and search-first; full usage instructions live
+    # in the shared footer instead of consuming space above the service cards.
     hero = page.locator("section.home-hero")
-    assert hero.get_by_role("heading", name="¿Internet, tu banco o una aplicación están fallando?").count() == 1
-    assert hero.get_by_text("PulsoVE reúne reportes en Venezuela", exact=False).count() == 1
-    assert hero.get_by_text("no significa que el servicio funcione", exact=False).count() == 1
-    assert hero.get_by_role("button", name="Buscar servicio").count() == 1
-    assert hero.get_by_role("link", name="¿Cómo funciona?").get_attribute("href") == "/metodologia"
-    quick_steps = hero.locator("[aria-labelledby='getting-started-title'] ol > li")
-    assert quick_steps.count() == 3
-    for word in ("Busca", "Revisa", "Reporta"):
-        assert quick_steps.get_by_text(word, exact=True).count() == 1
-    assert hero.get_by_text("Reporta un problema", exact=False).count() >= 1
+    assert hero.get_by_role("heading", name="¿Tu internet, banco o aplicación está fallando?").count() == 1
+    assert hero.get_by_text("Busca servicios, consulta reportes", exact=False).count() == 1
+    assert hero.get_by_role("button", name="Buscar").count() == 1
+    assert hero.locator("#hero-search").count() == 1
+    assert hero.locator("ol, .home-intro-steps").count() == 0
+    assert hero.get_by_text("Servicios en catálogo").count() == 0
+    assert hero.locator("dt").all_inner_texts() == ["Reportes (24h)", "Incidentes activos"]
 
-    # The complete seed catalogue is not synonymous with technical monitoring.
-    assert page.get_by_text("Servicios en catálogo", exact=True).count() == 1
-    assert page.get_by_text("Servicios monitoreados", exact=True).count() == 0
-    assert hero.get_by_text("si no hay reportes suficientes, no significa que el servicio funcione", exact=False).count() == 1
-    assert page.get_by_text("Consulta:", exact=False).count() >= 1
-    zero_incidents = page.locator("section.home-hero dt").filter(has_text="Incidentes activos").locator("xpath=following-sibling::dd")
-    if zero_incidents.count() and zero_incidents.inner_text().strip() == "0":
-        assert page.get_by_text("Sin incidentes activos registrados en PulsoVE.", exact=False).count() == 1
-
+    help_section = page.locator("footer #ayuda")
+    assert help_section.get_by_role("heading", name="¿Cómo usar PulsoVE?").count() == 1
+    footer_steps = help_section.locator("ol > li")
+    assert footer_steps.count() == 3
+    for word in ("1 · Busca", "2 · Revisa", "3 · Reporta"):
+        assert footer_steps.get_by_text(word, exact=True).count() == 1
+    assert page.locator("footer").get_by_role("link", name="Logos y créditos").get_attribute("href") == "/creditos-marcas"
+    assert page.locator("header").get_by_text("Logos y créditos").count() == 0
 
     grid = page.locator("section[aria-labelledby='home-services-title'] ul")
     cards = grid.locator(":scope > li")

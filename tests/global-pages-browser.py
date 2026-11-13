@@ -25,20 +25,25 @@ with sync_playwright() as playwright:
     assert page.get_by_text("VISTA PREVIA PÚBLICA").count() == 0
     assert page.locator(".banner").count() == 0
 
-    # A visitor unfamiliar with PulsoVE must understand its purpose, what
-    # this demo can/cannot do and the path to explore services immediately.
+    # Clear first screen: search first, guidance and credits only in footer.
     hero_intro = page.locator(".wrap.hero")
     assert hero_intro.get_by_role("heading", name="¿Tu internet, banco o aplicación está fallando?").count() == 1
-    assert hero_intro.get_by_text("Encuentra servicios de Venezuela y del mundo", exact=False).count() == 1
-    assert hero_intro.get_by_text("Estás viendo una demostración:", exact=False).count() == 0
+    assert hero_intro.get_by_text("Busca tu servicio y consulta su información en PulsoVE.").count() == 1
+    assert hero_intro.locator(".stats").count() == 0
+    assert hero_intro.locator(".intro-guide").count() == 0
+    assert hero_intro.get_by_role("link", name="Ver plataformas").get_attribute("href") == "/web-downdetector-ve/servicios/"
+    assert hero_intro.locator("#quicksearch").count() == 1
+    assert hero_intro.locator("#home-search-count").inner_text().strip() == "Destacados"
+    assert page.locator("header.top .navlinks a").all_inner_texts() == ["Inicio", "Servicios"]
     assert page.get_by_text("Gráficos ilustrativos, no indicadores de disponibilidad actual", exact=False).count() == 1
-    assert hero_intro.get_by_role("link", name="Explorar servicios").get_attribute("href") == "/web-downdetector-ve/servicios/"
-    assert hero_intro.get_by_role("link", name="Cómo se usa").get_attribute("href") == "#como-funciona"
-    steps = hero_intro.locator("#como-funciona ol.intro-steps > li")
+    help_section = page.locator("footer #ayuda")
+    assert help_section.get_by_role("heading", name="¿Cómo usar PulsoVE?").count() == 1
+    steps = help_section.locator("ol.footer-steps > li")
     assert steps.count() == 3
-    for heading in ("1 · Busca", "2 · Revisa", "3 · Reporta"):
+    for heading in ("Busca", "Revisa", "Reporta"):
         assert steps.get_by_text(heading, exact=True).count() == 1
-    assert hero_intro.get_by_text("Todo lo que usas, en un solo lugar.").count() == 0
+    assert page.locator("footer").get_by_role("link", name="Logos y créditos").get_attribute("href") == "/web-downdetector-ve/creditos-marcas/"
+    assert page.locator("header").get_by_text("Logos y créditos").count() == 0
 
     for name in ("Cloudflare", "Gmail", "Outlook", "Fortnite"):
         assert page.get_by_role("link", name="Ver ficha de " + name).count() == 1, name
@@ -99,7 +104,7 @@ with sync_playwright() as playwright:
     page.get_by_role("button", name="Nube", exact=True).click()
     assert page.get_by_role("button", name="Nube", exact=True).get_attribute("aria-pressed") == "true"
     assert page.locator("main .card:visible").count() >= 6
-    assert page.locator("#home-search-count").inner_text().endswith("servicios destacados")
+    assert page.locator("#home-search-count").inner_text().endswith("resultados")
     page.get_by_role("button", name="Todos", exact=True).click()
     assert page.locator("main .card:visible").count() == 60
     page.locator("#quicksearch").fill("zzzzsinresultados")
@@ -142,7 +147,7 @@ with sync_playwright() as playwright:
         top_height = topbar.evaluate("(el) => Math.round(el.getBoundingClientRect().height)")
         assert top_height <= 56, ("Header must not wrap into a second row", width, top_height)
         controls = topbar.locator(".navlinks a")
-        assert controls.count() == 3
+        assert controls.count() == 2
         theme_box = topbar.locator("#theme-toggle").bounding_box()
         assert theme_box is not None
         assert theme_box["x"] + theme_box["width"] <= width + 1, ("Theme icon off screen", width)
@@ -156,7 +161,7 @@ with sync_playwright() as playwright:
         for step in steps.all():
             left = step.bounding_box()
             assert left is not None
-            assert left["x"] >= -2 and left["x"] + left["width"] <= width + 2, ("Intro step out of view", width, left)
+            assert left["x"] >= -2 and left["x"] + left["width"] <= width + 2, ("Footer help step out of view", width, left)
         measurements = page.locator("#nube .card").evaluate_all("""(cards) => cards.map(card => {
           const rect = (selector) => {
             const el = selector === '.card' ? card : card.querySelector(selector);
@@ -375,7 +380,7 @@ with sync_playwright() as playwright:
     for width in (320, 390, 768, 1280):
         page.set_viewport_size({"width": width, "height": 844})
         assert page.evaluate("document.documentElement.scrollWidth <= window.innerWidth + 2"), ("detail overflow", width)
-    page.get_by_role("link", name="Volver a los 211 servicios").click()
+    page.get_by_role("link", name="Volver a servicios").click()
     assert page.url.endswith("/web-downdetector-ve/servicios/")
     assert page.locator("#directory-cards .card").count() == 211
     page.goto(ROOT + "servicios/cloudflare/", wait_until="networkidle")
