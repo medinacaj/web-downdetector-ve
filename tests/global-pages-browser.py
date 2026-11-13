@@ -35,13 +35,39 @@ with sync_playwright() as playwright:
     assert page.get_by_text("Gráficos ficticios de ejemplo").count() >= 1
 
 
-    for width in (320, 390, 768):
+    # Inspect real rendered geometry: actions may not occupy the chart column,
+    # and the brand/chart bands must align across an entire grid row.
+    for width in (320, 390, 768, 1280):
         page.set_viewport_size({"width": width, "height": 844})
         count = page.locator("#juegos .cards").evaluate(
             "(el) => getComputedStyle(el).gridTemplateColumns.split(' ').filter(Boolean).length"
         )
-        assert count == (2 if width < 760 else 3), (width, count)
-        assert page.evaluate("document.documentElement.scrollWidth <= window.innerWidth + 2")
+        assert count == (2 if width < 760 else (3 if width < 1060 else 6)), (width, count)
+        assert page.evaluate("document.documentElement.scrollWidth <= window.innerWidth + 2"), f"Horizontal overflow: {width}"
+        measurements = page.locator("#nube .card").evaluate_all("""(cards) => cards.map(card => {
+          const rect = (selector) => {
+            const el = card.querySelector(selector);
+            const r = el.getBoundingClientRect();
+            return { left: r.left, right: r.right, top: r.top, bottom: r.bottom, width: r.width, height: r.height };
+          };
+          return {
+            card: rect('.card'), toolbar: rect('.card-actions'),
+            header: rect('.card-header'), logo: rect('.logo-area'),
+            graph: rect('.demo-chart'), signal: rect('.signal'),
+            link: rect('.card-link'), alert: rect('.report-quick'), star: rect('.star')
+          };
+        })""")
+        for box in measurements:
+            assert box["toolbar"]["bottom"] <= box["header"]["top"] + 1, (width, "toolbar overlap", box)
+            assert box["header"]["bottom"] <= box["logo"]["top"] + 1, (width, "header overlap", box)
+            assert box["logo"]["bottom"] <= box["signal"]["top"] + 2, (width, "logo/chart overlap", box)
+            assert box["graph"]["width"] >= box["link"]["width"] - 32, (width, "graph too narrow", box)
+            assert box["alert"]["right"] + 2 <= box["star"]["left"], (width, "actions overlap", box)
+            assert box["alert"]["top"] >= box["card"]["top"] - 1
+            assert box["star"]["right"] <= box["card"]["right"] + 1
+        assert max(b["graph"]["height"] for b in measurements) - min(b["graph"]["height"] for b in measurements) < 1
+        assert max(b["graph"]["width"] for b in measurements) - min(b["graph"]["width"] for b in measurements) < 1
+        assert max(b["card"]["height"] for b in measurements) - min(b["card"]["height"] for b in measurements) < 2
 
     page.set_viewport_size({"width": 390, "height": 844})
     logo = page.locator("#nube img[src$='/brands/cloudflare.svg']").first
