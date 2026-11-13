@@ -8,11 +8,11 @@ const homepage = html('index.html');
 const directory = html('servicios/index.html');
 const credits = html('creditos-marcas/index.html');
 const info = html('build-info.txt');
-if(!info.includes('catalogue=142')) throw Error('Unexpected catalogue size in public output');
+if(!info.includes('catalogue=211')) throw Error('Unexpected catalogue size in public output');
 for(const file of [homepage,directory]){
   if(!file.includes('Cloudflare')||!file.includes('Gmail')||!file.includes('Outlook')||!file.includes('Fortnite'))
     throw Error('Required global services absent');
-  if(!file.includes('VISTA PREVIA PÚBLICA')||!file.includes('sin reportes reales'))
+  if(!file.includes('VISTA PREVIA PÚBLICA')||!file.includes('Gráficos ficticios de ejemplo'))
     throw Error('Demo warning absent');
   if(!file.includes('noindex,nofollow'))throw Error('Demo must not be search-indexed');
   if(!file.includes('.monogram[hidden]{display:none!important}')) throw Error('Logo and monogram visibility must be mutually exclusive');
@@ -30,7 +30,7 @@ if(!homepage.includes('Nube e infraestructura')||!homepage.includes('Videojuegos
 if(!directory.includes('id="directory-cards"'))throw Error('Interactive directory missing');
 if(!credits.includes('Banesco'))throw Error('Brand credits missing');
 const files = readdirSync(join(root,'brands'));
-if(files.length!==29)throw Error('Missing assets: '+files.length);
+if(files.length!==50)throw Error('Missing assets: '+files.length);
 for(const file of files) {
   const full=join(root,'brands',file);
   const data=readFileSync(full);
@@ -48,4 +48,4 @@ for(const x of top){
   if(!new Set(['index.html','servicios','creditos-marcas','brands','.nojekyll','build-info.txt']).has(x))
     throw Error('Unexpected public artifact '+x);
 }
-console.log('PASS: 142 public-demo services, 5 worldwide sections, 29 safe local logos, readable scripts; no backend secret or invented status');
+console.log('PASS: 211 demo services, 8 worldwide sections, 50 local logos, synthetic-only charts and no backend requests');
