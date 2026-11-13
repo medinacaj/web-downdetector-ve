@@ -34,29 +34,25 @@ with sync_playwright() as playwright:
     page.get_by_role("button", name="Cambiar a modo claro").click()
     assert not page.locator("html").evaluate("(el) => el.classList.contains('dark')")
 
-    # A first-time visitor can discover the site's purpose and primary actions
-    # without prior explanation, a walkthrough modal or misleading uptime claims.
+    # A first-time visitor gets a concise question and immediate search.
+    # The long how-to steps and brand attribution belong in the footer.
     hero = page.locator("section.home-hero")
     assert hero.get_by_role("heading", name="¿Internet, tu banco o una aplicación están fallando?").count() == 1
-    assert hero.get_by_text("PulsoVE reúne reportes en Venezuela", exact=False).count() == 1
-    assert hero.get_by_text("no significa que el servicio funcione", exact=False).count() == 1
+    assert hero.get_by_text("Busca un servicio y revisa los reportes", exact=False).count() == 1
     assert hero.get_by_role("button", name="Buscar servicio").count() == 1
-    assert hero.get_by_role("link", name="¿Cómo funciona?").get_attribute("href") == "/metodologia"
-    quick_steps = hero.locator("[aria-labelledby='getting-started-title'] ol > li")
+    assert hero.get_by_role("link", name="Explorar servicios").get_attribute("href") == "/servicios"
+    assert hero.locator(".home-intro-steps, dl").count() == 0
+    assert hero.evaluate("(el) => Math.round(el.getBoundingClientRect().height)") <= 310
+
+    help_footer = page.locator("footer#ayuda")
+    assert help_footer.get_by_role("heading", name="Ayuda · Cómo usar PulsoVE").count() == 1
+    quick_steps = help_footer.locator("ol > li")
     assert quick_steps.count() == 3
     for word in ("Busca", "Revisa", "Reporta"):
-        assert quick_steps.get_by_text(word, exact=True).count() == 1
-    assert hero.get_by_text("Reporta un problema", exact=False).count() >= 1
-
-    # The complete seed catalogue is not synonymous with technical monitoring.
-    assert page.get_by_text("Servicios en catálogo", exact=True).count() == 1
+        assert quick_steps.get_by_role("heading", name=word).count() == 1
+    assert help_footer.get_by_role("link", name="Logos y créditos").get_attribute("href") == "/creditos-marcas"
     assert page.get_by_text("Servicios monitoreados", exact=True).count() == 0
-    assert hero.get_by_text("si no hay reportes suficientes, no significa que el servicio funcione", exact=False).count() == 1
-    assert page.get_by_text("Consulta:", exact=False).count() >= 1
-    zero_incidents = page.locator("section.home-hero dt").filter(has_text="Incidentes activos").locator("xpath=following-sibling::dd")
-    if zero_incidents.count() and zero_incidents.inner_text().strip() == "0":
-        assert page.get_by_text("Sin incidentes activos registrados en PulsoVE.", exact=False).count() == 1
-
+    assert page.get_by_text("Servicios en catálogo", exact=True).count() == 0
 
     grid = page.locator("section[aria-labelledby='home-services-title'] ul")
     cards = grid.locator(":scope > li")
