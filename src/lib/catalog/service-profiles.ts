@@ -23,6 +23,7 @@ const PROVIDERS: Readonly<Record<string, string>> = {
   'corpoelec': 'CORPOELEC',
   'banco-de-venezuela': 'Banco de Venezuela',
   'banesco': 'Banesco',
+  'bnc': 'Banco Nacional de Crédito',
   'mercantil': 'Mercantil',
   'netflix': 'Netflix',
   'spotify': 'Spotify',
@@ -179,6 +180,16 @@ const COMPANY_EDITORIAL: Readonly<Record<string, {
     uses: ['Cuenta y autenticación', 'Juego en línea', 'PlayStation Store', 'Funciones sociales'],
     source: 'https://www.playstation.com/en-us/your-account-for-playstation/',
   },
+  banesco: {
+    overview: 'Banesco es una entidad bancaria venezolana que ofrece productos y canales financieros a personas y empresas. Sus servicios incluyen cuentas, tarjetas, pagos y plataformas digitales. Un inconveniente de autenticación, transferencias o banca móvil debe distinguirse de fallas de otros canales, sin inferir afectación general.',
+    uses: ['Banca digital y consultas', 'Transferencias y pagos', 'Cuentas y tarjetas', 'Servicios para personas y empresas'],
+    source: 'https://www.banesco.com/somosbanesco/',
+  },
+  bnc: {
+    overview: 'El Banco Nacional de Crédito (BNC) es una entidad bancaria venezolana que ofrece servicios financieros para personas y empresas. Entre sus canales figuran la banca digital, los pagos y la gestión de cuentas. Las incidencias de ingreso, procesamiento de transferencias o consulta de saldo deben tratarse como funciones diferentes.',
+    uses: ['Banca en línea', 'Pagos y transferencias', 'Cuentas y tarjetas', 'Productos empresariales'],
+    source: 'https://www.banconacionaldecredito.com.ve/Somos-BNC',
+  },
   netflix: {
     overview: 'Netflix es un servicio de entretenimiento en línea que ofrece series, películas y juegos. El catálogo y las funciones pueden variar según la ubicación y el dispositivo. Un problema de reproducción, de inicio de sesión o de facturación no implica necesariamente que todo el servicio esté interrumpido.',
     uses: ['Reproducción de series y películas', 'Descubrimiento de contenidos', 'Perfiles y acceso', 'Aplicaciones para distintos dispositivos'],
@@ -297,7 +308,7 @@ const COMPANY_EDITORIAL: Readonly<Record<string, {
   'digitel': {
     overview: 'Digitel es una empresa de telecomunicaciones móviles en Venezuela. Sus clientes utilizan servicios de voz y datos, cuyas incidencias pueden estar relacionadas con cobertura, congestión, autenticación o acceso a Internet.',
     uses: ['Datos móviles', 'Telefonía móvil', 'Servicios de red', 'Conectividad en Venezuela'],
-    source: null,
+    source: 'https://digitel.com.ve/la-corporacion',
   },
   'movistar': {
     overview: 'Movistar opera servicios de telecomunicaciones en varios mercados, entre ellos Venezuela. La experiencia puede depender del acceso móvil o fijo y de la localidad. PulsoVE reúne reportes ciudadanos, no diagnósticos de red del operador.',
