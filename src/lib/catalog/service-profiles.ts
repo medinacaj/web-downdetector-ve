@@ -54,6 +54,8 @@ const PROVIDERS: Readonly<Record<string, string>> = {
   'discord': 'Discord',
   'reddit': 'Reddit',
   'twitch': 'Twitch',
+  'linkedin': 'LinkedIn (Microsoft)',
+  'playstation-network': 'Sony Interactive Entertainment',
   'amazon': 'Amazon',
   'paypal': 'PayPal',
   'shopify': 'Shopify',
@@ -156,6 +158,26 @@ const COMPANY_EDITORIAL: Readonly<Record<string, {
     overview: 'YouTube Music es un servicio de música y contenido de audio del ecosistema YouTube de Google. El acceso, la búsqueda, la reproducción y las listas pueden presentar problemas diferentes dependiendo del dispositivo y la conexión.',
     uses: ['Escuchar música', 'Buscar artistas y canciones', 'Crear listas', 'Reproducción en distintos dispositivos'],
     source: 'https://music.youtube.com/',
+  },
+  twitch: {
+    overview: 'Twitch es una plataforma de transmisión de video en directo centrada en comunidades y creadores. Reúne contenido de videojuegos, música, deporte y otras actividades con chat interactivo. La reproducción de transmisiones, el acceso a canales, las notificaciones y el chat pueden presentar incidencias distintas.',
+    uses: ['Ver transmisiones en directo', 'Emitir contenido propio', 'Participar en chats', 'Seguir canales y comunidades'],
+    source: 'https://www.twitch.tv/p/es-es/company/',
+  },
+  reddit: {
+    overview: 'Reddit es una plataforma de comunidades organizadas por temas en la que las personas publican enlaces, textos y contenido multimedia, comentan y votan. La navegación por comunidades, el inicio de sesión, la publicación y la carga de comentarios son componentes que pueden funcionar de forma diferente durante una incidencia.',
+    uses: ['Leer comunidades temáticas', 'Crear publicaciones', 'Comentar y votar', 'Gestionar una cuenta'],
+    source: 'https://about.reddit.com/',
+  },
+  linkedin: {
+    overview: 'LinkedIn es una red profesional para establecer contactos, compartir información laboral y consultar oportunidades de empleo. La plataforma también reúne servicios para empresas, reclutamiento y aprendizaje. El acceso al perfil, la mensajería, el buscador de empleos y las páginas corporativas pueden fallar por separado.',
+    uses: ['Perfil y red profesional', 'Oportunidades laborales', 'Mensajería profesional', 'Publicaciones de empresas'],
+    source: 'https://about.linkedin.com/es-es',
+  },
+  'playstation-network': {
+    overview: 'PlayStation Network permite utilizar una cuenta de PlayStation para acceder a servicios y funcionalidades conectadas, como juegos en línea, PlayStation Store y otros productos. Los incidentes pueden afectar el inicio de sesión, las funciones sociales, las compras o los juegos en red sin interrumpir necesariamente todas las actividades.',
+    uses: ['Cuenta y autenticación', 'Juego en línea', 'PlayStation Store', 'Funciones sociales'],
+    source: 'https://www.playstation.com/en-us/your-account-for-playstation/',
   },
   netflix: {
     overview: 'Netflix es un servicio de entretenimiento en línea que ofrece series, películas y juegos. El catálogo y las funciones pueden variar según la ubicación y el dispositivo. Un problema de reproducción, de inicio de sesión o de facturación no implica necesariamente que todo el servicio esté interrumpido.',
