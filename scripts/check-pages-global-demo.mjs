@@ -102,7 +102,7 @@ if(!homepage.includes('.wrap.hero,body[data-theme="light"] .wrap.hero{border:0;b
 if(!homepage.includes('¿Tu internet, banco o aplicación está fallando?') ||
    homepage.includes('Estás viendo una demostración:') ||
    !homepage.includes('class="intro-primary" href="/web-downdetector-ve/servicios/"') ||
-   !homepage.includes('class="home-tools-bar"') ||
+   !homepage.includes('class="wrap home-tools-bar"') ||
    homepage.includes('class="stats"') ||
    homepage.includes('class="intro-guide"'))
   throw Error('Homepage should have a compact introduction and a separate search toolbar');
