@@ -18,7 +18,7 @@ export function ThemeToggle() {
 
   // Evita parpadeo de hidratación: no se sabe el tema real hasta montar.
   if (isDark === null) {
-    return <div className="h-9 w-9" aria-hidden="true" />;
+    return <div className="h-11 w-11 shrink-0" aria-hidden="true" />;
   }
 
   return (
@@ -26,10 +26,12 @@ export function ThemeToggle() {
       type="button"
       onClick={toggle}
       aria-label={isDark ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'}
-      className="flex h-9 w-9 items-center justify-center rounded-md border border-border text-ink-muted transition-colors hover:text-ink"
+      title={isDark ? "Cambiar a modo claro" : "Cambiar a modo oscuro"}
+      aria-pressed={isDark}
+      className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg text-ink-muted transition-colors hover:bg-surface hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-pulse-500"
     >
       {isDark ? (
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75">
+        <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75">
           <circle cx="12" cy="12" r="4" />
           <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41" />
         </svg>
