@@ -16,6 +16,21 @@ with sync_playwright() as playwright:
     assert response and response.status == 200
     assert page.get_by_text("VISTA PREVIA PÚBLICA").count() >= 1
 
+    # A visitor unfamiliar with PulsoVE must understand its purpose, what
+    # this demo can/cannot do and the path to explore services immediately.
+    hero_intro = page.locator(".wrap.hero")
+    assert hero_intro.get_by_role("heading", name="¿Tu internet, banco o aplicación está fallando?").count() == 1
+    assert hero_intro.get_by_text("PulsoVE te ayuda a consultar reportes de otras personas", exact=False).count() == 1
+    assert hero_intro.get_by_text("Estás viendo una demostración:", exact=False).count() >= 1
+    assert hero_intro.get_by_text("no se consultan fallas en tiempo real ni se envían reportes", exact=False).count() >= 1
+    assert hero_intro.get_by_role("link", name="Explorar servicios").get_attribute("href") == "/web-downdetector-ve/servicios/"
+    assert hero_intro.get_by_role("link", name="Cómo se usa").get_attribute("href") == "#como-funciona"
+    steps = hero_intro.locator("#como-funciona ol.intro-steps > li")
+    assert steps.count() == 3
+    for heading in ("1 · Busca", "2 · Revisa", "3 · Reporta"):
+        assert steps.get_by_text(heading, exact=True).count() == 1
+    assert hero_intro.get_by_text("Todo lo que usas, en un solo lugar.").count() == 0
+
     for name in ("Cloudflare", "Gmail", "Outlook", "Fortnite"):
         assert page.get_by_role("link", name="Ver ficha de " + name).count() == 1, name
 
@@ -105,6 +120,10 @@ with sync_playwright() as playwright:
         )
         assert count == (2 if width < 760 else (3 if width < 1060 else 6)), (width, count)
         assert page.evaluate("document.documentElement.scrollWidth <= window.innerWidth + 2"), f"Horizontal overflow: {width}"
+        for step in steps.all():
+            left = step.bounding_box()
+            assert left is not None
+            assert left["x"] >= -2 and left["x"] + left["width"] <= width + 2, ("Intro step out of view", width, left)
         measurements = page.locator("#nube .card").evaluate_all("""(cards) => cards.map(card => {
           const rect = (selector) => {
             const el = selector === '.card' ? card : card.querySelector(selector);
