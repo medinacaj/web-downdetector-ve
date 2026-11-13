@@ -73,7 +73,7 @@ export default async function ServiceDetailPage({ params }: { params: Promise<{ 
               {profile.tags.map((tag) => <span key={tag} className="rounded-full border border-border bg-bg px-3 py-1 text-xs text-ink-muted">{tag}</span>)}
             </div>
           </div>
-          <a href="#reportar" className="shrink-0 rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white transition-[transform,box-shadow,background-color] hover:-translate-y-0.5 hover:bg-red-700 hover:shadow-md active:translate-y-0 active:scale-95 focus-visible:outline-red-500">
+          <a href="#reportar" className="inline-flex shrink-0 items-center justify-center rounded-lg bg-red-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-[transform,box-shadow,background-color] hover:-translate-y-0.5 hover:bg-red-700 hover:shadow-md active:translate-y-0 active:scale-95 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-500 motion-reduce:transform-none">
             ! Reportar falla
           </a>
         </div>
