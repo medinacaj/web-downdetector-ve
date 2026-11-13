@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { logoForService } from '@/lib/brand-logos';
 
 const BRAND_TONES: Record<string, { background: string; foreground: string }> = {
@@ -30,16 +30,15 @@ export function BrandMark({
   name: string;
   categorySlug: string;
 }) {
-  const [broken, setBroken] = useState(false);
+  const [failedLogo, setFailedLogo] = useState<string | null>(null);
   const logo = logoForService(slug);
 
-  // A reused card must retry the new service's asset after a prior image failed.
-  useEffect(() => {
-    setBroken(false);
-  }, [logo]);
+  // Associate an image failure with its exact asset, not with the reused
+  // React component. A late error from a previous service must not hide the
+  // next service's valid image. No effect/reset render is required.
   const tone = BRAND_TONES[categorySlug] ?? DEFAULT_TONE;
 
-  if (logo && !broken) {
+  if (logo && logo !== failedLogo) {
     return (
       <div className="flex h-full w-full items-center justify-center">
         <div className="flex h-full w-full max-w-[175px] items-center justify-center rounded-lg bg-white p-1">
@@ -50,7 +49,7 @@ export function BrandMark({
             height={110}
             sizes="(max-width: 640px) 160px, 220px"
             unoptimized
-            onError={() => setBroken(true)}
+            onError={() => setFailedLogo(logo)}
             className="h-full max-h-[72px] w-full object-contain object-center"
           />
         </div>
