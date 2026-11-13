@@ -67,3 +67,9 @@ Los gráficos distribuidos por Simple Icons usan licencia CC0 para la representa
 Se añadió el SVG original de **EA** obtenido de [Simple Icons (icono EA)](https://github.com/simple-icons/simple-icons/blob/develop/icons/ea.svg) como identificador del **editor de EA app**. La ilustración distribuida por Simple Icons se publica bajo CC0, sin transferir los derechos de marca de Electronic Arts. No se representa como logotipo específico de la aplicación ni se afirma asociación con EA.
 
 La cobertura pasa de **164 a 165 recursos locales de 211 servicios (78,2 %)**; **46 servicios** siguen con monograma hasta contar con archivos y procedencia verificables. Las cifras históricas anteriores se conservan para trazabilidad.
+
+## Recursos comunitarios adicionales · 13 de noviembre de 2026
+
+Se incorporaron dos ilustraciones vectoriales locales de [Lawnicons](https://github.com/LawnchairLauncher/lawnicons), con licencia de repositorio [Apache-2.0](https://github.com/LawnchairLauncher/lawnicons/blob/develop/LICENSE): [PedidosYa](https://github.com/LawnchairLauncher/lawnicons/blob/develop/svgs/pedidosya.svg) y [Yango](https://github.com/LawnchairLauncher/lawnicons/blob/develop/svgs/yango.svg). Son **representaciones comunitarias de identificación**, no se anuncian como logotipos oficiales ni implican afiliación. Las marcas siguen siendo de sus titulares. Los SVG son locales, sin scripts ni solicitudes a servidores externos.
+
+Con estos dos recursos, el catálogo dispone de **167 imágenes locales entre 211 servicios (79,1 %)**, y **44 servicios** conservan un monograma por falta de activos adecuados verificados. Las cifras anteriores se mantienen como historial de incorporación.
