@@ -57,9 +57,9 @@ export default async function ServiceDetailPage({ params }: { params: Promise<{ 
         <Link href="/servicios" className="underline underline-offset-2 hover:text-ink">Todos los servicios</Link>
         <span aria-hidden="true" className="px-2">/</span>{service.name}
       </nav>
-      <header className="rounded-xl border border-border bg-surface p-5 sm:p-7">
+      <header className="service-detail-panel rounded-xl border border-border bg-surface p-5 sm:p-7">
         <div className="flex flex-wrap items-start gap-5 sm:flex-nowrap">
-          <div className="h-24 w-28 shrink-0 rounded-xl border border-border bg-white p-2">
+          <div className="h-24 w-28 shrink-0 rounded-xl bg-white p-2 shadow-sm">
             <BrandMark slug={service.slug} name={service.name} categorySlug={service.category.slug} />
           </div>
           <div className="min-w-0 flex-1">
@@ -73,7 +73,7 @@ export default async function ServiceDetailPage({ params }: { params: Promise<{ 
               {profile.tags.map((tag) => <span key={tag} className="rounded-full border border-border bg-bg px-3 py-1 text-xs text-ink-muted">{tag}</span>)}
             </div>
           </div>
-          <a href="#reportar" className="shrink-0 rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-700 focus-visible:outline-red-500">
+          <a href="#reportar" className="shrink-0 rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white transition-[transform,box-shadow,background-color] hover:-translate-y-0.5 hover:bg-red-700 hover:shadow-md active:translate-y-0 active:scale-95 focus-visible:outline-red-500">
             ! Reportar falla
           </a>
         </div>
@@ -98,7 +98,7 @@ export default async function ServiceDetailPage({ params }: { params: Promise<{ 
         )}
       </header>
 
-      <section className="mt-6 rounded-xl border border-border bg-surface p-5 sm:p-7" aria-labelledby="company-overview-title">
+      <section className="service-detail-panel mt-6 rounded-xl border border-border bg-surface p-5 sm:p-7" aria-labelledby="company-overview-title">
         <h2 id="company-overview-title" className="font-display text-xl font-semibold">Acerca de la empresa y el servicio</h2>
         <p className="mt-3 max-w-4xl text-sm leading-7 text-ink-muted">{profile.companyOverview}</p>
         <div className="mt-5 grid gap-5 md:grid-cols-2">
