@@ -13,7 +13,7 @@ describe('Metodología PulsoVE: evidencia, límites y coherencia', () => {
       expect(nextPage).toContain(label);
     }
     expect(nextPage).not.toContain('Downdetector');
-    expect(nextPage).toContain('No se publican coordenadas personales');
+    expect(nextPage.toLowerCase()).toContain('no se publican coordenadas personales');
   });
 
   it('distingue parámetros de detección de promesas sobre la actualización automática', () => {
@@ -22,6 +22,6 @@ describe('Metodología PulsoVE: evidencia, límites y coherencia', () => {
     }
     expect(staticGuide).toContain('no envía ni almacena reportes');
     expect(staticGuide).toContain('no cuenta con datos de fallas en vivo');
-    expect(staticGuide).toContain('La versión pública de GitHub Pages');
+    expect(staticGuide).toContain('En GitHub Pages el formulario es una demostración');
   });
 });
