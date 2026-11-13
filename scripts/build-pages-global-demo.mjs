@@ -85,6 +85,8 @@ const CSS=[
 "/* Header theme control: icon only, with a 44px touch target and visible focus. */\n.theme-toggle,body[data-theme=\"light\"] .theme-toggle,body[data-theme=\"dark\"] .theme-toggle{width:44px;height:44px;min-width:44px;min-height:44px;padding:0;display:inline-flex;align-items:center;justify-content:center;border:0;border-radius:10px;background:transparent;cursor:pointer;line-height:1;color:inherit;flex-shrink:0}\n.theme-toggle:hover{background:rgba(0,131,116,.1);text-decoration:none}\n.theme-toggle:focus-visible{outline:2px solid #00a58c;outline-offset:3px}\nbody[data-theme=\"dark\"] .theme-toggle:hover{background:rgba(139,226,204,.15)}\n.theme-toggle svg{display:block;pointer-events:none}\n"
 ,
 "/* Compact header with one horizontal row; no wrapped second navigation line. */\n.top .wrap.nav{height:54px;min-height:54px;max-height:54px;display:flex;flex-wrap:nowrap;align-items:center;gap:12px}\n.top .brand{font-size:20px;line-height:1;flex:none;white-space:nowrap}\n.top .navlinks{display:flex;flex:1;min-width:0;align-items:center;gap:15px;overflow-x:auto;white-space:nowrap;scrollbar-width:none;margin-left:auto}\n.top .navlinks::-webkit-scrollbar{display:none}\n.top .navlinks a{flex:none;font-size:13px;line-height:1.4;padding:8px 1px}\n.top .theme-toggle{width:44px;min-width:44px;height:44px;min-height:44px;flex:none}\n.top .navlinks a:nth-child(1){color:#216f88}\n.top .navlinks a:nth-child(2){color:#69499b}\n.top .navlinks a:nth-child(3){color:#a23c65}\n.top .navlinks a:hover{color:#133c48}\nbody[data-theme=\"dark\"] .top .navlinks a:nth-child(1){color:#96d7f1}\nbody[data-theme=\"dark\"] .top .navlinks a:nth-child(2){color:#cbb7f9}\nbody[data-theme=\"dark\"] .top .navlinks a:nth-child(3){color:#ffb2d1}\nbody[data-theme=\"dark\"] .top .navlinks a:hover{color:#fff}\n.wrap.hero,body[data-theme=\"light\"] .wrap.hero{margin-top:14px;padding:24px 24px 22px}\n.hero .intro-steps li:nth-child(2) strong{color:#f4ce8c}\n.hero .intro-steps li:nth-child(3) strong{color:#ffb3bb}\n.hero .intro-guide{margin-top:12px;padding-top:11px}\n.hero .intro-actions{margin-top:14px;margin-bottom:6px}\n.hero .intro-primary{background:#f0d17f;color:#373012}\n.hero .intro-primary:hover,.hero .intro-primary:focus-visible{background:#f7e0a5}\n.hero .intro-secondary{color:#b8c9ff}\n.group#nube .section-title h2,.group#correo .section-title h2{color:#235f99}\n.group#juegos .section-title h2,.group#juegos-nuevos .section-title h2{color:#a63761}\n.group#comercio .section-title h2,.group#entretenimiento .section-title h2{color:#83551f}\n.group#ia-comunidad .section-title h2,.group#redes-globales .section-title h2{color:#7355a3}\nbody[data-theme=\"dark\"] .group#nube .section-title h2,body[data-theme=\"dark\"] .group#correo .section-title h2{color:#a3d6fd}\nbody[data-theme=\"dark\"] .group#juegos .section-title h2,body[data-theme=\"dark\"] .group#juegos-nuevos .section-title h2{color:#ffb0c8}\nbody[data-theme=\"dark\"] .group#comercio .section-title h2,body[data-theme=\"dark\"] .group#entretenimiento .section-title h2{color:#ffdb9c}\nbody[data-theme=\"dark\"] .group#ia-comunidad .section-title h2,body[data-theme=\"dark\"] .group#redes-globales .section-title h2{color:#d4bafa}\n.card{--logo-wash:#e9f4f1}\n.card[data-category=\"nube-e-infraestructura\"],.card[data-category=\"telecomunicaciones\"]{--logo-wash:#e7f3fc}\n.card[data-category=\"plataformas-digitales\"],.card[data-category=\"correo-y-productividad\"]{--logo-wash:#f1edfc}\n.card[data-category=\"videojuegos\"],.card[data-category=\"streaming\"]{--logo-wash:#fbeaf0}\n.card[data-category=\"comercio-global\"],.card[data-category=\"banca-y-pagos\"]{--logo-wash:#fff3dc}\n.card[data-category=\"servicios-publicos\"],.card[data-category=\"delivery-y-movilidad\"]{--logo-wash:#e8f6e8}\n.card[data-category=\"inteligencia-artificial\"]{--logo-wash:#f1eaff}\n.card[data-category=\"apuestas-y-loterias\"]{--logo-wash:#fbeef2}\n.card .logo-area{background:var(--logo-wash)}\n.card .category{color:var(--plot);font-weight:700}\nbody[data-theme=\"dark\"] .card[data-category=\"nube-e-infraestructura\"],body[data-theme=\"dark\"] .card[data-category=\"telecomunicaciones\"]{--plot:#a3d6fd}\nbody[data-theme=\"dark\"] .card[data-category=\"plataformas-digitales\"],body[data-theme=\"dark\"] .card[data-category=\"correo-y-productividad\"]{--plot:#d4bafa}\nbody[data-theme=\"dark\"] .card[data-category=\"videojuegos\"],body[data-theme=\"dark\"] .card[data-category=\"streaming\"]{--plot:#ffb0c8}\nbody[data-theme=\"dark\"] .card[data-category=\"comercio-global\"],body[data-theme=\"dark\"] .card[data-category=\"banca-y-pagos\"]{--plot:#ffdb9c}\nbody[data-theme=\"dark\"] .card[data-category=\"servicios-publicos\"],body[data-theme=\"dark\"] .card[data-category=\"delivery-y-movilidad\"]{--plot:#9ce6c5}\nbody[data-theme=\"dark\"] .card[data-category=\"inteligencia-artificial\"]{--plot:#d4bafa}\nbody[data-theme=\"dark\"] .card[data-category=\"apuestas-y-loterias\"]{--plot:#f4b0cf}\nbody[data-theme=\"dark\"] .card .category{color:var(--plot)}\n@media(max-width:760px){.top .wrap.nav{height:54px;min-height:54px;max-height:54px;gap:8px}.top .brand{font-size:18px}.top .navlinks{gap:12px}.top .navlinks a{font-size:12px}.wrap.hero,body[data-theme=\"light\"] .wrap.hero{margin-top:10px;padding:21px 16px 19px}}\n@media(max-width:375px){.top .wrap.nav{gap:7px}.top .brand{font-size:17px}.top .navlinks{gap:10px}.wrap.hero,body[data-theme=\"light\"] .wrap.hero{padding:19px 12px}}\n"
+,
+"/* Intentional: compact first screen. The full explanation lives in the footer. */\n.wrap.hero,body[data-theme=\"light\"] .wrap.hero,body[data-theme=\"dark\"] .wrap.hero{padding:20px 22px 16px;margin-top:10px}\n.hero .hero-top{display:block}\n.hero .hero-copy{max-width:100%}\n.hero .hero-copy h1{font-size:clamp(21px,3.3vw,32px);line-height:1.2;margin:0 0 7px}\n.hero .intro-lead{font-size:14px!important;line-height:1.55;margin:0 0 12px!important;max-width:680px!important}\n.hero .stats,.hero .intro-guide,.hero .eyebrow,.hero .intro-actions{display:none}\n.hero .hero-tools{padding-top:8px;margin-top:0}\n.hero .hero-tools .filters{gap:8px;flex-wrap:wrap}\n.hero .home-search-status{font-size:12px}\n.footer-inner{padding-top:22px;padding-bottom:18px}\n.footer-help{padding:0 0 18px}\n.footer-help h2{font-size:17px;line-height:1.4;margin:0 0 6px;color:#effaf7}\n.footer-help p{font-size:13px;line-height:1.6;color:#b9d5d3;margin:0 0 12px}\n.footer-steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;list-style:none;margin:0;padding:0}\n.footer-steps li{display:flex;flex-direction:column;gap:4px;min-width:0}\n.footer-steps strong{color:#a7e5d7;font-size:13px}\n.footer-steps li:nth-child(2) strong{color:#ffdfa1}\n.footer-steps li:nth-child(3) strong{color:#ffc4d5}\n.footer-steps span{color:#cbdcde;font-size:12px;line-height:1.6}\n.footer-bottom{display:flex;justify-content:space-between;flex-wrap:wrap;align-items:center;gap:14px;border-top:1px solid #37515e;padding-top:14px;color:#b9d5d3;font-size:12px}\n.footer-bottom nav{display:flex;gap:20px;flex-wrap:wrap}\n.footer-bottom a{color:#b7ece2;text-decoration:underline;text-underline-offset:3px}\nbody[data-theme=\"light\"] .footer-help h2{color:#143d4c}\nbody[data-theme=\"light\"] .footer-help p,body[data-theme=\"light\"] .footer-steps span,body[data-theme=\"light\"] .footer-bottom{color:#3c5661}\nbody[data-theme=\"light\"] .footer-steps strong{color:#18665b}\nbody[data-theme=\"light\"] .footer-steps li:nth-child(2) strong{color:#80520e}\nbody[data-theme=\"light\"] .footer-steps li:nth-child(3) strong{color:#a63761}\nbody[data-theme=\"light\"] .footer-bottom{border-color:#d2dfe4}\nbody[data-theme=\"light\"] .footer-bottom a{color:#146b84}\n@media(max-width:760px){.wrap.hero,body[data-theme=\"light\"] .wrap.hero,body[data-theme=\"dark\"] .wrap.hero{padding:17px 14px 14px;margin-top:8px}.footer-steps{grid-template-columns:1fr;gap:10px}.footer-steps li{flex-direction:row;gap:9px}.footer-steps strong{flex:0 0 64px}.footer-steps span{min-width:0}.hero .hero-tools .filters{gap:6px}}\n"
 ].join('\n');
 
 function monogram(name){const parts=name.trim().split(/\s+/);return parts.length>1?parts.slice(0,2).map((s)=>s[0]).join('').toUpperCase():name.slice(0,2).toUpperCase();}
@@ -125,7 +127,7 @@ function card(s) {
 }
 function header(){
  return '<header class="top"><div class="wrap nav"><a class="brand" href="'+BASE+'/">Pulso<span>VE</span></a>'+
-   '<nav class="navlinks" aria-label="Navegación"><a href="'+BASE+'/">Inicio</a><a href="'+BASE+'/servicios/">'+catalog.length+' servicios</a><a href="'+BASE+'/creditos-marcas/">Logos y créditos</a></nav>'+
+   '<nav class="navlinks" aria-label="Navegación"><a href="'+BASE+'/">Inicio</a><a href="'+BASE+'/servicios/">Servicios</a></nav>'+
    '<button type="button" id="theme-toggle" class="theme-toggle" aria-label="Cambiar a modo oscuro" title="Cambiar a modo oscuro" aria-pressed="false"><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79Z"/></svg></button></div></header>';
 }
 
@@ -150,8 +152,15 @@ function layout(title,body,description){
  return '<!DOCTYPE html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">'+
   '<meta name="robots" content="noindex,nofollow"><title>'+escape(title)+' — PulsoVE</title>'+
   '<meta name="description" content="'+escape(description)+'"><style>'+CSS+'</style></head><body>'+header()+
-  '<main id="contenido">'+body+'</main><footer class="footer"><div class="wrap">PulsoVE · Gráficos ilustrativos, no indicadores de disponibilidad actual. '+
-  '<a href="'+BASE+'/creditos-marcas/">Créditos y marcas</a>.</div></footer>'+REPORT_MODAL+
+  '<main id="contenido">'+body+'</main><footer class="footer"><div class="wrap footer-inner">'+
+  '<section class="footer-help" id="ayuda" aria-labelledby="footer-help-title"><h2 id="footer-help-title">¿Cómo usar PulsoVE?</h2>'+
+  '<p>Busca un servicio, revisa su ficha y utiliza la opción de reportar cuando detectes un problema.</p>'+
+  '<ol class="footer-steps"><li><strong>Busca</strong><span>Selecciona una plataforma o escribe su nombre.</span></li>'+
+  '<li><strong>Revisa</strong><span>Consulta los detalles y el historial disponible.</span></li>'+
+  '<li><strong>Reporta</strong><span>Utiliza el botón rojo en la ficha del servicio.</span></li></ol></section>'+
+  '<div class="footer-bottom"><span>PulsoVE · Gráficos ilustrativos, no indicadores de disponibilidad actual.</span>'+
+  '<nav aria-label="Enlaces del pie de página"><a href="'+BASE+'/servicios/">Servicios</a>'+
+  '<a href="'+BASE+'/creditos-marcas/">Logos y créditos</a></nav></div></div></footer>'+REPORT_MODAL+
   '<script>const PREVIEW_ISSUES='+JSON.stringify(DEMO_REPORT_ISSUES).replace(/</g,'\\u003c')+';'+clientEnhance.toString()+';clientEnhance();'+demoChartInteraction.toString()+';demoChartInteraction();</script></body></html>';
 }
 function group(title,desc,items,id){
@@ -168,28 +177,20 @@ const homeSections=WORLDWIDE_SPOTLIGHT.map((section)=>({
 }));
 if(homeSections.length!==8||homeSections.some((s)=>s.items.length!==6))throw Error('All eight global spotlight groups need 6 items');
 
-const hero='<div class="wrap hero"><div class="hero-top"><div class="hero-copy"><div class="eyebrow">PULSOVE · FALLAS DE SERVICIOS Y APLICACIONES</div>'+
+const hero='<div class="wrap hero"><div class="hero-top"><div class="hero-copy">'+
 '<h1>¿Tu internet, banco o aplicación está fallando?</h1>'+
-'<p class="intro-lead">Encuentra servicios de Venezuela y del mundo, conoce sus funciones, explora sus fichas y descubre cómo consultar y compartir reportes de fallas.</p>'+
-'<div class="intro-actions"><a class="intro-primary" href="'+BASE+'/servicios/">Explorar servicios</a><a class="intro-secondary" href="#como-funciona">Cómo se usa</a></div>'+
-'<div class="intro-guide" id="como-funciona"><h2>En tres pasos</h2><ol class="intro-steps">'+
-'<li><strong>1 · Busca</strong><span>Elige tu internet, banco, juego o aplicación.</span></li>'+
-'<li><strong>2 · Revisa</strong><span>Consulta la información y los gráficos ilustrativos.</span></li>'+
-'<li><strong>3 · Reporta</strong><span>Conoce el formulario desde el botón rojo.</span></li>'+
-'</ol></div></div>'+
-'<div class="stats"><div class="stat"><strong>'+catalog.length+'</strong><small>Servicios del catálogo</small></div>'+
-'<div class="stat"><strong>'+categoriesSeed.length+'</strong><small>Categorías</small></div>'+
-'<div class="stat"><strong>'+homeSections.length*6+'</strong><small>Plataformas internacionales destacadas</small></div></div>'+
-'</div><div class="hero-tools"><div class="filters"><input id="quicksearch" type="search" class="input" placeholder="Buscar Gmail, Cloudflare, Fortnite… (/) " aria-label="Buscar entre tarjetas visibles">'+
+'<p class="intro-lead">Busca tu servicio y consulta su información en PulsoVE.</p>'+
+'</div></div><div class="hero-tools"><div class="filters"><input id="quicksearch" type="search" class="input" placeholder="Buscar un servicio, juego o aplicación…" aria-label="Buscar entre tarjetas visibles">'+
 '<button id="reset-home-search" class="reset-home-search" type="button" hidden>Limpiar</button>'+
-'<a class="chip" href="'+BASE+'/servicios/">Ver los '+catalog.length+' servicios</a></div>'+
+'<a class="chip" href="'+BASE+'/servicios/">Ver plataformas</a></div>'+
 '<div class="filters" role="group" aria-label="Filtrar destacados por tipo">'+
 '<button type="button" class="chip" data-home-filter="" aria-pressed="true">Todos</button>'+
 '<button type="button" class="chip" data-home-filter="nube-e-infraestructura" aria-pressed="false">Nube</button>'+
 '<button type="button" class="chip" data-home-filter="correo-y-productividad" aria-pressed="false">Correo</button>'+
 '<button type="button" class="chip" data-home-filter="videojuegos" aria-pressed="false">Videojuegos</button>'+
 '<button type="button" class="chip" data-home-filter="inteligencia-artificial" aria-pressed="false">IA</button>'+
-'</div><p class="home-search-status" id="home-search-count" aria-live="polite">60 servicios destacados</p></div></div>';
+'</div><p class="home-search-status" id="home-search-count" aria-live="polite">Destacados</p></div></div>';
+
 const officialSourcesPanel='<section class="group" id="microsoft-status"><div class="section-title"><h2>Estado oficial de Microsoft</h2></div>'+
 '<p class="hint">Estado oficial no consultado. Comprueba la fuente para ver información actual.</p>'+
 '<ul class="cards">'+MICROSOFT_FEEDS.map((feed)=>'<li class="card"><div class="card-link"><strong class="name">'+escape(feed.name)+'</strong>'+
@@ -203,7 +204,7 @@ const indexHtml=layout('Servicios y plataformas internacionales',indexBody,'Cons
 
 const options=categoriesSeed.map((cat)=>'<option value="'+escape(cat.slug)+'">'+escape(cat.name)+'</option>').join('');
 const dirBody='<div class="wrap directory"><div class="hero"><div class="eyebrow">Directorio completo</div>'+
-'<h1>Directorio de '+catalog.length+' plataformas</h1>'+
+'<h1>Plataformas y servicios</h1>'+
 '<p>Busca por plataforma, filtra por sector y organiza tus favoritos.</p>'+
 '<div class="filterbar"><input id="directory-search" class="input" type="search" placeholder="Buscar plataforma por nombre…" aria-label="Buscar plataformas">'+
 '<select id="category-filter" aria-label="Filtrar por categoría"><option value="">Todas las categorías</option>'+options+'</select>'+
@@ -263,7 +264,7 @@ function serviceDetailHtml(s){
         '</section>'+
       '<section class="profile-panel profile-wide"><h2>Historial de incidentes</h2>'+
         '<div class="profile-incident">Sin historial verificado disponible. No es posible confirmar que el servicio haya funcionado sin interrupciones.</div></section>'+
-    '</div><a class="profile-back" href="'+BASE+'/servicios/">Volver a los 211 servicios</a></div>';
+    '</div><a class="profile-back" href="'+BASE+'/servicios/">Volver a servicios</a></div>';
   return layout('Ficha de '+s.name,body,'Información de '+s.name+': empresa, principales usos y gráfico ilustrativo.');
 }
 
@@ -397,7 +398,7 @@ function clientEnhance(){
      group.hidden=visible===0;
    });
    const total=document.querySelector('#home-search-count');
-   if(total)total.textContent=count+' servicios destacados';
+   if(total)total.textContent=query||selected?count+' resultados':'Destacados';
    const empty=document.querySelector('#home-empty');
    if(empty)empty.hidden=count!==0;
    const reset=document.querySelector('#reset-home-search');
