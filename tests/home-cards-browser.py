@@ -64,6 +64,32 @@ with sync_playwright() as playwright:
         assert grid_columns == 2, f"Expected 2 columns at {width}px, got {grid_columns}"
         overflow = page.evaluate("document.documentElement.scrollWidth - window.innerWidth")
         assert overflow <= 2, f"Horizontal overflow at {width}px: {overflow}px"
+        geometry = cards.evaluate_all("""(items) => items.map(item => {
+          const card = item.querySelector('article');
+          const box = (node) => {
+            const r = node.getBoundingClientRect();
+            return {left:r.left, right:r.right, top:r.top, bottom:r.bottom, width:r.width, height:r.height};
+          };
+          return {
+            article:box(card),
+            toolbar:box(card.querySelector('[data-card-actions]')),
+            title:box(card.querySelector('[data-card-title]')),
+            logo:box(card.querySelector('[data-card-logo]')),
+            chart:box(card.querySelector('[data-card-trend]')),
+            alert:box(card.querySelector('a[aria-label^="Reportar falla"]')),
+            star:box(card.querySelector('button[aria-label*="favoritos"]'))
+          };
+        })""")
+        for rect in geometry:
+            assert rect["toolbar"]["bottom"] <= rect["title"]["top"] + 1, (width, "toolbar/title collision")
+            assert rect["title"]["bottom"] <= rect["logo"]["top"] + 1, (width, "title/logo collision")
+            assert rect["logo"]["bottom"] <= rect["chart"]["top"] + 30, (width, "logo/chart collision")
+            assert rect["alert"]["right"] + 1 <= rect["star"]["left"], (width, "buttons collide")
+            assert rect["chart"]["width"] >= rect["article"]["width"] - 42, (width, "chart too narrow")
+            assert abs(rect["chart"]["height"] - 60) <= 1, (width, "chart heights differ")
+        assert max(x["chart"]["width"] for x in geometry) - min(x["chart"]["width"] for x in geometry) < 1, (
+            width, "Charts in a row must have identical widths"
+        )
 
     page.set_viewport_size({"width": 390, "height": 844})
     star = page.get_by_role("button", name="Añadir CANTV a favoritos")
