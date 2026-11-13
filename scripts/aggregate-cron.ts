@@ -9,7 +9,7 @@
  * (ver docs/00-PLAN-MAESTRO.md, pendientes de la Etapa 3).
  */
 import 'dotenv/config';
-import { and, eq } from 'drizzle-orm';
+import { and, eq, isNull } from 'drizzle-orm';
 import { db } from '../src/lib/db/client';
 import { services, aggregatedWindows } from '../src/lib/db/schema';
 import { aggregateWindow } from '../src/lib/engine/aggregate';
@@ -66,7 +66,11 @@ async function main() {
     const [current] = await db
       .select({ uniqueReporters: aggregatedWindows.uniqueReporters })
       .from(aggregatedWindows)
-      .where(and(eq(aggregatedWindows.serviceId, service.id), eq(aggregatedWindows.windowStart, windowStart)))
+      .where(and(
+        eq(aggregatedWindows.serviceId, service.id),
+        isNull(aggregatedWindows.stateId),
+        eq(aggregatedWindows.windowStart, windowStart),
+      ))
       .limit(1);
 
     const lifecycle = await updateIncidentLifecycle(
@@ -74,6 +78,7 @@ async function main() {
       windowStart,
       result.confidence,
       current?.uniqueReporters ?? 0,
+      windowMinutes,
     );
     if (lifecycle.action !== 'none') {
       incidentActions.push(`${service.name}: ${lifecycle.action} (confianza ${result.confidence.toFixed(1)})`);

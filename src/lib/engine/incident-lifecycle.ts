@@ -1,4 +1,4 @@
-import { and, desc, eq, gte, isNull, ne } from 'drizzle-orm';
+import { and, desc, eq, gte, isNull, lte, ne } from 'drizzle-orm';
 import { db } from '@/lib/db/client';
 import { incidents, incidentRegions, aggregatedWindows } from '@/lib/db/schema';
 
@@ -10,6 +10,34 @@ const MIN_CONSECUTIVE_WINDOWS = Number(process.env.INCIDENT_MIN_CONSECUTIVE_WIND
 // Evita que un solo reportante (o un hash duplicado) abra un incidente por
 // sí solo (brief, sección 9.7: "diversidad de reportantes suficiente").
 const MIN_UNIQUE_REPORTERS = Number(process.env.INCIDENT_MIN_UNIQUE_REPORTERS ?? 2);
+
+export interface ScoredWindow {
+  windowStart: Date;
+  confidence: number;
+}
+
+/**
+ * Only fully scored, uninterrupted windows may open, escalate or resolve
+ * incidents. An outage in the job scheduler must not make two distant
+ * samples look consecutive.
+ */
+export function consecutiveConfidenceWindows(
+  windows: readonly ScoredWindow[],
+  currentStart: Date,
+  windowMinutes: number,
+  expectedCount: number,
+  predicate: (confidence: number) => boolean,
+): boolean {
+  if (!Number.isInteger(windowMinutes) || windowMinutes <= 0
+      || !Number.isInteger(expectedCount) || expectedCount < 1
+      || !Number.isFinite(currentStart.getTime())
+      || windows.length < expectedCount) return false;
+  const interval = windowMinutes * 60_000;
+  return windows.slice(0, expectedCount).every((window, index) =>
+    Number.isFinite(window.confidence) && predicate(window.confidence)
+    && window.windowStart.getTime() === currentStart.getTime() - index * interval
+  );
+}
 
 function severityForConfidence(confidence: number): string {
   if (confidence >= 85) return 'critical';
@@ -51,6 +79,7 @@ export async function updateIncidentLifecycle(
   windowStart: Date,
   confidence: number,
   uniqueReporters: number,
+  windowMinutes: number,
 ): Promise<LifecycleResult> {
   const [openIncident] = await db
     .select()
@@ -62,15 +91,23 @@ export async function updateIncidentLifecycle(
   const recentWindows = await db
     .select({ confidence: aggregatedWindows.confidence, windowStart: aggregatedWindows.windowStart })
     .from(aggregatedWindows)
-    .where(and(eq(aggregatedWindows.serviceId, serviceId), isNull(aggregatedWindows.stateId)))
+    .where(and(
+      eq(aggregatedWindows.serviceId, serviceId),
+      isNull(aggregatedWindows.stateId),
+      lte(aggregatedWindows.windowStart, windowStart),
+      gte(aggregatedWindows.windowStart,
+        new Date(windowStart.getTime() - (MIN_CONSECUTIVE_WINDOWS - 1) * windowMinutes * 60_000)),
+    ))
     .orderBy(desc(aggregatedWindows.windowStart))
     .limit(MIN_CONSECUTIVE_WINDOWS);
 
   const shouldOpenOrEscalate =
     confidence >= OPEN_THRESHOLD &&
     uniqueReporters >= MIN_UNIQUE_REPORTERS &&
-    recentWindows.length >= MIN_CONSECUTIVE_WINDOWS &&
-    recentWindows.every((w) => w.confidence >= OPEN_THRESHOLD);
+    consecutiveConfidenceWindows(
+      recentWindows, windowStart, windowMinutes, MIN_CONSECUTIVE_WINDOWS,
+      (score) => score >= OPEN_THRESHOLD,
+    );
 
   if (shouldOpenOrEscalate) {
     const status = confidence >= 85 ? 'high_confidence' : confidence >= 70 ? 'detected' : 'possible';
@@ -110,8 +147,10 @@ export async function updateIncidentLifecycle(
   }
 
   if (openIncident && confidence < CLOSE_THRESHOLD) {
-    const allLow =
-      recentWindows.length >= MIN_CONSECUTIVE_WINDOWS && recentWindows.every((w) => w.confidence < CLOSE_THRESHOLD);
+    const allLow = consecutiveConfidenceWindows(
+      recentWindows, windowStart, windowMinutes, MIN_CONSECUTIVE_WINDOWS,
+      (score) => score < CLOSE_THRESHOLD,
+    );
 
     if (allLow) {
       await db
