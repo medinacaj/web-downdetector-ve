@@ -55,6 +55,23 @@ describe('service editorial profile', () => {
     }
   });
 
+  it('uses verified corporate references for Banesco, BNC and Digitel', () => {
+    const cases = [
+      ['banesco', 'banesco.com'],
+      ['bnc', 'banconacionaldecredito.com.ve'],
+      ['digitel', 'digitel.com.ve'],
+    ];
+    for (const [slug, domain] of cases) {
+      const item = servicesSeed.find((service) => service.slug === slug);
+      expect(item, slug).toBeDefined();
+      const profile = getServiceProfile({ slug, categoryName: 'Servicios', description: item!.description });
+      expect(profile.provider, slug).toBeTruthy();
+      expect(profile.companyOverview.length, slug).toBeGreaterThan(160);
+      expect(profile.mainUses, slug).toHaveLength(4);
+      expect(profile.sourceUrl, slug).toContain(domain);
+    }
+  });
+
   it('uses a transparent fallback rather than guessing unknown providers', () => {
     const p = getServiceProfile({ slug: 'unknown-service', categoryName: 'Servicios', description: null });
     expect(p.provider).toBeNull();
