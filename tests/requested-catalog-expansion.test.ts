@@ -15,7 +15,7 @@ describe('catálogo ampliado solicitado: Chile, Venezuela e internacional', () =
     expect(new Set(slugs).size).toBe(servicesSeed.length);
   });
 
-  it('concilia todos los 649 nombres solicitados, sin duplicar marcas', () => {
+  it('concilia todos los 650 renglones solicitados, sin duplicar marcas', () => {
     let requested = 0;
     const sources = new Set<string>();
     for (const { source, groups } of requestedGroups) {
@@ -31,7 +31,7 @@ describe('catálogo ampliado solicitado: Chile, Venezuela e internacional', () =
         }
       }
     }
-    expect(requested).toBe(649); // 149 Chile (Mercado Libre aparece dos veces), 81 VE, 419 global
+    expect(requested).toBe(650); // 150 Chile (Mercado Libre aparece dos veces), 81 VE, 419 global
     expect([...sources]).toEqual(['Chile', 'Venezuela', 'Internacional']);
   });
 
