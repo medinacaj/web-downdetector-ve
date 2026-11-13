@@ -9,9 +9,7 @@ existente: identidad visual, arquitectura, código y metodología propios.
 **Estado del código (13/11/2026):** catálogo ampliado a 579 fichas, 18 categorías y 47 tipos de problema. La aplicación Next.js dispone de reportes, incidentes, mapas, estadísticas y metodología para trabajar con una base PostgreSQL; el sitio GitHub Pages es solo una demostración sin backend.
 Ver `docs/00-PLAN-MAESTRO.md` y `docs/CATALOGO-SERVICIOS.md` para arquitectura, criterios de incorporación y restricciones de cobertura.
 
-**Todavía no está listo para publicarse:** falta la capa de SEO técnico
-(`robots.txt`, `sitemap.xml`, canonical, Open Graph, favicon, datos
-estructurados y dominio). Ver `docs/SEO-PENDIENTE.md`.
+**Aún no está aprobado para indexación ni publicación productiva:** ya existen `src/app/robots.ts`, `src/app/sitemap.ts`, `src/lib/seo.ts` y metadatos Open Graph en `src/app/layout.tsx`. La indexación sigue deshabilitada por defecto y solo se habilita explícitamente con `SITE_URL` válido y `PUBLIC_INDEXABLE=true`. Faltan favicon, revisar datos estructurados, verificar salida HTTP/SEO en un entorno real, configurar dominio y decidir cuándo permitir indexación. La auditoría original de octubre en `docs/SEO-PENDIENTE.md` es una referencia histórica, no una lista vigente de funcionalidades ausentes.
 
 ## Qué existe hoy
 
@@ -108,9 +106,7 @@ ya instalado, sin usar), mapa nacional (cartograma — los datos
 global, estadísticas, metodología completa. El formulario de reporte
 funciona pero sin Turnstile ni geolocalización (Etapa 5).
 
-SEO técnico e indexación: `robots.txt`, `sitemap.xml`, canonical, Open
-Graph, favicon, datos estructurados, dominio y la decisión de indexar o no
-mientras todo sea demostrativo (`docs/SEO-PENDIENTE.md`).
+SEO e indexación: los endpoints de robots/sitemap, utilidades canonical y Open Graph existen, pero deben probarse con URL aprobada; favicon, datos estructurados, dominio y la decisión de indexar siguen pendientes de cierre (`docs/SEO-PENDIENTE.md`).
 
 Panel administrativo, autenticación, tiempo real, mediciones técnicas
 activas (sección 10 del brief), moderación — Etapas 5 en adelante. Las
