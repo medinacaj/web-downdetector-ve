@@ -65,7 +65,7 @@ const SOURCES = [
 
 const ADDITIONAL_SOURCES = servicesSeed.filter((service) => isAdditionalLogo(service.slug)).map((service) => {
   const source = brandLogoSource(service.slug, logoForService(service.slug) ?? '');
-  return { name: service.name, url: source.url, provider: source.provider };
+  return { name: service.name, url: source.url, provider: source.provider, licenseUrl: source.licenseUrl };
 });
 
 export default function CreditsPage() {
@@ -89,6 +89,11 @@ export default function CreditsPage() {
                 className="text-brand-600 underline underline-offset-2 hover:text-brand-700">
                 Archivo y derechos · {item.provider}
               </a>
+              {'licenseUrl' in item && item.licenseUrl && (
+                <span className="block text-xs text-ink-muted">
+                  <a href={item.licenseUrl} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2">Consultar licencia del recurso</a>
+                </span>
+              )}
               {'license' in item && (
                 <span className="block text-xs text-ink-muted">
                   Obra atribuida a Banesco: conversión de formato a PNG sin redibujar la marca.
