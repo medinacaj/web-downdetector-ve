@@ -10,7 +10,7 @@ export const chileGroups = {
   "videojuegos": "Steam;PlayStation Network;Xbox Live;Nintendo Switch Online;Epic Games;Riot Games;Electronic Arts (EA);Ubisoft Connect;Battle.net;Rockstar Games;Fortnite;Valorant;League of Legends;Roblox;Minecraft;Call of Duty;FIFA / EA Sports FC;Apex Legends;Counter-Strike 2;Overwatch 2;Genshin Impact;World of Warcraft;Grand Theft Auto Online;Dota 2;Rocket League;PUBG;Free Fire;Brawl Stars;Clash Royale;Pokémon GO",
   "delivery-y-movilidad": "Uber;Uber Eats;PedidosYa;Rappi;DiDi;Cabify",
   "viajes-y-turismo": "Airbnb;Booking.com;LATAM Airlines;Sky Airline;JetSMART",
-  "comercio-global": "Mercado Libre;Mercado Libre;Falabella;Ripley;Paris;AliExpress;Amazon;Shein;Temu;Lider (Walmart);Jumbo;Santa Isabel;Tottus;Sodimac;Easy",
+  "comercio-global": "Mercado Libre;Mercado Libre;Shopify;Falabella;Ripley;Paris;AliExpress;Amazon;Shein;Temu;Lider (Walmart);Jumbo;Santa Isabel;Tottus;Sodimac;Easy",
   "salud-y-farmacias": "Cruz Verde;Salcobrand;Farmacias Ahumada",
   "servicios-publicos": "SII (Servicio de Impuestos Internos);Registro Civil;ClaveÚnica;Fonasa;ChileAtiende",
   "logistica-y-envios": "CorreosChile;Chilexpress"
