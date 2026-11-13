@@ -80,6 +80,25 @@ describe('Local brand logo inventory', () => {
     }
   });
 
+  it('uses source-backed local assets for five Venezuelan services', () => {
+    const cases = [
+      ['cashea', 'Lawnicons'],
+      ['bnc', 'Arcticons'],
+      ['ridery', 'Arcticons'],
+      ['zinli', 'Arcticons'],
+      ['zupper', 'Arcticons'],
+    ];
+    for (const [slug, provider] of cases) {
+      const path = logoForService(slug);
+      expect(path).toBe('/brands/' + slug + '.svg');
+      const source = brandLogoSource(slug, path!);
+      expect(source.provider).toContain(provider);
+      expect(source.url).toContain(slug + '.svg');
+      expect(source.licenseUrl).toMatch(/^https:\/\/github\.com\//);
+      expect(isAdditionalLogo(slug)).toBe(true);
+    }
+  });
+
   it('keeps an honest fallback for missing/unchecked brands', () => {
     expect(logoForService('seniat')).toBeNull();
     expect(logoForService('no-existe')).toBeNull();
