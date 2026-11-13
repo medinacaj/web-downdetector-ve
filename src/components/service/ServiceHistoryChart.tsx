@@ -6,7 +6,7 @@ import {
   ResponsiveContainer, Tooltip, XAxis, YAxis,
 } from 'recharts';
 import {
-  incidentInBucket, type HistoryPeriod, type HistoryPoint, type ServiceHistory,
+  historyIndexFromLabel, incidentInBucket, type HistoryPeriod, type HistoryPoint, type ServiceHistory,
 } from '@/lib/queries/service-history-series';
 
 const PERIODS: readonly HistoryPeriod[] = ['24h', '7d', '30d', '90d'];
@@ -126,8 +126,8 @@ export function ServiceHistoryChart({
             <ResponsiveContainer width="100%" height="100%">
               <ComposedChart data={points} margin={{ top: 15, right: 10, bottom: 5, left: -18 }}
                 onClick={(state) => {
-                  const index = state?.activeTooltipIndex;
-                  if (typeof index === 'number' && index >= 0 && index < points.length) setSelected(index);
+                  const index = historyIndexFromLabel(points, state?.activeLabel);
+                  if (index >= 0) setSelected(index);
                 }}>
                 <defs><linearGradient id={`fill-${chartId}`} x1="0" y1="0" x2="0" y2="1">
                   <stop offset="0%" stopColor="#00a994" stopOpacity={0.32}/>
