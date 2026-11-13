@@ -44,7 +44,8 @@ async function main() {
   console.log(`      ${aggregated.length} servicios agregados`);
 
   console.log('  2/4 recalculando líneas base...');
-  const { bucketsUpdated } = await recomputeBaselines(at);
+  // Score this interval against historical windows strictly BEFORE it.
+  const { bucketsUpdated } = await recomputeBaselines(windowStart);
   console.log(`      ${bucketsUpdated} buckets (servicio×estado×día×hora) actualizados`);
 
   console.log('  3/4 puntuando anomalías...');
