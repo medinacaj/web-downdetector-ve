@@ -15,7 +15,7 @@ import { brandLogoSource } from '../src/lib/brand-logo-sources.ts';
 import { MICROSOFT_FEEDS } from '../src/lib/official-status/microsoft-rss.ts';
 import { getServiceProfile } from '../src/lib/catalog/service-profiles.ts';
 
-const BASE='/web-downdetector-ve';
+const BASE='/web-pulso-ve';
 const OUTPUT='pages-global-demo';
 const escape=(v)=>String(v).replace(/[&<>"']/g,(ch)=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
 const categoryNames=new Map(categoriesSeed.map((c)=>[c.slug,c.name]));
