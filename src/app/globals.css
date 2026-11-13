@@ -93,3 +93,54 @@ body {
 .dark .home-featured-band { background: linear-gradient(142deg, rgb(17 51 78 / .72), rgb(49 31 71 / .48)); }
 .dark .home-platform-band { background: linear-gradient(130deg, rgb(16 48 69 / .54), rgb(43 30 67 / .42)); }
 @media (prefers-reduced-motion: reduce) { .service-tile:hover { transform: none; } }
+
+/* PulsoVE observatory: a single strong hero, quiet sections, clear report controls. */
+.home-hero {
+  background: #14243e;
+  border-color: #263d5d;
+  color: #f7fbff;
+}
+.home-hero h1 {
+  max-width: 630px;
+  color: #fff;
+  font-weight: 750;
+  letter-spacing: -.04em;
+}
+.home-hero p { color: #c2d3e2; }
+.home-hero a:not([class*="bg-"]) { color: #a6e6de; }
+.home-hero > div { padding-top: 50px; padding-bottom: 50px; }
+.home-hero > div > div:last-child {
+  border-radius: 16px;
+  border-color: #d8e4ee;
+  box-shadow: 0 8px 32px rgb(4 17 33 / .12);
+}
+.home-hero > div > div:last-child p { color: rgb(var(--ink-muted)); }
+.home-featured-band, .dark .home-featured-band {
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid rgb(var(--border));
+  border-radius: 0;
+}
+.home-platform-band, .dark .home-platform-band {
+  background: rgb(var(--surface) / .48);
+  border-top: 1px solid rgb(var(--border));
+}
+.service-tile {
+  border-top: 3px solid var(--tile-accent);
+  background: rgb(var(--surface));
+  background-image: none;
+  border-radius: 14px;
+  box-shadow: 0 2px 10px rgb(14 31 49 / .06);
+}
+.service-tile:hover, .service-tile:focus-within {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px rgb(13 29 47 / .13);
+}
+.service-tile-actions { background: rgb(var(--bg) / .5); }
+@media (max-width: 639px) {
+  .home-hero > div { padding-top: 34px; padding-bottom: 34px; }
+  .home-hero h1 { font-size: 30px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .service-tile:hover { transform: none; }
+}
