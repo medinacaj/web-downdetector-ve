@@ -24,8 +24,8 @@ if(actualLogos !== expectedLogos) throw Error('Logo inventory mismatch: build='+
 for(const file of [homepage,directory]){
   if(!file.includes('Cloudflare')||!file.includes('Gmail')||!file.includes('Outlook')||!file.includes('Fortnite'))
     throw Error('Required global services absent');
-  if(!file.includes('VISTA PREVIA PÚBLICA')||!file.includes('Gráficos ficticios de ejemplo'))
-    throw Error('Demo warning absent');
+  if(!file.includes('Gráficos ilustrativos, no indicadores de disponibilidad actual'))
+    throw Error('Neutral disclosure of illustrative charts missing');
   if(!file.includes('noindex,nofollow'))throw Error('Demo must not be search-indexed');
   if(!file.includes('.monogram[hidden]{display:none!important}')) throw Error('Logo and monogram visibility must be mutually exclusive');
   if(!file.includes('id="demo-report-dialog"')||!file.includes('data-report=')||!file.includes('no envía ni almacena reportes'))
@@ -47,7 +47,7 @@ for(const entry of profiles){
      !detail.includes('demoChartInteraction()')||
      !detail.includes('Ficha de la plataforma')||!detail.includes('Proveedor o fabricante')||!detail.includes('Tipo de servicio')||
      !detail.includes('Historial de incidentes')||!detail.includes('Gráfica detallada de reportes')||
-     !detail.includes('datos simulados')||!detail.includes('noindex,nofollow'))
+     !detail.includes('Gráfico ilustrativo, sin reportes ni métricas reales de disponibilidad.')||!detail.includes('noindex,nofollow'))
     throw Error('Service page lacks essential disclosure or details: '+entry.name);
   if(/DATABASE_URL|ANONYMIZATION_SALT|postgresql:|authorization:\s*Bearer/i.test(detail))
     throw Error('Potential private server reference in '+entry.name);
@@ -59,7 +59,7 @@ for(const entry of profiles){
 for(const slug of ['cloudflare','gmail','outlook','fortnite']){
   const page=html(join('servicios',slug,'index.html'));
   if(!page.includes('id="profile-name"')||!page.includes('class="profile-tags"')) throw Error('Missing branded profile for '+slug);
-  if(!page.includes('Consultar la fuente')||!page.includes('https://')||!page.includes('Sin datos reales suficientes'))
+  if(!page.includes('Consultar la fuente')||!page.includes('https://')||!page.includes('Estado actual no consultado'))
     throw Error('Curated company information missing for '+slug);
 }
 if(!homepage.includes('Nube e infraestructura')||!homepage.includes('Videojuegos y plataformas de juego'))
@@ -78,11 +78,16 @@ if(!homepage.includes('.card>a.card-link::after') ||
    !directory.includes('.card>a.card-link::after') ||
    !homepage.includes('.card>.card-actions button{pointer-events:auto}'))
   throw Error('Detail link must cover each card without hijacking action buttons');
-if(!homepage.includes('VISTA PREVIA PÚBLICA')||!directory.includes('VISTA PREVIA PÚBLICA'))
-  throw Error('Global synthetic preview disclosure required');
+if(homepage.includes('VISTA PREVIA PÚBLICA')||directory.includes('VISTA PREVIA PÚBLICA')||
+   homepage.includes('Estás viendo una demostración')||homepage.includes('☼ Vista'))
+  throw Error('Redundant preview marketing notices or text-based theme controls remain');
 if(!homepage.includes('id="theme-toggle"')||!homepage.includes('data-home-filter=')||
    !homepage.includes('id="home-search-count"')||!homepage.includes('id="home-empty"'))
   throw Error('Home filter and visual mode controls missing');
+if(!homepage.includes('id="theme-toggle" class="theme-toggle" aria-label="Cambiar a modo oscuro"')||
+   !homepage.includes('.theme-toggle svg{display:block;pointer-events:none}')||
+   !homepage.includes('themeToggle.setAttribute(\'aria-label\',label)'))
+  throw Error('Theme switch must use only an accessible icon in the top header');
 if(!directory.includes('id="directory-sort"')||!directory.includes('id="favorites-only"'))
   throw Error('Directory interactive sorting/favorites missing');
 if(directory.indexOf('class="card-link"')>directory.indexOf('class="card-actions"'))
@@ -95,12 +100,12 @@ if(!homepage.includes('.card{border:0;border-top:0;border-radius:13px;box-shadow
 if(!homepage.includes('.wrap.hero,body[data-theme="light"] .wrap.hero{border:0;border-radius:16px;box-shadow:0 8px 26px'))
   throw Error('Hero should be rounded with subtle depth and no colored frame');
 if(!homepage.includes('¿Tu internet, banco o aplicación está fallando?') ||
-   !homepage.includes('Estás viendo una demostración:') ||
+   homepage.includes('Estás viendo una demostración:') ||
    !homepage.includes('En tres pasos') ||
-   !homepage.includes('esta demo no se envían datos') ||
+   !homepage.includes('Gráficos ilustrativos, no indicadores de disponibilidad actual') ||
    !homepage.includes('href="#como-funciona"') ||
    !homepage.includes('class="intro-primary" href="/web-downdetector-ve/servicios/"'))
-  throw Error('Static homepage must explain the purpose and distinguish preview from live monitoring');
+  throw Error('Static homepage must explain the purpose while keeping a compact data disclaimer');
 if((homepage.match(/class="intro-steps"/g)||[]).length!==1 ||
    (homepage.match(/<li><strong>[123] · /g)||[]).length!==3)
   throw Error('First-time visitors need a single, accessible three-step guide');
