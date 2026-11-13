@@ -18,7 +18,7 @@ export async function getServiceDetailData(slug: string) {
   const service = await getServiceBySlug(slug);
   if (!service || !service.active) return null;
 
-  const [statusDetail, issueTypeOptions, issueBreakdown, recentIncidents, history] = await Promise.all([
+  const [statusDetail, issueTypeOptions, history, issueBreakdown, recentIncidents] = await Promise.all([
     getServiceStatusDetail(service.id),
     getIssueTypesForCategory(service.category.id),
     getServiceHistory(service.id),
