@@ -70,9 +70,11 @@ if(directory.indexOf('class="card-link"')>directory.indexOf('class="card-actions
   throw Error('Actions must be after full-width service title and chart');
 if(!homepage.includes('--plot:#146e97')||!homepage.includes('--plot:#b95177'))
   throw Error('Charts must retain distinct category colors');
-if(!homepage.includes('.card,.card:hover,.card:focus-within{border:0;border-radius:0;box-shadow:none') ||
-   !homepage.includes('.wrap.hero,body[data-theme="light"] .wrap.hero{background:#152c33;color:#fff;border:0;border-radius:0;box-shadow:none'))
-  throw Error('Editorial style must have borderless, shadowless service tiles and a flat masthead');
+if(!homepage.includes('.card{border:0;border-top:0;border-radius:13px;box-shadow:0 3px 12px') ||
+   !homepage.includes('.card:hover,.card:focus-within{border:0;border-top:0;border-radius:13px;box-shadow:0 8px 23px'))
+  throw Error('Cards should have rounded corners, subtle shadows, but never a colored top border');
+if(!homepage.includes('.wrap.hero,body[data-theme="light"] .wrap.hero{border:0;border-radius:16px;box-shadow:0 8px 26px'))
+  throw Error('Hero should be rounded with subtle depth and no colored frame');
 if((homepage.match(/class="section-index"/g)||[]).length!==9)
   throw Error('Numbered editorial sections missing');
 if(homepage.includes('linear-gradient('))

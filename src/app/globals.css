@@ -89,18 +89,23 @@ body {
 .service-tile {
   --tile-accent: #16787f;
   border: 0 !important;
-  border-radius: 0 !important;
+  border-top: 0 !important;
+  border-radius: 13px !important;
   background: rgb(var(--surface));
   background-image: none;
-  box-shadow: none !important;
-  transition: background .16s ease;
+  box-shadow: 0 3px 12px rgb(19 39 44 / .11) !important;
+  transition: background .18s ease, box-shadow .18s ease, transform .18s ease;
 }
 .service-tile:hover, .service-tile:focus-within {
   background: #e4f0ee;
-  transform: none;
-  box-shadow: none !important;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 23px rgb(19 39 44 / .17) !important;
 }
-.dark .service-tile:hover, .dark .service-tile:focus-within { background: #2b4445; }
+.dark .service-tile { box-shadow: 0 4px 15px rgb(0 0 0 / .23) !important; }
+.dark .service-tile:hover, .dark .service-tile:focus-within {
+  background: #2b4445;
+  box-shadow: 0 9px 25px rgb(0 0 0 / .3) !important;
+}
 .service-tile-chart, .service-tile-cta { color: var(--tile-accent); }
 .service-tile-cta { white-space: nowrap; }
 .service-tile-actions { border: 0; background: transparent; }
