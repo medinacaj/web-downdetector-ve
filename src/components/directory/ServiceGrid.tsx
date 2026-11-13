@@ -75,7 +75,7 @@ export function ServiceGrid({ services }: { services: DirectoryService[] }) {
       ) : view === 'list' ? (
         <ul className="divide-y divide-border overflow-hidden rounded-xl border border-border bg-surface" data-directory-list>
           {visible.map((s) => (
-            <li key={s.slug} className="relative flex min-w-0 items-center transition-colors hover:bg-bg">
+            <li key={s.slug} data-rapid-surge={s.surgeScore > 0 ? 'true' : 'false'} className="relative flex min-w-0 items-center transition-colors hover:bg-bg">
               <Link
                 href={`/servicios/${encodeURIComponent(s.slug)}`}
                 aria-label={`Ver estado y reportes de ${s.name}`}
@@ -84,6 +84,7 @@ export function ServiceGrid({ services }: { services: DirectoryService[] }) {
                 <div className="min-w-0">
                   <p className="truncate font-medium">{s.name}</p>
                   <p className="text-xs text-ink-muted">{s.categoryName}</p>
+                  {s.surgeScore > 0 && <p className="mt-1 text-xs font-medium text-brand-600">↗ Reportes en aumento</p>}
                 </div>
                 <div className="flex shrink-0 flex-wrap items-center justify-end gap-2 sm:gap-4">
                   <span className="font-mono text-xs text-ink-muted tabular-nums">
@@ -101,7 +102,7 @@ export function ServiceGrid({ services }: { services: DirectoryService[] }) {
       ) : (
         <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3" data-directory-grid>
           {visible.map((s) => (
-            <li key={s.slug} className="relative flex min-w-0 flex-col rounded-xl border border-border bg-surface shadow-sm transition-[box-shadow,background-color] hover:bg-bg hover:shadow-md">
+            <li key={s.slug} data-rapid-surge={s.surgeScore > 0 ? 'true' : 'false'} className="relative flex min-w-0 flex-col rounded-xl border border-border bg-surface shadow-sm transition-[box-shadow,background-color] hover:bg-bg hover:shadow-md">
               <Link
                 href={`/servicios/${encodeURIComponent(s.slug)}`}
                 aria-label={`Ver estado y reportes de ${s.name}`}
@@ -111,6 +112,7 @@ export function ServiceGrid({ services }: { services: DirectoryService[] }) {
                   <div className="min-w-0">
                     <p className="font-semibold">{s.name}</p>
                     <p className="text-xs text-ink-muted">{s.categoryName}</p>
+                  {s.surgeScore > 0 && <p className="mt-1 text-xs font-medium text-brand-600">↗ Reportes en aumento</p>}
                   </div>
                   <StatusBadge status={s.status} size="sm" />
                 </div>

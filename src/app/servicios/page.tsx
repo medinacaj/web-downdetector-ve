@@ -2,7 +2,10 @@ import type { Metadata } from 'next';
 import { getDirectoryServices, getCategories, type DirectorySort } from '@/lib/queries/directory';
 import { ViewToggleProvider } from '@/components/directory/ViewToggle';
 import { ServiceGrid } from '@/components/directory/ServiceGrid';
+import { HomeAutoRefresh } from '@/components/home/HomeAutoRefresh';
 import type { OperationalStatus } from '@/lib/engine/status-bands';
+
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: 'Servicios',
@@ -20,7 +23,7 @@ const STATUS_OPTIONS: { value: OperationalStatus; label: string }[] = [
 
 const SORT_OPTIONS: { value: DirectorySort; label: string }[] = [
   { value: 'alphabetical', label: 'Alfabético' },
-  { value: 'activity', label: 'Por actividad' },
+  { value: 'activity', label: 'Actividad reciente' },
   { value: 'stability', label: 'Por estabilidad' },
 ];
 
@@ -40,10 +43,17 @@ export default async function ServicesDirectoryPage({
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6">
+      {(!validSort || validSort === 'activity') && <HomeAutoRefresh />}
       <div className="flex items-baseline justify-between gap-4">
         <h1 className="font-display text-2xl font-semibold tracking-tight">Servicios</h1>
         <p className="font-mono text-sm text-ink-muted tabular-nums">{total} servicios</p>
       </div>
+      {(!validSort || validSort === 'activity') && (
+        <p className="mt-2 text-sm text-ink-muted">
+          Los aumentos repentinos de reportes aparecen primero. El orden se actualiza cada minuto;
+          esto no significa que exista una falla confirmada.
+        </p>
+      )}
 
       <form className="mt-6 grid min-w-0 gap-3 sm:grid-cols-2 lg:grid-cols-[minmax(0,2fr)_repeat(3,minmax(0,1fr))_auto]" action="/servicios">
         <label className="sr-only" htmlFor="q">
@@ -98,7 +108,7 @@ export default async function ServicesDirectoryPage({
         <select
           id="sort"
           name="sort"
-          defaultValue={validSort ?? 'alphabetical'}
+          defaultValue={validSort ?? 'activity'}
           className="w-full min-w-0 rounded-md border border-border bg-surface px-3 py-2 text-sm focus:border-pulse-500"
         >
           {SORT_OPTIONS.map((o) => (

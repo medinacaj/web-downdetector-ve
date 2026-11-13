@@ -3,6 +3,7 @@ import { db } from '@/lib/db/client';
 import { services, categories, reports, incidents } from '@/lib/db/schema';
 import { statusForService } from './status';
 import type { OperationalStatus } from '@/lib/engine/status-bands';
+import { getRecentSurgeScores } from './report-surges';
 
 export type DirectorySort = 'activity' | 'alphabetical' | 'stability';
 
@@ -13,6 +14,7 @@ export interface DirectoryService {
   categorySlug: string;
   categoryName: string;
   reportsLast24h: number;
+  surgeScore: number;
   incidentsAllTime: number;
   status: OperationalStatus;
 }
@@ -52,17 +54,25 @@ export async function getDirectoryServices(params: {
     .groupBy(services.id, categories.slug, categories.name)
     .orderBy(asc(services.name));
 
+  const surgeByServiceId = await getRecentSurgeScores();
   let withStatus: DirectoryService[] = await Promise.all(
-    rows.map(async ({ id, ...rest }) => ({ ...rest, status: await statusForService(id) })),
+    rows.map(async ({ id, ...rest }) => ({
+      ...rest,
+      surgeScore: surgeByServiceId.get(id) ?? 0,
+      status: await statusForService(id),
+    })),
   );
 
   if (params.status) {
     withStatus = withStatus.filter((s) => s.status === params.status);
   }
 
-  const sort = params.sort ?? 'alphabetical';
+  const sort = params.sort ?? 'activity';
   if (sort === 'activity') {
-    withStatus.sort((a, b) => b.reportsLast24h - a.reportsLast24h);
+    withStatus.sort((a, b) =>
+      (b.surgeScore - a.surgeScore)
+      || (b.reportsLast24h - a.reportsLast24h)
+      || a.name.localeCompare(b.name, 'es'));
   } else if (sort === 'stability') {
     withStatus.sort((a, b) => a.incidentsAllTime - b.incidentsAllTime || a.name.localeCompare(b.name));
   } else {

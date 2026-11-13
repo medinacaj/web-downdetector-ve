@@ -2,8 +2,12 @@ import Link from 'next/link';
 import { getHomeData } from '@/lib/queries/home';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { ServicePulseCard } from '@/components/home/ServicePulseCard';
+import { HomeAutoRefresh } from '@/components/home/HomeAutoRefresh';
 import { OfficialMicrosoftStatus } from '@/components/home/OfficialMicrosoftStatus';
 import { ROUTE, isRouteAvailable } from '@/lib/nav';
+
+// Citizen activity is time-sensitive and must not be served from a stale static page.
+export const dynamic = 'force-dynamic';
 
 function formatUpdatedAt(date: Date) {
   return new Intl.DateTimeFormat('es-VE', {
@@ -27,6 +31,7 @@ export default async function HomePage() {
 
   return (
     <>
+      <HomeAutoRefresh />
       {/* Hero — izquierda: el trabajo real (buscar); derecha: pulso nacional en vivo */}
       <section className="home-hero border-b border-border">
         <div className="mx-auto grid max-w-6xl gap-10 px-4 py-14 sm:px-6 lg:grid-cols-[1.1fr_0.9fr] lg:items-center lg:py-20">
@@ -159,11 +164,14 @@ export default async function HomePage() {
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.18em] text-pulse-600">Explora el pulso</p>
             <h2 id="home-services-title" className="mt-1 font-display text-xl font-semibold tracking-tight sm:text-2xl">
-              {data.hasAnyActivity ? 'Servicios con más reportes recientes' : 'Servicios de interés en Venezuela'}
+              {data.hasRapidSurge
+                ? 'Servicios con reportes en aumento'
+                : data.hasAnyActivity ? 'Servicios con más reportes recientes' : 'Servicios de interés en Venezuela'}
             </h2>
             <p className="mt-1 max-w-lg text-xs text-ink-muted sm:text-sm">
-              Consulta el estado, guarda favoritos en este navegador y revisa reportes de las últimas 24 horas.
-              Los gráficos reflejan datos registrados, no mediciones inventadas.
+              Si los reportes crecen de forma repentina, esos servicios suben al inicio.
+              El orden se actualiza cada minuto a partir de reportes ciudadanos no sospechosos.
+              Un aumento de reportes no confirma por sí solo una interrupción.
             </p>
           </div>
           <Link href="/servicios" className="shrink-0 pt-1 text-xs font-medium text-brand-600 underline-offset-4 hover:underline sm:text-sm">
