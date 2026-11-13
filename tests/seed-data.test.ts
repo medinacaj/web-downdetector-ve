@@ -52,7 +52,7 @@ describe('seed-data: integridad estructural', () => {
   });
 
   it('tipos de problema: categorySlug (cuando no es null) referencia una categoría real', () => {
-    const validSlugs = new Set(categoriesSeed.map((c) => c.slug));
+    const validSlugs = new Set<string>(categoriesSeed.map((c) => c.slug));
     for (const it of issueTypesSeed) {
       if (it.categorySlug !== null) {
         expect(validSlugs.has(it.categorySlug)).toBe(true);
