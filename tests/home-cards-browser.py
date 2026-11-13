@@ -377,6 +377,11 @@ with sync_playwright() as playwright:
     assert history.get_by_role("button", name="90d").count() == 1
     assert history.get_by_role("button", name="Barras").count() == 1
     assert history.get_by_role("button", name="Área").count() == 1
+    baseline_toggle = history.get_by_role("button", name="Comparar con actividad habitual")
+    assert baseline_toggle.count() == 1
+    assert history.get_by_text("Referencia histórica aún no disponible:", exact=False).count() == 1
+    assert baseline_toggle.is_disabled(), "Without sampled engine windows, do not invent a chart baseline"
+
     assert history.get_by_text("Sin reportes registrados en este periodo").count() == 1
     # A range brush with no plotted points is a non-functional control.
     # The date picker and keyboard interval navigation remain available.
