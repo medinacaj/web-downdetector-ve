@@ -19,8 +19,11 @@ if (!validLevels || data.error) {
   process.exitCode = 2;
 } else {
   const criticalOrHigh = levels.critical + levels.high;
+  const scope = process.env.AUDIT_SCOPE === 'all'
+    ? 'todas las dependencias (incluye desarrollo)'
+    : 'dependencias de producción';
   const summary = [
-    '## Auditoría de dependencias de producción (npm)',
+    '## Auditoría de ' + scope + ' (npm)',
     'Avisos detectados, no equivalentes a explotación confirmada:',
     ...['critical', 'high', 'moderate', 'low'].map((level) => '- ' + level + ': ' + levels[level]),
     '',
