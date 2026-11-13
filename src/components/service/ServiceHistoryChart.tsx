@@ -104,8 +104,10 @@ export function ServiceHistoryChart({
 
       <div className="mt-5 flex flex-wrap items-center justify-between gap-2">
         <p className="text-xs text-ink-muted">Selecciona un punto para consultar el intervalo y sus incidentes.</p>
-        <button type="button" aria-pressed={zoomEnabled} onClick={() => setZoomEnabled((current) => !current)}
-          className="rounded-md border border-border px-3 py-2 text-xs font-semibold text-ink hover:bg-bg focus-visible:outline-pulse-500">
+        <button type="button" aria-pressed={zoomEnabled} disabled={total === 0}
+          title={total === 0 ? 'El zoom requiere reportes registrados para mostrar un gráfico' : undefined}
+          onClick={() => setZoomEnabled((current) => !current)}
+          className="rounded-md border border-border px-3 py-2 text-xs font-semibold text-ink hover:bg-bg focus-visible:outline-pulse-500 disabled:cursor-not-allowed disabled:opacity-50">
           {zoomEnabled ? 'Ocultar selector de zoom' : 'Explorar rango / zoom'}
         </button>
       </div>
