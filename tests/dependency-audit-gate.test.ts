@@ -24,7 +24,8 @@ function runAudit(audit: unknown, options: { failOnHigh?: boolean; scope?: 'prod
 }
 
 function auditWith(high: number, critical: number) {
-  return { metadata: { vulnerabilities: { critical, high, moderate: 2, low: 1 } } };
+  // npm audit v2 includes both aggregate counts and a per-package map.
+  return { metadata: { vulnerabilities: { critical, high, moderate: 2, low: 1 } }, vulnerabilities: {} };
 }
 
 describe('Production dependency audit gate', () => {
