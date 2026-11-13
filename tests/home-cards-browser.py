@@ -49,6 +49,13 @@ with sync_playwright() as playwright:
         assert article.locator("[data-card-actions]").first.is_visible()
         assert article.locator("[data-card-actions]").evaluate("(el) => el.previousElementSibling?.tagName") == "A"
 
+    # Empty data is not an alert. The full text should stand on its own,
+    # without a tiny question-mark glyph that looks like a rendering error.
+    neutral = grid.get_by_text("Sin datos suficientes", exact=True)
+    assert neutral.count() >= 1
+    for label in neutral.all():
+        assert label.locator("..").locator("svg").count() == 0
+
     # Logos come from a reviewed, self-hosted allowlist; the browser must
     # never receive a broken external logo or a third-party tracking request.
     logo_images = grid.locator('img[alt^="Logotipo identificativo de"]')

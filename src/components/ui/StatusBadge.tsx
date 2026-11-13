@@ -6,7 +6,7 @@ interface StatusVisual {
   colorClass: string;
   dotClass: string;
   label: string;
-  icon: 'check' | 'trend-up' | 'trend-down' | 'alert' | 'question';
+  icon: 'check' | 'trend-up' | 'trend-down' | 'alert' | null;
 }
 
 const VISUALS: Record<ExtendedStatus, StatusVisual> = {
@@ -52,17 +52,17 @@ const VISUALS: Record<ExtendedStatus, StatusVisual> = {
     colorClass: 'text-ink-muted',
     dotClass: 'bg-ink-muted',
     label: 'Sin datos suficientes',
-    icon: 'question',
+    icon: null,
   },
   monitoring_unavailable: {
     colorClass: 'text-ink-muted',
     dotClass: 'bg-ink-muted',
     label: 'Monitoreo no disponible',
-    icon: 'question',
+    icon: null,
   },
 };
 
-const ICONS: Record<StatusVisual['icon'], React.ReactNode> = {
+const ICONS: Record<Exclude<StatusVisual['icon'], null>, React.ReactNode> = {
   check: (
     <path d="M20 6 9 17l-5-5" strokeLinecap="round" strokeLinejoin="round" />
   ),
@@ -75,13 +75,6 @@ const ICONS: Record<StatusVisual['icon'], React.ReactNode> = {
   alert: (
     <path
       d="M12 9v4m0 4h.01M10.29 3.86 1.82 18a1 1 0 0 0 .86 1.5h18.64a1 1 0 0 0 .86-1.5L13.71 3.86a1 1 0 0 0-1.72 0Z"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-  ),
-  question: (
-    <path
-      d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 2-3 4M12 17h.01"
       strokeLinecap="round"
       strokeLinejoin="round"
     />
@@ -100,9 +93,11 @@ export function StatusBadge({
 
   return (
     <span className={`inline-flex items-center gap-1.5 font-medium ${visual.colorClass} ${size === 'sm' ? 'text-xs' : 'text-sm'}`}>
-      <svg width={iconSize} height={iconSize} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-        {ICONS[visual.icon]}
-      </svg>
+      {visual.icon && (
+        <svg width={iconSize} height={iconSize} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+          {ICONS[visual.icon]}
+        </svg>
+      )}
       <span>{visual.label}</span>
     </span>
   );
