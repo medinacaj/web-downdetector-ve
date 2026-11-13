@@ -27,6 +27,12 @@ for(const file of [homepage,directory]){
 }
 if(!homepage.includes('Nube e infraestructura')||!homepage.includes('Videojuegos y plataformas de juego'))
   throw Error('Global homepage sections absent');
+if((homepage.match(/class="demo-chart"/g)||[]).length!==60)throw Error('Expected 60 clearly labelled illustrative charts on index');
+if((directory.match(/class="demo-chart"/g)||[]).length!==211)throw Error('Every catalogue card requires illustrative demo chart');
+if((homepage.match(/Ejemplo visual · datos simulados/g)||[]).length!==60)throw Error('Illustrative chart disclosure missing');
+if((directory.match(/Ejemplo visual · datos simulados/g)||[]).length!==211)throw Error('Catalogue chart disclosure missing');
+if((directory.match(/class="report-quick"/g)||[]).length!==211)throw Error('Expected one compact red report icon per card');
+if(!homepage.includes('.report-quick{position:absolute')||!homepage.includes('background:#dc2626'))throw Error('Report icon must be compact and red');
 if(!directory.includes('id="directory-cards"'))throw Error('Interactive directory missing');
 if(!credits.includes('Banesco'))throw Error('Brand credits missing');
 const files = readdirSync(join(root,'brands'));
