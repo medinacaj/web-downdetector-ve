@@ -126,3 +126,11 @@ body {
   .home-hero > div { padding-top: 32px; padding-bottom: 32px; }
   .home-hero h1 { font-size: 30px; }
 }
+
+/* Service detail: quiet elevation without decorative colored borders. */
+.service-detail-panel {
+  box-shadow: 0 2px 8px rgb(19 39 44 / .055), 0 12px 28px rgb(19 39 44 / .055);
+}
+.dark .service-detail-panel {
+  box-shadow: 0 4px 14px rgb(0 0 0 / .18);
+}
