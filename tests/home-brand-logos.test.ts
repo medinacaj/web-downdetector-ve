@@ -6,7 +6,7 @@ import { HOME_BRAND_LOGOS, logoForService } from '@/lib/brand-logos';
 describe('homepage editorial brand assets', () => {
   it('renders explicit local images for researched services, not external trackers', () => {
     const keys = Object.keys(HOME_BRAND_LOGOS);
-    expect(keys.length).toBe(165);
+    expect(keys.length).toBe(167);
     for (const [slug, path] of Object.entries(HOME_BRAND_LOGOS)) {
       expect(slug).toMatch(/^[a-z0-9]+(?:-[a-z0-9]+)*$/);
       expect(path).toMatch(/^\/brands\/[a-z0-9-]+\.(png|svg)$/);
