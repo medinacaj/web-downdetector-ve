@@ -60,3 +60,10 @@ Los gráficos distribuidos por Simple Icons usan licencia CC0 para la representa
 **Sin archivo aprobado (47 servicios):** Inter, NetUno, Fibex, VNET, Thundernet, Simple TV, Supercable, Airtek, G-Network, Mercantil, BBVA Provincial, BNC, Banco Digital de los Trabajadores, Bancamiga, Banco del Tesoro, Bancaribe, Banplus, Cashea, Ubii, Zinli, Reserve, Creska, Mony, Wally, Sistema Patria, Hidroven, SENIAT, SAIME, BCV, Call of Duty: Mobile, Yummy, PedidosYa, Zupper, Farmatodo, Yummy Rides, Ridery, Yango, 1xBet, Lotto Activo, La Granjita, Triple Táchira, Kino Táchira, Call of Duty: Warzone, EA app, AOL Mail, Mobile Legends, EA Sports FC. Estos no deben recibir logotipos de empresas distintas, variantes no verificadas o supuestos iconos oficiales creados por IA.
 
 **Normalización visual:** contenedor autocentrado y de contraste estable, `object-fit: contain` y medidas consistentes en portada, directorio y fichas. Las imágenes fallidas se reemplazan por un monograma, sin llamadas a terceros ni bloqueo de la página.
+
+
+## Mejora incremental: EA app · 13 de noviembre de 2026
+
+Se añadió el SVG original de **EA** obtenido de [Simple Icons (icono EA)](https://github.com/simple-icons/simple-icons/blob/develop/icons/ea.svg) como identificador del **editor de EA app**. La ilustración distribuida por Simple Icons se publica bajo CC0, sin transferir los derechos de marca de Electronic Arts. No se representa como logotipo específico de la aplicación ni se afirma asociación con EA.
+
+La cobertura pasa de **164 a 165 recursos locales de 211 servicios (78,2 %)**; **46 servicios** siguen con monograma hasta contar con archivos y procedencia verificables. Las cifras históricas anteriores se conservan para trazabilidad.

@@ -1,7 +1,7 @@
 /** Source attribution for local brand assets. A logo is not an availability signal. */
 export type LogoProvenance = {provider: string; url: string; licenseUrl?: string};
 /** Additional SVGs copied from Simple Icons' CC0 graphic library. */
-export const ADDITIONAL_SIMPLE_ICONS = new Set(["aliexpress","ebay","tumblr","youtube-music","binance","messenger","hbo-max","digitalocean","cloudinary","riot-games","quora","revolut","western-union","cash-app","venmo","lyft","uber-eats","doordash","openrouter","poe","google-docs","icloud-mail","counter-strike-2","battle-net","gmx-mail","ubisoft-connect"]);
+export const ADDITIONAL_SIMPLE_ICONS = new Set(["ea-app","aliexpress","ebay","tumblr","youtube-music","binance","messenger","hbo-max","digitalocean","cloudinary","riot-games","quora","revolut","western-union","cash-app","venmo","lyft","uber-eats","doordash","openrouter","poe","google-docs","icloud-mail","counter-strike-2","battle-net","gmx-mail","ubisoft-connect"]);
 /** Curated source icons from Dashboard Icons (Apache-2.0 repository, trademarks excluded). */
 export const DASHBOARD_ICONS = new Set(["amazon","minecraft","overwatch-2","facebook","tiktok","telegram","linkedin","netflix","disney-plus","prime-video","paramount-plus","spotify","youtube","xbox","proton-mail","microsoft-365","microsoft-teams","google-meet","dropbox","slack","notion","amazon-web-services","microsoft-azure","gitlab","netlify","supabase","firebase","npm-registry","oracle-cloud","microsoft-copilot","perplexity","deepseek","grok","league-of-legends","genshin-impact","apex-legends","snapchat","pinterest","threads","kick","akamai","fly-io","hugging-face","zoho-mail","fastmail","tuta-mail","proton-drive","box","tidal","apple-tv-plus","plex","outlook","onedrive","rocket-league","pubg-battlegrounds","warframe","x-twitter","playstation-network","nintendo-switch-online","google-search","hetzner-cloud","redis-cloud","docker-hub","ovhcloud","yahoo-mail","google-workspace","bolt","chatgpt"]);
 const DASHBOARD_ALIASES: Record<string, string> = {
@@ -66,7 +66,7 @@ export function brandLogoSource(slug: string, assetPath: string): LogoProvenance
     };
   }
   if (ADDITIONAL_SIMPLE_ICONS.has(slug)) {
-    const file = slug.replaceAll('-', '').replace('battlenet', 'battledotnet');
+    const file = slug === 'ea-app' ? 'ea' : slug.replaceAll('-', '').replace('battlenet', 'battledotnet');
     return {
       provider: 'Simple Icons',
       url: 'https://github.com/simple-icons/simple-icons/blob/develop/icons/' + (slug === 'battle-net' ? 'battledotnet' : file) + '.svg',

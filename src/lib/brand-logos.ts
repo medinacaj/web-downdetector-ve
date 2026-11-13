@@ -44,6 +44,7 @@ export const HOME_BRAND_LOGOS: Readonly<Record<string, string>> = Object.freeze(
   'doordash': '/brands/doordash.svg',
   'dota-2': '/brands/dota-2.svg',
   'dropbox': '/brands/dropbox.svg',
+  'ea-app': '/brands/ea-app.svg',
   'ebay': '/brands/ebay.svg',
   'efootball': '/brands/efootball.svg',
   'epic-games-store': '/brands/epic-games-store.svg',
