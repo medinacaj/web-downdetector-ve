@@ -9,7 +9,7 @@ const directory = html('servicios/index.html');
 const credits = html('creditos-marcas/index.html');
 const methodology = html('metodologia/index.html');
 const info = html('build-info.txt');
-if(!info.includes('catalogue=211')) throw Error('Unexpected catalogue size in public output');
+if(!info.includes('catalogue=579')) throw Error('Unexpected catalogue size in public output');
 if(!methodology.includes('Examinamos reportes ciudadanos para identificar posibles problemas de servicio.') ||
    !methodology.includes('Siete elementos de una ficha de servicio') ||
    !methodology.includes('id="deteccion"') ||
@@ -52,7 +52,7 @@ for(const file of [homepage,directory]){
   new vm.Script(script);
 }
 const profiles = readdirSync(join(root,'servicios'),{withFileTypes:true}).filter((item)=>item.isDirectory());
-if(profiles.length!==211)throw Error('Expected 211 individually generated service pages, got '+profiles.length);
+if(profiles.length!==579)throw Error('Expected 579 individually generated service pages, got '+profiles.length);
 for(const entry of profiles){
   const detail=html(join('servicios',entry.name,'index.html'));
   if(!detail.includes('Acerca de la empresa y el servicio')||!detail.includes('Principales usos y productos')||
@@ -79,14 +79,14 @@ for(const slug of ['cloudflare','gmail','outlook','fortnite']){
 if(!homepage.includes('Nube e infraestructura')||!homepage.includes('Videojuegos y plataformas de juego'))
   throw Error('Global homepage sections absent');
 if((homepage.match(/class="demo-chart"/g)||[]).length!==60)throw Error('Expected 60 clearly labelled illustrative charts on index');
-if((directory.match(/class="demo-chart"/g)||[]).length!==211)throw Error('Every catalogue card requires illustrative demo chart');
+if((directory.match(/class="demo-chart"/g)||[]).length!==579)throw Error('Every catalogue card requires illustrative demo chart');
 if(homepage.includes('Ejemplo visual · datos simulados')||directory.includes('Ejemplo visual · datos simulados'))
   throw Error('Redundant repeated chart disclaimer must not occupy card space');
 if(homepage.includes('class="card-cta"') || directory.includes('class="card-cta"') ||
    homepage.includes('>Ver detalles<') || directory.includes('>Ver detalles<'))
   throw Error('Redundant detail CTA must not occupy card space');
 if((homepage.match(/<a class="card-link"/g)||[]).length!==60 ||
-   (directory.match(/<a class="card-link"/g)||[]).length!==211)
+   (directory.match(/<a class="card-link"/g)||[]).length!==579)
   throw Error('Every service card needs one native detail link');
 if(!homepage.includes('.card>a.card-link::after') ||
    !directory.includes('.card>a.card-link::after') ||
@@ -135,9 +135,9 @@ if((homepage.match(/class="section-index"/g)||[]).length!==9)
   throw Error('Numbered editorial sections missing');
 if(homepage.includes('linear-gradient('))
   throw Error('Illustrative preview must not reintroduce generic gradient card styling');
-if((directory.match(/class="report-quick"/g)||[]).length!==211)throw Error('Expected one compact red report icon per card');
+if((directory.match(/class="report-quick"/g)||[]).length!==579)throw Error('Expected one compact red report icon per card');
 if((homepage.match(/class="card-actions"/g)||[]).length!==60)throw Error('Expected isolated toolbar on each index card');
-if((directory.match(/class="card-actions"/g)||[]).length!==211)throw Error('Expected isolated toolbar on each directory card');
+if((directory.match(/class="card-actions"/g)||[]).length!==579)throw Error('Expected isolated toolbar on each directory card');
 if(!homepage.includes('.card-header{display:flex')||!homepage.includes('.demo-chart{display:block;flex:none;width:100%'))
   throw Error('Uniform, full-width card layout CSS missing');
 if(homepage.includes('padding-right:75px')||homepage.includes('padding-right:88px'))
@@ -173,4 +173,4 @@ for(const x of top){
   if(!new Set(['index.html','servicios','creditos-marcas','metodologia','brands','.nojekyll','build-info.txt']).has(x))
     throw Error('Unexpected public artifact '+x);
 }
-console.log('PASS: 211 demo services, 8 worldwide sections, 50 local logos, synthetic-only charts and no backend requests');
+console.log('PASS: 579 demo services, 8 worldwide sections, 50 local logos, synthetic-only charts and no backend requests');
