@@ -276,6 +276,9 @@ with sync_playwright() as playwright:
     assert report_section.locator("button[type='submit']").is_disabled()
     # Community messages are NOT outage reports. Every submission must
     # remain pending until a moderator approves it explicitly.
+    comment_link = page.get_by_role("link", name="Leer o escribir comentarios")
+    assert comment_link.count() == 1
+    assert comment_link.get_attribute("href") == "#comentarios"
     community = page.locator("#comentarios")
     assert community.get_by_role("heading", name="Comentarios de la comunidad").count() == 1
     assert community.get_by_text("no aumentan el contador de reportes de fallas", exact=False).count() == 1
