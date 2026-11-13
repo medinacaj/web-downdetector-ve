@@ -22,6 +22,6 @@ describe('Metodología PulsoVE: evidencia, límites y coherencia', () => {
     }
     expect(staticGuide).toContain('no envía ni almacena reportes');
     expect(staticGuide).toContain('no cuenta con datos de fallas en vivo');
-    expect(staticGuide).toContain('Esta vista pública');
+    expect(staticGuide).toContain('La versión pública de GitHub Pages');
   });
 });
