@@ -24,7 +24,8 @@ const PROVIDERS: Readonly<Record<string, string>> = {
   'banco-de-venezuela': 'Banco de Venezuela',
   'banesco': 'Banesco',
   'bnc': 'Banco Nacional de Crédito',
-  'mercantil': 'Mercantil',
+  'mercantil': 'Mercantil Banco',
+  'inter': 'Inter',
   'netflix': 'Netflix',
   'spotify': 'Spotify',
   'telegram': 'Telegram',
@@ -189,6 +190,16 @@ const COMPANY_EDITORIAL: Readonly<Record<string, {
     overview: 'El Banco Nacional de Crédito (BNC) es una entidad bancaria venezolana que ofrece servicios financieros para personas y empresas. Entre sus canales figuran la banca digital, los pagos y la gestión de cuentas. Las incidencias de ingreso, procesamiento de transferencias o consulta de saldo deben tratarse como funciones diferentes.',
     uses: ['Banca en línea', 'Pagos y transferencias', 'Cuentas y tarjetas', 'Productos empresariales'],
     source: 'https://www.banconacionaldecredito.com.ve/Somos-BNC',
+  },
+  inter: {
+    overview: 'Inter es una empresa de telecomunicaciones que opera en Venezuela y presta servicios de internet, televisión y conectividad para hogares y empresas. Su oferta incluye acceso por fibra óptica, soluciones corporativas y entretenimiento en línea. Los problemas de conexión a internet, televisión y acceso a la cuenta deben evaluarse como funciones distintas.',
+    uses: ['Internet de banda ancha y fibra óptica', 'Televisión y entretenimiento', 'Soluciones para empresas', 'Gestión de cuenta y atención al cliente'],
+    source: 'https://blog.inter.com.ve/inter-celebra-30-a%C3%B1os-conectando-a-toda-venezuela',
+  },
+  mercantil: {
+    overview: 'Mercantil es una entidad bancaria que opera en Venezuela, con canales para personas y empresas. Ofrece cuentas, tarjetas, transferencias y soluciones de pago, incluidos Mercantil en Línea y Mercantil Móvil. Las incidencias de acceso, pago móvil, consultas o procesamiento de transacciones pueden afectar áreas diferentes.',
+    uses: ['Banca digital para personas y empresas', 'Mercantil Móvil y consultas', 'Transferencias y pago móvil', 'Tarjetas y servicios de pago'],
+    source: 'https://www.mercantilbanco.com/conoce/aprende-con-mercantil/soluciones-de-pago-para-hacer-crecer-tu-negocio',
   },
   netflix: {
     overview: 'Netflix es un servicio de entretenimiento en línea que ofrece series, películas y juegos. El catálogo y las funciones pueden variar según la ubicación y el dispositivo. Un problema de reproducción, de inicio de sesión o de facturación no implica necesariamente que todo el servicio esté interrumpido.',
