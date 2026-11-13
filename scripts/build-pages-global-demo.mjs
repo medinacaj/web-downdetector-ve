@@ -77,6 +77,8 @@ const CSS=[
 "\n/* Visual correction: round the surfaces, not with a colored border-strip. */\n.card{border:0;border-top:0;border-radius:13px;box-shadow:0 3px 12px rgba(19,39,44,.11);overflow:hidden;transition:background .18s ease,box-shadow .18s ease,transform .18s ease}\n.card:hover,.card:focus-within{border:0;border-top:0;border-radius:13px;box-shadow:0 8px 23px rgba(19,39,44,.17);transform:translateY(-2px)}\n.wrap.hero,body[data-theme=\"light\"] .wrap.hero{border:0;border-radius:16px;box-shadow:0 8px 26px rgba(15,35,40,.12)}\n.profile-hero,.profile-panel{border:0;border-radius:13px;box-shadow:0 3px 14px rgba(14,34,39,.08)}\n.profile-chart{border-radius:11px}\n.profile-incident{border-radius:8px}\n.report-dialog{border-radius:13px}\nbody[data-theme=\"dark\"] .card{border:0;border-top:0;box-shadow:0 4px 15px rgba(0,0,0,.23)}\nbody[data-theme=\"dark\"] .card:hover,body[data-theme=\"dark\"] .card:focus-within{box-shadow:0 9px 25px rgba(0,0,0,.3)}\nbody[data-theme=\"dark\"] .profile-hero,body[data-theme=\"dark\"] .profile-panel{border:0;box-shadow:0 4px 14px rgba(0,0,0,.19)}\n@media(prefers-reduced-motion:reduce){.card:hover,.card:focus-within{transform:none}}\n"
 ,
 ".card .logo-area{background:#fff;border-radius:9px;margin:4px 5px 0;box-sizing:border-box;padding:6px 8px;height:76px}.card .logo{display:block;width:100%;max-width:170px;height:64px;max-height:100%;object-fit:contain;object-position:center}.profile-logo .logo{max-width:100%;height:80px;object-fit:contain;object-position:center} @media(max-width:375px){.card .logo-area{height:68px;padding:5px 6px}.card .logo{height:58px}}"
+,
+"/* One accessible anchor covers the entire catalog tile; only the separate action buttons intercept clicks. */\n.card{position:relative}\n.card>a.card-link::after{content:\"\";position:absolute;inset:0;z-index:2;border-radius:13px;cursor:pointer}\n.card>a.card-link:focus-visible{outline:none}\n.card>a.card-link:focus-visible::after{outline:3px solid var(--cyan);outline-offset:-3px}\n.card>.card-actions{position:relative;z-index:3;pointer-events:none}\n.card>.card-actions button{pointer-events:auto}"
 ].join('\n');
 
 function monogram(name){const parts=name.trim().split(/\s+/);return parts.length>1?parts.slice(0,2).map((s)=>s[0]).join('').toUpperCase():name.slice(0,2).toUpperCase();}
@@ -109,7 +111,7 @@ function card(s) {
       '<span class="card-header"><span class="name">'+escape(s.name)+'</span><span class="category">'+escape(s.categoryName)+'</span></span>'+
       '<span class="logo-area">'+logo+'</span>'+
       '<span class="signal">'+illustrativeSparkline(s.slug)+
-        '<span class="card-cta"><span>Ver detalles</span><span class="arrow" aria-hidden="true">↗</span></span></span></a>'+
+        '</span></a>'+
     '<div class="card-actions" role="group" aria-label="Acciones de '+escape(s.name)+'">'+
       
       '<button type="button" class="report-quick" data-report="'+escape(s.slug)+'" aria-label="Reportar falla de '+escape(s.name)+'" title="Reportar falla de '+escape(s.name)+'"><span aria-hidden="true">!</span></button>'+
