@@ -1,4 +1,4 @@
 mode=synthetic-public-demo
 catalogue=211
 logos=176
-source-commit=2bfb79df5ab76aff751afcb626372641e380986c
+source-commit=21578f14a572e3a3d7e1ea6d8e8153d52b156afe
