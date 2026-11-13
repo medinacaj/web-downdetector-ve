@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { getServiceDetailData } from '@/lib/queries/service-detail';
+import { getServiceBySlug } from '@/lib/queries/services';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { ReportForm } from '@/components/service/ReportForm';
 import { BrandMark } from '@/components/home/BrandMark';
@@ -32,12 +33,12 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const data = await getServiceDetailData(slug);
-  if (!data) return { title: 'Servicio no encontrado' };
+  const service = await getServiceBySlug(slug);
+  if (!service || !service.active) return { title: 'Servicio no encontrado' };
   return {
-    title: `Estado de ${data.service.name} en Venezuela`,
-    alternates: { canonical: `/servicios/${encodeURIComponent(data.service.slug)}` },
-    description: `${data.service.name}: ${data.service.description || data.service.category.name}. Consulta reportes e incidentes registrados, sin confundirlos con disponibilidad confirmada.`,
+    title: `Estado de ${service.name} en Venezuela`,
+    alternates: { canonical: `/servicios/${encodeURIComponent(service.slug)}` },
+    description: `${service.name}: ${service.description || service.category.name}. Consulta reportes e incidentes registrados, sin confundirlos con disponibilidad confirmada.`,
   };
 }
 
@@ -46,8 +47,8 @@ export default async function ServiceDetailPage({ params }: { params: Promise<{ 
   const data = await getServiceDetailData(slug);
   if (!data) notFound();
 
-  const { service, statusDetail, issueTypeOptions, issueBreakdown, recentIncidents, affectedStates, allStates, history } = data;
-  const profile = getServiceProfile({slug: service.slug, categoryName: service.category.name, description: service.description});
+  const { service, statusDetail, issueTypeOptions, issueBreakdown, recentIncidents, timelineIncidents, affectedStates, allStates, history } = data;
+  const profile = getServiceProfile({slug: service.slug, name: service.name, categorySlug: service.category.slug, categoryName: service.category.name, description: service.description});
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
@@ -97,8 +98,39 @@ export default async function ServiceDetailPage({ params }: { params: Promise<{ 
         )}
       </header>
 
+      <section className="mt-6 rounded-xl border border-border bg-surface p-5 sm:p-7" aria-labelledby="company-overview-title">
+        <h2 id="company-overview-title" className="font-display text-xl font-semibold">Acerca de la empresa y el servicio</h2>
+        <p className="mt-3 max-w-4xl text-sm leading-7 text-ink-muted">{profile.companyOverview}</p>
+        <div className="mt-5 grid gap-5 md:grid-cols-2">
+          <div>
+            <h3 className="text-sm font-semibold">Principales productos y usos</h3>
+            <ul className="mt-2 list-disc space-y-1 pl-5 text-sm leading-6 text-ink-muted">
+              {profile.mainUses.map((item) => <li key={item}>{item}</li>)}
+            </ul>
+          </div>
+          <div>
+            <h3 className="text-sm font-semibold">Cómo interpretar las incidencias</h3>
+            <p className="mt-2 text-sm leading-6 text-ink-muted">{profile.monitoringContext}</p>
+          </div>
+        </div>
+        <p className="mt-5 border-t border-border pt-4 text-xs text-ink-muted">
+          {profile.sourceUrl ? (
+            <>Información editorial contrastada con una <a href={profile.sourceUrl} target="_blank" rel="noopener noreferrer" className="text-brand-600 underline underline-offset-2">fuente del proveedor</a>. La fuente describe el producto, no su disponibilidad actual.</>
+          ) : (
+            'La reseña corporativa individual aún no tiene una fuente verificada: no se presenta como información oficial del proveedor.'
+          )}
+        </p>
+      </section>
+
       <div className="mt-6">
-        <ServiceHistoryChart serviceName={service.name} history={history} />
+        <ServiceHistoryChart serviceName={service.name} history={history} observations={timelineIncidents.map((incident) => ({
+          id: incident.id,
+          timestamp: incident.startedAt.toISOString(),
+          status: incident.status,
+          summary: incident.summary,
+          severity: incident.severity,
+          officiallyConfirmed: incident.officiallyConfirmed,
+        }))} />
       </div>
 
       {/* Reportar */}
