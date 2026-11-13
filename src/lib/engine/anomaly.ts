@@ -1,4 +1,4 @@
-import { and, desc, eq, gte, isNull, lte } from 'drizzle-orm';
+import { and, desc, eq, gte, isNotNull, isNull, lte } from 'drizzle-orm';
 import { db } from '@/lib/db/client';
 import { aggregatedWindows, baselines, officialUpdates } from '@/lib/db/schema';
 import { modifiedZScore } from './robust-stats';
@@ -54,6 +54,25 @@ export function reliabilityFactor(sampleSize: number): number {
   if (sampleSize < 8) return 0.55;
   if (sampleSize < 15) return 0.8;
   return 1.0;
+}
+
+/**
+ * A provider update is evidence only after a recorded verification and
+ * publication, never for an earlier window or beyond the 24h recency bound.
+ * This is different from an unmoderated citizen comment or draft notice.
+ */
+export function officialSignalEligible(
+  publishedAt: Date,
+  verifiedAt: Date | null,
+  windowStart: Date,
+): boolean {
+  if (!verifiedAt) return false;
+  const published = publishedAt.getTime();
+  const verified = verifiedAt.getTime();
+  const instant = windowStart.getTime();
+  return Number.isFinite(published) && Number.isFinite(verified) && Number.isFinite(instant)
+    && published <= instant && verified <= instant
+    && published >= instant - 24 * 60 * 60_000;
 }
 
 export interface ScoreResult {
@@ -163,21 +182,25 @@ export async function scoreWindow(
   // simula. Ver docs/00-PLAN-MAESTRO.md, pendientes de la Etapa 3. ---
   const technicalScoreSignal: number | null = null;
 
-  // --- 6. Confirmación oficial (5%): ¿existe un OfficialUpdate verificado
-  // reciente para este servicio? (no hay panel admin todavía para crear
-  // uno — la consulta es real, simplemente no tendrá filas hasta la
-  // Etapa 6) ---
+  // --- 6. Confirmación oficial (5%) ---
+  // Solo cuenta una actualización VERIFICADA antes de esta ventana.
+  // Borradores, registros sin verificar y publicaciones futuras no deben
+  // elevar una señal estadística ni aparentar confirmación del proveedor.
   const recentOfficial = await db
-    .select({ id: officialUpdates.id })
+    .select({ publishedAt: officialUpdates.publishedAt, verifiedAt: officialUpdates.verifiedAt })
     .from(officialUpdates)
     .where(
       and(
         eq(officialUpdates.serviceId, serviceId),
+        isNotNull(officialUpdates.verifiedAt),
+        lte(officialUpdates.verifiedAt, windowStart),
         gte(officialUpdates.publishedAt, new Date(windowStart.getTime() - 24 * 60 * 60_000)),
+        lte(officialUpdates.publishedAt, windowStart),
       ),
     )
     .limit(1);
-  const officialScore = recentOfficial.length > 0 ? 100 : null;
+  const officialScore = recentOfficial.some((item) =>
+    officialSignalEligible(item.publishedAt, item.verifiedAt, windowStart)) ? 100 : null;
 
   const anomalyScore = combineWeightedSignals([
     { weight: WEIGHTS.deviation, score: deviationScore },

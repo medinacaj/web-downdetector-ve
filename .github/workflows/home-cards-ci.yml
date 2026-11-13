@@ -11,6 +11,8 @@ on:
       - 'tests/issue-breakdown-series.test.ts'
       - 'src/lib/queries/home.ts'
       - 'src/lib/queries/home-trends.ts'
+      - 'src/lib/engine/**'
+      - 'tests/engine-*.test.ts'
       - 'src/lib/favorites.ts'
       - 'src/lib/brand-logos.ts'
       - 'src/lib/db/seed-data/**'
