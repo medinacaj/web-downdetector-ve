@@ -175,34 +175,28 @@ const homeSections=WORLDWIDE_SPOTLIGHT.map((section)=>({
 }));
 if(homeSections.length!==8||homeSections.some((s)=>s.items.length!==6))throw Error('All eight global spotlight groups need 6 items');
 
-const hero='<div class="wrap hero"><div class="hero-top"><div class="hero-copy"><div class="eyebrow">PULSOVE · FALLAS DE SERVICIOS Y APLICACIONES</div>'+
+const hero='<section class="wrap hero"><div class="hero-top"><div class="hero-copy">'+
 '<h1>¿Tu internet, banco o aplicación está fallando?</h1>'+
-'<p class="intro-lead">Encuentra servicios de Venezuela y del mundo, conoce sus funciones, explora sus fichas y descubre cómo consultar y compartir reportes de fallas.</p>'+
-'<div class="intro-actions"><a class="intro-primary" href="'+BASE+'/servicios/">Explorar servicios</a><a class="intro-secondary" href="#como-funciona">Cómo se usa</a></div>'+
-'<div class="intro-guide" id="como-funciona"><h2>En tres pasos</h2><ol class="intro-steps">'+
-'<li><strong>1 · Busca</strong><span>Elige tu internet, banco, juego o aplicación.</span></li>'+
-'<li><strong>2 · Revisa</strong><span>Consulta la información y los gráficos ilustrativos.</span></li>'+
-'<li><strong>3 · Reporta</strong><span>Conoce el formulario desde el botón rojo.</span></li>'+
-'</ol></div></div>'+
-'<div class="stats"><div class="stat"><strong>'+catalog.length+'</strong><small>Servicios del catálogo</small></div>'+
-'<div class="stat"><strong>'+categoriesSeed.length+'</strong><small>Categorías</small></div>'+
-'<div class="stat"><strong>'+homeSections.length*6+'</strong><small>Plataformas internacionales destacadas</small></div></div>'+
-'</div><div class="hero-tools"><div class="filters"><input id="quicksearch" type="search" class="input" placeholder="Buscar Gmail, Cloudflare, Fortnite… (/) " aria-label="Buscar entre tarjetas visibles">'+
+'<p class="intro-lead">Busca servicios, consulta su información y conoce los reportes de fallas.</p>'+
+'<a class="intro-primary" href="'+BASE+'/servicios/">Explorar servicios</a>'+
+'</div></div></section>';
+const homeTools='<section class="wrap home-tools-bar" aria-label="Buscar y filtrar servicios destacados">'+
+'<div class="hero-tools"><div class="filters"><input id="quicksearch" type="search" class="input" placeholder="Buscar Gmail, Cloudflare, Fortnite…" aria-label="Buscar entre tarjetas visibles">'+
 '<button id="reset-home-search" class="reset-home-search" type="button" hidden>Limpiar</button>'+
-'<a class="chip" href="'+BASE+'/servicios/">Ver los '+catalog.length+' servicios</a></div>'+
+'<a class="chip" href="'+BASE+'/servicios/">Servicios</a></div>'+
 '<div class="filters" role="group" aria-label="Filtrar destacados por tipo">'+
 '<button type="button" class="chip" data-home-filter="" aria-pressed="true">Todos</button>'+
 '<button type="button" class="chip" data-home-filter="nube-e-infraestructura" aria-pressed="false">Nube</button>'+
 '<button type="button" class="chip" data-home-filter="correo-y-productividad" aria-pressed="false">Correo</button>'+
 '<button type="button" class="chip" data-home-filter="videojuegos" aria-pressed="false">Videojuegos</button>'+
 '<button type="button" class="chip" data-home-filter="inteligencia-artificial" aria-pressed="false">IA</button>'+
-'</div><p class="home-search-status" id="home-search-count" aria-live="polite">60 servicios destacados</p></div></div>';
+'</div><p class="home-search-status" id="home-search-count" aria-live="polite">Servicios destacados</p></div></section>';
 const officialSourcesPanel='<section class="group" id="microsoft-status"><div class="section-title"><h2>Estado oficial de Microsoft</h2></div>'+
 '<p class="hint">Estado oficial no consultado. Comprueba la fuente para ver información actual.</p>'+
 '<ul class="cards">'+MICROSOFT_FEEDS.map((feed)=>'<li class="card"><div class="card-link"><strong class="name">'+escape(feed.name)+'</strong>'+
 '<p class="category">'+escape(feed.scope)+'</p><div class="logo-area"><span class="monogram">MS</span></div>'+
 '<span class="signal">Estado actual: no consultado</span><a class="chip" target="_blank" rel="noopener noreferrer" href="'+escape(feed.statusUrl)+'">Fuente oficial</a></div></li>').join('')+'</ul></section>';
-const indexBody=hero+'<div class="wrap">'+group('Destacados de Venezuela','Servicios tradicionales del catálogo, con identificadores de marca cuando hay archivos verificados.',homeSelected,'ve')+
+const indexBody=hero+homeTools+'<div class="wrap">'+group('Destacados de Venezuela','Servicios tradicionales del catálogo, con identificadores de marca cuando hay archivos verificados.',homeSelected,'ve')+
 homeSections.map((s)=>group(s.title,s.description,s.items,s.id)).join('')+
 '<p id="home-empty" class="noresults" hidden>No encontramos servicios destacados con esa búsqueda. Prueba otro término o abre el directorio completo.</p>'+
 '</div>';
@@ -210,13 +204,13 @@ const indexHtml=layout('Servicios y plataformas internacionales',indexBody,'Cons
 
 const options=categoriesSeed.map((cat)=>'<option value="'+escape(cat.slug)+'">'+escape(cat.name)+'</option>').join('');
 const dirBody='<div class="wrap directory"><div class="hero"><div class="eyebrow">Directorio completo</div>'+
-'<h1>Directorio de '+catalog.length+' plataformas</h1>'+
+'<h1>Servicios y plataformas</h1>'+
 '<p>Busca por plataforma, filtra por sector y organiza tus favoritos.</p>'+
 '<div class="filterbar"><input id="directory-search" class="input" type="search" placeholder="Buscar plataforma por nombre…" aria-label="Buscar plataformas">'+
 '<select id="category-filter" aria-label="Filtrar por categoría"><option value="">Todas las categorías</option>'+options+'</select>'+
 '<select id="directory-sort" aria-label="Ordenar servicios"><option value="name">Nombre A–Z</option><option value="category">Por categoría</option><option value="favorites">Favoritos primero</option></select>'+
 '<label class="chip"><input type="checkbox" id="favorites-only"> Solo mis favoritos</label></div>'+
-'<p class="result" id="result-count" aria-live="polite">'+catalog.length+' servicios</p></div>'+
+'<p class="result" id="result-count" aria-live="polite">Servicios disponibles</p></div>'+
 '<ul class="cards" id="directory-cards">'+catalog.map(card).join('')+'</ul>'+
 '<p class="noresults" id="empty-result" hidden>No se encontraron servicios con estos filtros.</p></div>';
 const directoryHtml=layout('Directorio global de servicios',dirBody,'Directorio de '+catalog.length+' plataformas, servicios cloud, correo y juegos.');
@@ -270,7 +264,7 @@ function serviceDetailHtml(s){
         '</section>'+
       '<section class="profile-panel profile-wide"><h2>Historial de incidentes</h2>'+
         '<div class="profile-incident">Sin historial verificado disponible. No es posible confirmar que el servicio haya funcionado sin interrupciones.</div></section>'+
-    '</div><a class="profile-back" href="'+BASE+'/servicios/">Volver a los 211 servicios</a></div>';
+    '</div><a class="profile-back" href="'+BASE+'/servicios/">Volver a servicios</a></div>';
   return layout('Ficha de '+s.name,body,'Información de '+s.name+': empresa, principales usos y gráfico ilustrativo.');
 }
 
@@ -319,7 +313,7 @@ function clientEnhance(){
      const ok=(!text||el.dataset.name.includes(text)||el.dataset.slug.includes(text))&&(!cat||el.dataset.category===cat)&&(!fav||saved.includes(el.dataset.slug));
      el.hidden=!ok;if(ok)visible++;
    }
-   const count=document.querySelector('#result-count');if(count)count.textContent=visible+' servicios';
+   const count=document.querySelector('#result-count');if(count)count.textContent=(text||cat||fav)?(visible+' resultados'):'Servicios disponibles';
    const empty=document.querySelector('#empty-result');if(empty)empty.hidden=visible!==0;
  }
  document.querySelectorAll('[data-fav]').forEach((el)=>el.addEventListener('click',()=>{
@@ -404,7 +398,7 @@ function clientEnhance(){
      group.hidden=visible===0;
    });
    const total=document.querySelector('#home-search-count');
-   if(total)total.textContent=count+' servicios destacados';
+   if(total)total.textContent=(query||selected)?(count+' resultados'):'Servicios destacados';
    const empty=document.querySelector('#home-empty');
    if(empty)empty.hidden=count!==0;
    const reset=document.querySelector('#reset-home-search');
