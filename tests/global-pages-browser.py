@@ -49,6 +49,7 @@ with sync_playwright() as playwright:
     logo.evaluate("(el) => el.decode()")
     assert logo.evaluate("(el) => el.naturalWidth > 0")
     cloudflare_card = page.locator("#nube .card[data-slug='cloudflare']")
+    example_line = cloudflare_card.locator("svg.demo-chart polyline").get_attribute("points")
     fallback = cloudflare_card.locator(".monogram")
     assert fallback.count() == 1
     assert fallback.get_attribute("hidden") is not None
@@ -68,7 +69,6 @@ with sync_playwright() as playwright:
     assert report.evaluate("(el) => getComputedStyle(el).backgroundColor") == "rgb(220, 38, 38)"
     star = cloudflare_card.locator("button[data-fav='cloudflare']")
     assert report.evaluate("(el) => el.getBoundingClientRect().right") < star.evaluate("(el) => el.getBoundingClientRect().left")
-    example_line = cloudflare_card.locator("svg.demo-chart polyline").get_attribute("points")
 
     report.click()
     dialog = page.locator("#demo-report-dialog")
