@@ -4,6 +4,11 @@
  * Omitted owners must be shown as "Por verificar", never guessed from a slug.
  * Keep owner identity distinct from the owner of a domain or a reseller.
  */
+/** Read curated dictionaries without inherited Object.prototype properties. */
+function ownValue<T>(entries: Readonly<Record<string, T>>, key: string): T | undefined {
+  return Object.prototype.hasOwnProperty.call(entries, key) ? entries[key] : undefined;
+}
+
 export interface ServiceProfile {
   provider: string | null;
   type: string;
@@ -350,11 +355,11 @@ export function getServiceProfile(input: {
   categoryName: string;
   description: string | null | undefined;
 }): ServiceProfile {
-  const tags = [input.categoryName, ...(TAGS[input.slug] ?? [])];
-  const editorial = COMPANY_EDITORIAL[input.slug];
+  const tags = [input.categoryName, ...(ownValue(TAGS, input.slug) ?? [])];
+  const editorial = ownValue(COMPANY_EDITORIAL, input.slug);
   const description = input.description?.trim() || 'Descripción editorial pendiente de verificar para este servicio.';
   const name = input.name || input.slug.replace(/-/g, ' ');
-  const provider = PROVIDERS[input.slug] ?? null;
+  const provider = ownValue(PROVIDERS, input.slug) ?? null;
   return {
     provider,
     type: input.categoryName,
@@ -366,7 +371,7 @@ export function getServiceProfile(input: {
       'Reseña corporativa individual pendiente de verificación; esta ficha se ampliará con fuentes del proveedor.'
     ),
     mainUses: [...(editorial?.uses ?? [description])],
-    monitoringContext: CATEGORY_CONTEXT[input.categorySlug ?? ''] ??
+    monitoringContext: ownValue(CATEGORY_CONTEXT, input.categorySlug ?? '') ??
       'PulsoVE diferencia los reportes ciudadanos de las confirmaciones oficiales. Sin datos suficientes no se afirma disponibilidad.',
     sourceUrl: editorial?.source ?? null,
   };

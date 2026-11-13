@@ -103,6 +103,22 @@ describe('service editorial profile', () => {
     expect(p.mainUses).toHaveLength(1);
     expect(p.description).toMatch(/pendiente de verificar/);
   });
+  it('does not treat inherited object names as verified providers or tag lists', () => {
+    for (const slug of ['__proto__', 'constructor', 'toString']) {
+      const profile = getServiceProfile({
+        slug,
+        categorySlug: '__proto__',
+        categoryName: 'Servicios',
+        description: null,
+      });
+      expect(profile.provider).toBeNull();
+      expect(profile.sourceUrl).toBeNull();
+      expect(profile.tags).toEqual(['Servicios']);
+      expect(profile.companyOverview).toContain('pendiente de verificación');
+      expect(typeof profile.monitoringContext).toBe('string');
+    }
+  });
+
   it('can produce a profile for every catalogue item without losing category', () => {
     const categories = new Map(categoriesSeed.map(({ slug, name }) => [slug, name]));
     for (const service of servicesSeed) {

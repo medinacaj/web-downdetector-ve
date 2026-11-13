@@ -66,10 +66,14 @@ const WIKIMEDIA_URLS: Record<string, string> = {
  * Brand trademarks remain with their owners irrespective of icon licensing.
  */
 export function brandLogoSource(slug: string, assetPath: string): LogoProvenance {
-  const custom = CUSTOM_SOURCES[slug];
+  const custom = Object.prototype.hasOwnProperty.call(CUSTOM_SOURCES, slug)
+    ? CUSTOM_SOURCES[slug]
+    : undefined;
   if (custom) return custom;
   if (DASHBOARD_ICONS.has(slug)) {
-    const file = DASHBOARD_ALIASES[slug] ?? slug;
+    const file = Object.prototype.hasOwnProperty.call(DASHBOARD_ALIASES, slug)
+      ? DASHBOARD_ALIASES[slug]
+      : slug;
     return {
       provider: 'Dashboard Icons',
       url: 'https://github.com/homarr-labs/dashboard-icons/blob/main/svg/' + file + '.svg',
@@ -85,7 +89,9 @@ export function brandLogoSource(slug: string, assetPath: string): LogoProvenance
     };
   }
   if (assetPath.endsWith('.png')) {
-    return {provider: 'Wikimedia Commons', url: WIKIMEDIA_URLS[slug] ?? 'https://commons.wikimedia.org/'};
+    return {provider: 'Wikimedia Commons', url: Object.prototype.hasOwnProperty.call(WIKIMEDIA_URLS, slug)
+      ? WIKIMEDIA_URLS[slug]
+      : 'https://commons.wikimedia.org/'};
   }
   return {
     provider: 'Simple Icons',
