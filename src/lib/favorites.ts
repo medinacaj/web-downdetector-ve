@@ -1,5 +1,7 @@
 /** Personal favorites are browser-local only: no account, no backend and no tracking. */
 export const FAVORITES_KEY = 'pulsove:favorites:v1';
+/** localStorage storage events fire in other tabs, never the writing tab. */
+export const FAVORITES_CHANGE_EVENT = 'pulsove:favorites:change';
 const SAFE_SLUG = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
 export function parseFavoriteSlugs(raw: string | null): string[] {
