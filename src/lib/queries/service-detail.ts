@@ -20,18 +20,30 @@ export async function getServiceDetailData(slug: string) {
   const service = await getServiceBySlug(slug);
   if (!service || !service.active) return null;
 
+  const now = Date.now();
+  const since24h = new Date(now - 24 * 60 * 60_000);
+  const since7d = new Date(now - 7 * 24 * 60 * 60_000);
+  const since30d = new Date(now - 30 * 24 * 60 * 60_000);
+
   const [statusDetail, issueTypeOptions, history, issueBreakdown, recentIncidents, timelineIncidents, approvedComments] = await Promise.all([
     getServiceStatusDetail(service.id),
     getIssueTypesForCategory(service.category.id),
     getServiceHistory(service.id),
     db
-      .select({ name: issueTypes.name, count: sql<number>`count(${reports.id})::int` })
+      .select({
+        name: issueTypes.name,
+        last24h: sql<number>`count(*) filter (where ${reports.createdAt} >= ${since24h.toISOString()})::int`,
+        last7d: sql<number>`count(*) filter (where ${reports.createdAt} >= ${since7d.toISOString()})::int`,
+        last30d: sql<number>`count(*)::int`,
+      })
       .from(reports)
       .innerJoin(issueTypes, eq(issueTypes.id, reports.issueTypeId))
-      .where(eq(reports.serviceId, service.id))
-      .groupBy(issueTypes.id, issueTypes.name)
-      .orderBy(desc(sql`count(${reports.id})`))
-      .limit(6),
+      .where(and(
+        eq(reports.serviceId, service.id),
+        eq(reports.suspicious, false),
+        gte(reports.createdAt, since30d),
+      ))
+      .groupBy(issueTypes.id, issueTypes.name),
     db
       .select({
         id: incidents.id,
