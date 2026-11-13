@@ -3,6 +3,8 @@ export type HistoryPeriod = '24h' | '7d' | '30d' | '90d';
 export interface HistoryPoint {
   label: string;
   reports: number;
+  /** Optional estimate from sampled historical medians; null means insufficient evidence. */
+  typicalReports?: number | null;
   startIso: string;
   endIso: string;
 }
