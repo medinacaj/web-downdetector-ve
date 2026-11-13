@@ -5,6 +5,7 @@ import { getServiceBySlug } from './services';
 import { getServiceStatusDetail } from './status';
 import { getServiceHistory } from './service-history';
 import { historyLowerBound } from './service-history-series';
+import { getApprovedServiceComments } from './service-comments';
 
 /** Tipos de problema de la categoría del servicio + los transversales (category_id null). */
 export async function getIssueTypesForCategory(categoryId: string) {
@@ -19,7 +20,7 @@ export async function getServiceDetailData(slug: string) {
   const service = await getServiceBySlug(slug);
   if (!service || !service.active) return null;
 
-  const [statusDetail, issueTypeOptions, history, issueBreakdown, recentIncidents, timelineIncidents] = await Promise.all([
+  const [statusDetail, issueTypeOptions, history, issueBreakdown, recentIncidents, timelineIncidents, approvedComments] = await Promise.all([
     getServiceStatusDetail(service.id),
     getIssueTypesForCategory(service.category.id),
     getServiceHistory(service.id),
@@ -60,6 +61,7 @@ export async function getServiceDetailData(slug: string) {
       .where(and(eq(incidents.serviceId, service.id), gte(incidents.startedAt, historyLowerBound(new Date()))))
       .orderBy(desc(incidents.startedAt))
       .limit(100),
+    getApprovedServiceComments(service.id),
   ]);
 
   const affectedStates = await db
@@ -73,5 +75,5 @@ export async function getServiceDetailData(slug: string) {
 
   const allStates = await db.select({ code: states.code, name: states.name }).from(states).orderBy(states.name);
 
-  return { service, statusDetail, issueTypeOptions, issueBreakdown, recentIncidents, timelineIncidents, affectedStates, allStates, history };
+  return { service, statusDetail, issueTypeOptions, issueBreakdown, recentIncidents, timelineIncidents, affectedStates, allStates, history, approvedComments };
 }
