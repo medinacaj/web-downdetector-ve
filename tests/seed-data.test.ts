@@ -79,7 +79,7 @@ describe('seed-data: integridad estructural', () => {
   });
 
   it('servicios: categorySlug referencia una categoría real', () => {
-    const validSlugs = new Set(categoriesSeed.map((c) => c.slug));
+    const validSlugs = new Set<string>(categoriesSeed.map((c) => c.slug));
     for (const s of servicesSeed) {
       expect(validSlugs.has(s.categorySlug)).toBe(true);
     }
