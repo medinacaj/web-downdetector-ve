@@ -22,6 +22,7 @@ export function ServicePulseCard({
     <li className="relative min-w-0">
       <article
         data-category={service.categorySlug}
+        data-rapid-surge={service.surgeScore > 0 ? 'true' : 'false'}
         className="service-tile relative flex h-full min-h-[260px] min-w-0 flex-col overflow-hidden bg-surface transition-colors sm:min-h-[270px]"
       >
         <Link
@@ -65,6 +66,11 @@ export function ServicePulseCard({
                 </div>
               )}
             </div>
+            {service.surgeScore > 0 && (
+              <p className="mt-1 text-[10px] font-medium text-brand-600" title="Aumento de reportes distintos en los últimos 30 minutos; no confirma una falla">
+                ↗ Reportes en aumento · 30 min
+              </p>
+            )}
             <div className="mt-2 flex min-w-0 flex-wrap items-center gap-1 pt-2">
               <StatusBadge status={service.status} size="sm" />
             </div>
