@@ -102,9 +102,9 @@ export default async function ServiceDetailPage({ params }: { params: Promise<{ 
       </div>
 
       {/* Reportar */}
-      <section className="mt-8">
-        <h2 className="font-display text-lg font-semibold">Reportar un problema</h2>
-        <p className="mt-1 text-sm text-ink-muted">Toma menos de 20 segundos y es anónimo.</p>
+      <section id="reportar" className="mt-8 scroll-mt-24" aria-labelledby="reportar-title">
+        <h2 id="reportar-title" className="font-display text-lg font-semibold">Reportar una falla de {service.name}</h2>
+        <p className="mt-1 text-sm text-ink-muted">Selecciona el problema y tu estado, acepta la declaración y envía. Puedes añadir detalles opcionales.</p>
         <div className="mt-4">
           <ReportForm serviceSlug={service.slug} issueTypes={issueTypeOptions} states={allStates} />
         </div>

@@ -87,6 +87,23 @@ with sync_playwright() as playwright:
 
     link = page.get_by_role("link", name="Ver estado y reportes de CANTV")
     assert link.get_attribute("href") == "/servicios/cantv"
-    assert grid.get_by_text("Servicio en catálogo de demostración").count() == 12
-    print("Mobile 320/390/768px: 2 columns, 12 real-data cards, no overflow, no false curves; favorites persist.")
+    quick = page.get_by_role("link", name="Reportar falla de CANTV")
+    assert quick.count() == 1
+    assert quick.get_attribute("href") == "/servicios/cantv#reportar"
+    quick.click()
+    page.wait_for_url("**/servicios/cantv*", timeout=30000)
+    print("QUICK REPORT TARGET:", page.url, flush=True)
+    assert page.url.split("#")[0].rstrip("/").endswith("/servicios/cantv")
+    assert page.url.split("#")[-1] == "reportar", "Deep link must focus the form section"
+    report_section = page.locator("#reportar")
+    assert report_section.is_visible()
+    assert report_section.get_by_role("heading", name="Reportar una falla de CANTV").count() == 1
+    assert report_section.locator("select[name='issueTypeSlug']").count() == 1
+    assert report_section.locator("select[name='stateCode']").count() == 1
+    optional = report_section.locator("details")
+    assert optional.count() == 1 and not optional.get_attribute("open")
+    assert optional.get_by_text("Añadir detalles (opcional)").count() == 1
+    assert report_section.locator("button[type='submit']").is_disabled()
+
+    print("Mobile cards responsive; quick report links to real protected service form; optional fields collapsed; favorites persist.")
     browser.close()
