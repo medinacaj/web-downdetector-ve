@@ -23,6 +23,19 @@ describe('service editorial profile', () => {
       expect(profile.sourceUrl).toMatch(/^https:\/\//);
     }
   });
+  it('describes five major streaming and messaging services with official editorial sources', () => {
+    for (const slug of ['netflix', 'spotify', 'telegram', 'youtube', 'signal']) {
+      const entry = servicesSeed.find((service) => service.slug === slug);
+      expect(entry, slug).toBeDefined();
+      const p = getServiceProfile({slug, categoryName: 'Plataformas', description: entry!.description});
+      expect(p.provider, slug).toBeTruthy();
+      expect(p.companyOverview.length, slug).toBeGreaterThan(140);
+      expect(p.mainUses.length, slug).toBeGreaterThanOrEqual(4);
+      expect(p.sourceUrl, slug).toMatch(/^https:\/\//);
+      expect(p.companyOverview, slug).not.toMatch(/pendiente de verificación/);
+    }
+  });
+
   it('uses a transparent fallback rather than guessing unknown providers', () => {
     const p = getServiceProfile({ slug: 'unknown-service', categoryName: 'Servicios', description: null });
     expect(p.provider).toBeNull();
