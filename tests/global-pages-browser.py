@@ -104,7 +104,7 @@ with sync_playwright() as playwright:
     page.get_by_role("button", name="Nube", exact=True).click()
     assert page.get_by_role("button", name="Nube", exact=True).get_attribute("aria-pressed") == "true"
     assert page.locator("main .card:visible").count() >= 6
-    assert page.locator("#home-search-count").inner_text().endswith("servicios destacados")
+    assert page.locator("#home-search-count").inner_text().endswith("resultados")
     page.get_by_role("button", name="Todos", exact=True).click()
     assert page.locator("main .card:visible").count() == 60
     page.locator("#quicksearch").fill("zzzzsinresultados")
