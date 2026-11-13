@@ -68,9 +68,16 @@ if((homepage.match(/class="demo-chart"/g)||[]).length!==60)throw Error('Expected
 if((directory.match(/class="demo-chart"/g)||[]).length!==211)throw Error('Every catalogue card requires illustrative demo chart');
 if(homepage.includes('Ejemplo visual · datos simulados')||directory.includes('Ejemplo visual · datos simulados'))
   throw Error('Redundant repeated chart disclaimer must not occupy card space');
-if((homepage.match(/class="card-cta"/g)||[]).length!==60 ||
-   (directory.match(/class="card-cta"/g)||[]).length!==211)
-  throw Error('Each card needs a concise way into its detail');
+if(homepage.includes('class="card-cta"') || directory.includes('class="card-cta"') ||
+   homepage.includes('>Ver detalles<') || directory.includes('>Ver detalles<'))
+  throw Error('Redundant detail CTA must not occupy card space');
+if((homepage.match(/<a class="card-link"/g)||[]).length!==60 ||
+   (directory.match(/<a class="card-link"/g)||[]).length!==211)
+  throw Error('Every service card needs one native detail link');
+if(!homepage.includes('.card>a.card-link::after') ||
+   !directory.includes('.card>a.card-link::after') ||
+   !homepage.includes('.card>.card-actions button{pointer-events:auto}'))
+  throw Error('Detail link must cover each card without hijacking action buttons');
 if(!homepage.includes('VISTA PREVIA PÚBLICA')||!directory.includes('VISTA PREVIA PÚBLICA'))
   throw Error('Global synthetic preview disclosure required');
 if(!homepage.includes('id="theme-toggle"')||!homepage.includes('data-home-filter=')||

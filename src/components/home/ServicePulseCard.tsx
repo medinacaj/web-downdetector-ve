@@ -6,8 +6,9 @@ import { FavoriteButton } from './FavoriteButton';
 import { BrandMark } from './BrandMark';
 
 /**
- * The full-width title is FIRST. Footer actions are independent of the
- * accessible detail link and can never steal its horizontal or vertical space.
+ * The entire tile opens its service detail via a stretched accessible link.
+ * Report and favorite actions remain independent controls above that link;
+ * neither is nested inside another interactive element.
  * Category colors identify topics, not operational severity or uptime.
  */
 export function ServicePulseCard({
@@ -21,12 +22,12 @@ export function ServicePulseCard({
     <li className="relative min-w-0">
       <article
         data-category={service.categorySlug}
-        className="service-tile flex h-full min-h-[260px] min-w-0 flex-col overflow-hidden bg-surface transition-colors sm:min-h-[270px]"
+        className="service-tile relative flex h-full min-h-[260px] min-w-0 flex-col overflow-hidden bg-surface transition-colors sm:min-h-[270px]"
       >
         <Link
           href={`/servicios/${encodeURIComponent(service.slug)}`}
           aria-label={`Ver estado y reportes de ${service.name}`}
-          className="flex min-w-0 flex-1 flex-col px-3 pb-2 pt-3 focus-visible:outline-offset-[-4px] sm:px-4"
+          className="service-tile-link flex min-w-0 flex-1 flex-col px-3 pb-2 pt-3 sm:px-4"
         >
           <div data-card-title className="min-h-[53px] min-w-0">
             <h3 className="line-clamp-2 font-display text-sm font-bold leading-snug tracking-tight text-ink sm:text-base">
@@ -64,14 +65,13 @@ export function ServicePulseCard({
                 </div>
               )}
             </div>
-            <div className="mt-2 flex min-w-0 flex-wrap items-center justify-between gap-1 pt-2">
+            <div className="mt-2 flex min-w-0 flex-wrap items-center gap-1 pt-2">
               <StatusBadge status={service.status} size="sm" />
-              <span className="service-tile-cta text-[10px] font-semibold sm:text-xs">Ver ficha ↗</span>
             </div>
           </div>
         </Link>
 
-        <div data-card-actions className="service-tile-actions flex h-10 shrink-0 items-center justify-end gap-2 px-3 sm:px-4">
+        <div data-card-actions className="service-tile-actions relative z-20 flex h-10 shrink-0 items-center justify-end gap-2 px-3 sm:px-4">
           <Link
             href={`/servicios/${encodeURIComponent(service.slug)}#reportar`}
             aria-label={`Reportar falla de ${service.name}`}

@@ -106,9 +106,32 @@ body {
   background: #2b4445;
   box-shadow: 0 9px 25px rgb(0 0 0 / .3) !important;
 }
-.service-tile-chart, .service-tile-cta { color: var(--tile-accent); }
-.service-tile-cta { white-space: nowrap; }
-.service-tile-actions { border: 0; background: transparent; }
+.service-tile-chart { color: var(--tile-accent); }
+/* Extend the native link across the whole card, including empty footer space.
+ * Do not nest the footer's report/favorite actions in a link: controls must
+ * remain individually keyboard reachable and independently clickable.
+ */
+.service-tile-link::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  border-radius: 13px;
+  cursor: pointer;
+}
+.service-tile-link:focus-visible { outline: none; }
+.service-tile-link:focus-visible::after {
+  outline: 3px solid #00c2a8;
+  outline-offset: -3px;
+}
+.service-tile-actions {
+  border: 0;
+  background: transparent;
+  pointer-events: none;
+}
+.service-tile-actions a, .service-tile-actions button {
+  pointer-events: auto;
+}
 .service-tile-actions button { border-radius: 9px; }
 .service-tile-actions a:active, .service-tile-actions button:active { transform: scale(.95); }
 @media (prefers-reduced-motion: reduce) {
