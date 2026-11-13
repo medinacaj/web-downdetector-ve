@@ -159,6 +159,18 @@ export function ServiceHistoryChart({
 
       <div className="mt-5 grid gap-4 border-t border-border pt-5 sm:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
         <div>
+          <div className="mb-3 flex flex-wrap gap-2" role="group" aria-label="Navegar por intervalos del histórico">
+            <button type="button" disabled={selectedIndex === 0}
+              onClick={() => setSelected((index) => Math.max(0, index - 1))}
+              className="rounded-md border border-border px-3 py-2 text-xs font-semibold text-ink hover:bg-bg disabled:cursor-not-allowed disabled:opacity-40 focus-visible:outline-pulse-500">
+              ← Anterior
+            </button>
+            <button type="button" disabled={selectedIndex === points.length - 1}
+              onClick={() => setSelected((index) => Math.min(points.length - 1, index + 1))}
+              className="rounded-md border border-border px-3 py-2 text-xs font-semibold text-ink hover:bg-bg disabled:cursor-not-allowed disabled:opacity-40 focus-visible:outline-pulse-500">
+              Siguiente →
+            </button>
+          </div>
           <label htmlFor={`interval-picker-${chartId}`} className="text-xs font-semibold text-ink-muted">
             Seleccionar una hora o un día para inspeccionar
           </label>
