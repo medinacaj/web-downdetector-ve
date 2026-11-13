@@ -389,6 +389,21 @@ with sync_playwright() as playwright:
     assert "Estado actual no consultado" in page.locator(".profile-panel").nth(1).inner_text()
     assert page.locator(".profile-tags span").count() >= 3
     assert remote == [], "Demo must not request third-party hosts"
+    # Newly requested Chile and Venezuela names must resolve to individual
+    # static profiles, with local monogram fallback for missing approved logos.
+    for slug, title in [
+        ("bancoestado", "BancoEstado"),
+        ("movistar-chile", "Movistar Chile"),
+        ("aba-cantv", "ABA CANTV"),
+        ("claveunica", "ClaveÚnica"),
+        ("starlink", "Starlink"),
+    ]:
+        page.goto(ROOT + "servicios/" + slug + "/", wait_until="networkidle")
+        assert page.get_by_role("heading", name=title, exact=True).count() == 1, slug
+        assert page.get_by_text("Estado actual no consultado").count() == 1, slug
+        assert "Referencia solicitada:" in page.locator(".profile-hero").inner_text(), slug
+    assert remote == [], "Newly added services must never load unverified external logos"
+
     # The documentation lives in Pages too, without claiming that this
     # static preview collects reports or monitors providers in real time.
     page.goto(ROOT + "metodologia/", wait_until="networkidle")
