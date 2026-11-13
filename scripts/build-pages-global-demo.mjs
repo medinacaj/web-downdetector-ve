@@ -81,6 +81,8 @@ const CSS=[
 "/* One accessible anchor covers the entire catalog tile; only the separate action buttons intercept clicks. */\n.card{position:relative}\n.card>a.card-link::after{content:\"\";position:absolute;inset:0;z-index:2;border-radius:13px;cursor:pointer}\n.card>a.card-link:focus-visible{outline:none}\n.card>a.card-link:focus-visible::after{outline:3px solid var(--cyan);outline-offset:-3px}\n.card>.card-actions{position:relative;z-index:3;pointer-events:none}\n.card>.card-actions button{pointer-events:auto}"
 ,
 "/* First-visit guidance for the public static preview: native links, no onboarding modal. */\n.intro-lead{font-size:15px!important;color:#e1f4f0!important;max-width:680px!important}\n.intro-disclaimer{margin-top:12px!important;color:#d7eee9!important;font-size:12px!important;line-height:1.6!important}\n.intro-disclaimer strong{color:#fff}\n.intro-actions{display:flex;flex-wrap:wrap;align-items:center;gap:12px;margin:20px 0 12px}\n.intro-primary{display:inline-flex;min-height:42px;align-items:center;justify-content:center;padding:10px 16px;border-radius:9px;background:#73e4ce;color:#113b35;font-size:14px;font-weight:800;text-decoration:none}\n.intro-primary:hover,.intro-primary:focus-visible{background:#a1f3e3}\n.intro-secondary{display:inline-flex;min-height:40px;align-items:center;color:#e1f5ef;font-size:13px;font-weight:700;text-underline-offset:4px;text-decoration:underline}\n.intro-guide{scroll-margin-top:90px;margin-top:18px;padding-top:16px;border-top:1px solid #3c585c}\n.intro-guide h2{font-size:13px;font-weight:800;color:#fff;margin:0 0 11px}\n.intro-steps{list-style:none;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:13px;margin:0;padding:0}\n.intro-steps li{display:flex;min-width:0;flex-direction:column;gap:4px;line-height:1.55}\n.intro-steps strong{color:#84e7d5;font-size:12px}\n.intro-steps span{color:#e5f6f2;font-size:12px}\n@media(max-width:760px){.intro-steps{grid-template-columns:1fr;gap:9px}.intro-steps li{flex-direction:row;gap:9px}.intro-steps strong{flex:0 0 76px}.intro-steps span{min-width:0}.intro-actions{margin:14px 0 9px}}\n"
+,
+"/* Header theme control: icon only, with a 44px touch target and visible focus. */\n.theme-toggle,body[data-theme=\"light\"] .theme-toggle,body[data-theme=\"dark\"] .theme-toggle{width:44px;height:44px;min-width:44px;min-height:44px;padding:0;display:inline-flex;align-items:center;justify-content:center;border:0;border-radius:10px;background:transparent;cursor:pointer;line-height:1;color:inherit;flex-shrink:0}\n.theme-toggle:hover{background:rgba(0,131,116,.1);text-decoration:none}\n.theme-toggle:focus-visible{outline:2px solid #00a58c;outline-offset:3px}\nbody[data-theme=\"dark\"] .theme-toggle:hover{background:rgba(139,226,204,.15)}\n.theme-toggle svg{display:block;pointer-events:none}\n"
 ].join('\n');
 
 function monogram(name){const parts=name.trim().split(/\s+/);return parts.length>1?parts.slice(0,2).map((s)=>s[0]).join('').toUpperCase():name.slice(0,2).toUpperCase();}
@@ -98,7 +100,7 @@ function illustrativeSparkline(slug){
     points.push((5+i*12.08).toFixed(1)+','+Math.max(5,Math.min(43,y)).toFixed(1));
   }
   return '<svg class="demo-chart" viewBox="0 0 300 48" preserveAspectRatio="none" role="img" '+
-    'aria-label="Gráfico ficticio de demostración de '+escape(slug)+'; no representa incidentes reales">'+
+    'aria-label="Gráfico ilustrativo de '+escape(slug)+'; no representa incidentes reales">'+
     '<line x1="4" y1="43" x2="296" y2="43" stroke="currentColor" opacity=".17"/>'+
     '<polyline fill="none" stroke="currentColor" stroke-width="2.8" stroke-linejoin="round" stroke-linecap="round" points="'+points.join(' ')+'"/>'+
     '</svg>';
@@ -122,8 +124,7 @@ function card(s) {
 function header(){
  return '<header class="top"><div class="wrap nav"><a class="brand" href="'+BASE+'/">Pulso<span>VE</span></a>'+
    '<nav class="navlinks" aria-label="Navegación"><a href="'+BASE+'/">Inicio</a><a href="'+BASE+'/servicios/">'+catalog.length+' servicios</a><a href="'+BASE+'/creditos-marcas/">Logos y créditos</a></nav>'+
-   '<button type="button" id="theme-toggle" class="theme-toggle" aria-label="Cambiar entre tema claro y oscuro" title="Cambiar contraste" aria-pressed="false">☼ Vista</button></div></header>'+
-   '<div class="banner" role="note"><div class="wrap"><strong>VISTA PREVIA PÚBLICA</strong> · Gráficos ficticios de ejemplo, sin reportes ni mediciones reales de caídas. La app operativa requiere servidor y base de datos.</div></div>';
+   '<button type="button" id="theme-toggle" class="theme-toggle" aria-label="Cambiar a modo oscuro" title="Cambiar a modo oscuro" aria-pressed="false"><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79Z"/></svg></button></div></header>';
 }
 
 const DEMO_REPORT_ISSUES = Object.fromEntries(categoriesSeed.map((category) => [
@@ -133,21 +134,21 @@ const DEMO_REPORT_ISSUES = Object.fromEntries(categoriesSeed.map((category) => [
 ]));
 const REPORT_MODAL = '<dialog id="demo-report-dialog" class="report-dialog" aria-labelledby="demo-report-title">'+
 '<h2 id="demo-report-title">Reportar falla: <span id="demo-report-service"></span></h2>'+
-'<p><strong>Simulación:</strong> esta demo no envía ni almacena reportes. El formulario operativo requiere el servidor de PulsoVE.</p>'+
+'<p>Este formulario no envía ni almacena reportes.</p>'+
 '<form id="demo-report-form" method="dialog">'+
 '<label for="demo-issue">Tipo de falla<select id="demo-issue" name="issue" required></select></label>'+
 '<label for="demo-state">Estado de Venezuela<select id="demo-state" name="state" required><option value="">Seleccionar estado</option>'+
 statesSeed.map((state)=>'<option value="'+escape(state.code)+'">'+escape(state.name)+'</option>').join('')+'</select></label>'+
-'<label class="check"><input id="demo-consent" type="checkbox" required>Entiendo que esto es una prueba, sin envío ni almacenamiento de datos.</label>'+
+'<label class="check"><input id="demo-consent" type="checkbox" required>Entiendo que no se enviará ningún reporte.</label>'+
 '<p class="report-feedback" id="demo-report-feedback" role="status" aria-live="polite"></p>'+
 '<div class="buttons"><button type="button" id="demo-report-close">Cancelar</button>'+
-'<button type="submit">Probar reporte (demo)</button></div></form></dialog>';
+'<button type="submit">Probar formulario</button></div></form></dialog>';
 
 function layout(title,body,description){
  return '<!DOCTYPE html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">'+
-  '<meta name="robots" content="noindex,nofollow"><title>'+escape(title)+' — PulsoVE (demo)</title>'+
+  '<meta name="robots" content="noindex,nofollow"><title>'+escape(title)+' — PulsoVE</title>'+
   '<meta name="description" content="'+escape(description)+'"><style>'+CSS+'</style></head><body>'+header()+
-  '<main id="contenido">'+body+'</main><footer class="footer"><div class="wrap">PulsoVE · Vista previa técnica independiente. Sin datos productivos ni monitoreo en tiempo real. '+
+  '<main id="contenido">'+body+'</main><footer class="footer"><div class="wrap">PulsoVE · Gráficos ilustrativos, no indicadores de disponibilidad actual. '+
   '<a href="'+BASE+'/creditos-marcas/">Créditos y marcas</a>.</div></footer>'+REPORT_MODAL+
   '<script>const PREVIEW_ISSUES='+JSON.stringify(DEMO_REPORT_ISSUES).replace(/</g,'\\u003c')+';'+clientEnhance.toString()+';clientEnhance();'+demoChartInteraction.toString()+';demoChartInteraction();</script></body></html>';
 }
@@ -167,13 +168,12 @@ if(homeSections.length!==8||homeSections.some((s)=>s.items.length!==6))throw Err
 
 const hero='<div class="wrap hero"><div class="hero-top"><div class="hero-copy"><div class="eyebrow">PULSOVE · FALLAS DE SERVICIOS Y APLICACIONES</div>'+
 '<h1>¿Tu internet, banco o aplicación está fallando?</h1>'+
-'<p class="intro-lead">PulsoVE te ayuda a consultar reportes de otras personas sobre servicios de Venezuela y plataformas internacionales. En la aplicación operativa también podrás informar una falla.</p>'+
-'<p class="intro-disclaimer"><strong>Estás viendo una demostración:</strong> aquí puedes explorar el catálogo y probar sus funciones, pero no se consultan fallas en tiempo real ni se envían reportes.</p>'+
+'<p class="intro-lead">Encuentra servicios de Venezuela y del mundo, conoce sus funciones, explora sus fichas y descubre cómo consultar y compartir reportes de fallas.</p>'+
 '<div class="intro-actions"><a class="intro-primary" href="'+BASE+'/servicios/">Explorar servicios</a><a class="intro-secondary" href="#como-funciona">Cómo se usa</a></div>'+
 '<div class="intro-guide" id="como-funciona"><h2>En tres pasos</h2><ol class="intro-steps">'+
 '<li><strong>1 · Busca</strong><span>Elige tu internet, banco, juego o aplicación.</span></li>'+
-'<li><strong>2 · Revisa</strong><span>Abre su ficha; los gráficos de esta versión son ejemplos.</span></li>'+
-'<li><strong>3 · Reporta</strong><span>Prueba el botón rojo; en esta demo no se envían datos.</span></li>'+
+'<li><strong>2 · Revisa</strong><span>Consulta la información y los gráficos ilustrativos.</span></li>'+
+'<li><strong>3 · Reporta</strong><span>Conoce el formulario desde el botón rojo.</span></li>'+
 '</ol></div></div>'+
 '<div class="stats"><div class="stat"><strong>'+catalog.length+'</strong><small>Servicios del catálogo</small></div>'+
 '<div class="stat"><strong>'+categoriesSeed.length+'</strong><small>Categorías</small></div>'+
@@ -189,15 +189,15 @@ const hero='<div class="wrap hero"><div class="hero-top"><div class="hero-copy">
 '<button type="button" class="chip" data-home-filter="inteligencia-artificial" aria-pressed="false">IA</button>'+
 '</div><p class="home-search-status" id="home-search-count" aria-live="polite">60 servicios destacados</p></div></div>';
 const officialSourcesPanel='<section class="group" id="microsoft-status"><div class="section-title"><h2>Estado oficial de Microsoft</h2></div>'+
-'<p class="hint">En esta vista previa estática no se consulta el RSS ni se afirman estados actuales. La aplicación conectada actualiza las fuentes cada cinco minutos.</p>'+
+'<p class="hint">Estado oficial no consultado. Comprueba la fuente para ver información actual.</p>'+
 '<ul class="cards">'+MICROSOFT_FEEDS.map((feed)=>'<li class="card"><div class="card-link"><strong class="name">'+escape(feed.name)+'</strong>'+
 '<p class="category">'+escape(feed.scope)+'</p><div class="logo-area"><span class="monogram">MS</span></div>'+
-'<span class="signal">Estado actual: no consultado en esta demo</span><a class="chip" target="_blank" rel="noopener noreferrer" href="'+escape(feed.statusUrl)+'">Fuente oficial</a></div></li>').join('')+'</ul></section>';
+'<span class="signal">Estado actual: no consultado</span><a class="chip" target="_blank" rel="noopener noreferrer" href="'+escape(feed.statusUrl)+'">Fuente oficial</a></div></li>').join('')+'</ul></section>';
 const indexBody=hero+'<div class="wrap">'+group('Destacados de Venezuela','Servicios tradicionales del catálogo, con identificadores de marca cuando hay archivos verificados.',homeSelected,'ve')+
 homeSections.map((s)=>group(s.title,s.description,s.items,s.id)).join('')+
 '<p id="home-empty" class="noresults" hidden>No encontramos servicios destacados con esa búsqueda. Prueba otro término o abre el directorio completo.</p>'+
-'<p class="legal">Explora los servicios, guarda favoritos en este dispositivo o prueba el botón de reporte. Las funciones de la vista previa no envían información a un servidor.</p></div>';
-const indexHtml=layout('Servicios y plataformas internacionales',indexBody,'Catálogo demostrativo de plataformas internacionales y servicios venezolanos.');
+'</div>';
+const indexHtml=layout('Servicios y plataformas internacionales',indexBody,'Consulta el catálogo de servicios de Venezuela y plataformas internacionales.');
 
 const options=categoriesSeed.map((cat)=>'<option value="'+escape(cat.slug)+'">'+escape(cat.name)+'</option>').join('');
 const dirBody='<div class="wrap directory"><div class="hero"><div class="eyebrow">Directorio completo</div>'+
@@ -210,7 +210,7 @@ const dirBody='<div class="wrap directory"><div class="hero"><div class="eyebrow
 '<p class="result" id="result-count" aria-live="polite">'+catalog.length+' servicios</p></div>'+
 '<ul class="cards" id="directory-cards">'+catalog.map(card).join('')+'</ul>'+
 '<p class="noresults" id="empty-result" hidden>No se encontraron servicios con estos filtros.</p></div>';
-const directoryHtml=layout('Directorio global de servicios',dirBody,'Directorio demostrativo de '+catalog.length+' plataformas, servicios cloud, correo y juegos.');
+const directoryHtml=layout('Directorio global de servicios',dirBody,'Directorio de '+catalog.length+' plataformas, servicios cloud, correo y juegos.');
 
 
 /** Every catalogued service has a directly accessible, static, noindex profile. */
@@ -239,15 +239,15 @@ function serviceDetailHtml(s){
         '<h3>Tipo de servicio</h3><p class="profile-value">'+escape(profile.type)+'</p>'+
         '<p class="profile-note">Información editorial orientativa. La identificación no supone afiliación con PulsoVE.</p></section>'+
       '<section class="profile-panel"><h2>Estado y alcance</h2>'+
-        '<p class="profile-value">Sin datos reales suficientes</p>'+
-        '<p>Esta versión de GitHub Pages es una demostración estática. No consulta servidores de terceros ni recoge reportes ciudadanos.</p>'+
-        '<p class="profile-note">No es un indicador de funcionamiento, disponibilidad, incidentes ni tiempo en línea.</p></section>'+
+        '<p class="profile-value">Estado actual no consultado</p>'+
+        '<p>Comprueba la fuente oficial del proveedor para consultar su estado actual.</p>'+
+        '<p class="profile-note">La ausencia de reportes no confirma disponibilidad.</p></section>'+
       '<section class="profile-panel profile-wide"><h2>Acerca de la empresa y el servicio</h2>'+
         '<p class="profile-about">'+escape(profile.companyOverview)+'</p>'+
         '<h3>Principales usos y productos</h3><ul class="profile-list">'+uses+'</ul>'+source+
         '<h3>Qué significa un reporte aquí</h3><p>'+escape(profile.monitoringContext)+'</p></section>'+
       '<section class="profile-panel profile-wide"><h2>Gráfica detallada de reportes</h2>'+
-        '<p><strong>Explorador interactivo de DEMOSTRACIÓN.</strong> Todos los valores y fechas son ejemplos inventados y etiquetados; NO son reportes, incidentes, métricas de disponibilidad ni datos históricos de usuarios.</p>'+
+        '<p class="profile-note">Gráfico ilustrativo, sin reportes ni métricas reales de disponibilidad.</p>'+
         '<div class="chart-controls">'+
           '<label for="demo-range">Rango temporal<select id="demo-range"><option value="24h">24 horas</option><option value="7d">7 días</option><option value="30d">30 días</option><option value="90d">90 días</option></select></label>'+
           '<label for="demo-mode">Tipo de gráfico<select id="demo-mode"><option value="linea">Línea</option><option value="area">Área</option><option value="barras">Barras</option></select></label>'+
@@ -257,12 +257,12 @@ function serviceDetailHtml(s){
         '<div class="profile-chart chart-shell"><svg id="detail-chart" data-service="'+escape(s.slug)+'" viewBox="0 0 920 315" preserveAspectRatio="none" tabindex="0" role="img" aria-label="Gráfico ficticio interactivo: mueve el puntero, haz clic o utiliza las flechas para seleccionar un intervalo"></svg>'+
           '<div class="chart-readout" id="demo-chart-readout" aria-live="polite">Seleccione un periodo o mueva el puntero por la gráfica.</div></div>'+
         '<aside class="chart-observation" aria-label="Observaciones del intervalo seleccionado"><strong id="demo-observation-date">Observaciones por fecha</strong>'+
-          '<p id="demo-observation-text">Selecciona un intervalo para ver una anotación ilustrativa. No se han registrado incidentes en esta demo.</p></aside>'+
-        '<p class="profile-note">Ejemplo visual · datos simulados. La aplicación operativa permite explorar conteos auténticos y observaciones basadas en incidentes registrados.</p></section>'+
+          '<p id="demo-observation-text">Selecciona una fecha para consultar una anotación ilustrativa.</p></aside>'+
+        '</section>'+
       '<section class="profile-panel profile-wide"><h2>Historial de incidentes</h2>'+
-        '<div class="profile-incident">No hay historial de incidentes verificable en esta demo. La ausencia de registros no significa que el servicio haya funcionado sin fallas.</div></section>'+
+        '<div class="profile-incident">Sin historial verificado disponible. No es posible confirmar que el servicio haya funcionado sin interrupciones.</div></section>'+
     '</div><a class="profile-back" href="'+BASE+'/servicios/">Volver a los 211 servicios</a></div>';
-  return layout('Ficha de '+s.name,body,'Ficha demostrativa de '+s.name+': empresa, usos y gráfico interactivo de ejemplo sin datos operativos.');
+  return layout('Ficha de '+s.name,body,'Información de '+s.name+': empresa, principales usos y gráfico ilustrativo.');
 }
 
 const credits=Object.entries(HOME_BRAND_LOGOS).map(([slug,path])=>{
@@ -357,9 +357,13 @@ function clientEnhance(){
  function setTheme(theme){
    document.body.dataset.theme=theme;
    if(themeToggle){
-     themeToggle.setAttribute('aria-pressed',String(theme==='light'));
-     themeToggle.textContent=theme==='light'?'☾ Oscuro':'☼ Claro';
-     themeToggle.title=theme==='light'?'Cambiar a modo oscuro':'Cambiar a modo claro';
+     themeToggle.setAttribute('aria-pressed',String(theme==='dark'));
+     const label=theme==='light'?'Cambiar a modo oscuro':'Cambiar a modo claro';
+     themeToggle.title=label;
+     themeToggle.setAttribute('aria-label',label);
+     themeToggle.innerHTML=theme==='light'
+       ? '<svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79Z"/></svg>'
+       : '<svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>';
    }
  }
  setTheme(selectedTheme);
@@ -476,8 +480,8 @@ function demoChartInteraction(){
    noteDate.textContent='Intervalo ilustrativo: '+point.date+' UTC';
    const marks=new Set([Math.floor(points.length*0.28),Math.floor(points.length*0.72)]);
    noteText.textContent=marks.has(selected)
-     ? 'Anotación ficticia: cambio de la curva de ejemplo para demostrar el sistema de observaciones. No representa una falla ni un comunicado del proveedor.'
-     : 'Sin observaciones reales en esta demostración. Seleccione otra fecha para explorar valores de ejemplo; la app operativa vincula incidentes registrados.';
+     ? 'Cambio ilustrativo en la curva. No representa una falla confirmada.'
+     : 'Sin observaciones verificadas para esta fecha.';
    render();
  }
  function render(){
@@ -514,7 +518,7 @@ function demoChartInteraction(){
      pieces.push('<text x="'+x(tickIndex).toFixed(2)+'" y="283" text-anchor="middle" fill="#b0c3d1" font-size="12">'+points[tickIndex].label+'</text>');
    }
    svg.innerHTML=pieces.join('');
-   readout.textContent=points[active].date+' UTC · '+points[active].value+' puntos FICTICIOS (solo demostración)';
+   readout.textContent=points[active].date+' UTC · '+points[active].value+' puntos ilustrativos';
  }
  function reset(){
    points=synth(range.value);

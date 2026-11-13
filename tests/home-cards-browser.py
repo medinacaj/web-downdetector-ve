@@ -14,6 +14,21 @@ with sync_playwright() as playwright:
     page = context.new_page()
     response = page.goto("http://127.0.0.1:3000/", wait_until="networkidle", timeout=45000)
     assert response and response.status == 200, "Home must serve HTTP 200"
+
+    # Both versions of PulsoVE use a top-right icon-only theme toggle.
+    theme_toggle = page.get_by_role("button", name="Cambiar a modo oscuro")
+    assert theme_toggle.count() == 1
+    assert theme_toggle.locator("svg[aria-hidden=true]").count() == 1
+    assert theme_toggle.inner_text().strip() == ""
+    assert theme_toggle.evaluate("(el) => el.getBoundingClientRect().width") >= 44
+    theme_toggle.click()
+    assert page.locator("html").evaluate("(el) => el.classList.contains('dark')")
+    assert page.get_by_role("button", name="Cambiar a modo claro").get_attribute("aria-pressed") == "true"
+    page.reload(wait_until="networkidle")
+    assert page.locator("html").evaluate("(el) => el.classList.contains('dark')")
+    page.get_by_role("button", name="Cambiar a modo claro").click()
+    assert not page.locator("html").evaluate("(el) => el.classList.contains('dark')")
+
     # A first-time visitor can discover the site's purpose and primary actions
     # without prior explanation, a walkthrough modal or misleading uptime claims.
     hero = page.locator("section.home-hero")

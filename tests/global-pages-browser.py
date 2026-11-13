@@ -14,15 +14,16 @@ with sync_playwright() as playwright:
     page.on("request", lambda request: remote.append(request.url) if not request.url.startswith("http://127.0.0.1:3434/") else None)
     response = page.goto(ROOT, wait_until="networkidle")
     assert response and response.status == 200
-    assert page.get_by_text("VISTA PREVIA PÚBLICA").count() >= 1
+    assert page.get_by_text("VISTA PREVIA PÚBLICA").count() == 0
+    assert page.locator(".banner").count() == 0
 
     # A visitor unfamiliar with PulsoVE must understand its purpose, what
     # this demo can/cannot do and the path to explore services immediately.
     hero_intro = page.locator(".wrap.hero")
     assert hero_intro.get_by_role("heading", name="¿Tu internet, banco o aplicación está fallando?").count() == 1
-    assert hero_intro.get_by_text("PulsoVE te ayuda a consultar reportes de otras personas", exact=False).count() == 1
-    assert hero_intro.get_by_text("Estás viendo una demostración:", exact=False).count() >= 1
-    assert hero_intro.get_by_text("no se consultan fallas en tiempo real ni se envían reportes", exact=False).count() >= 1
+    assert hero_intro.get_by_text("Encuentra servicios de Venezuela y del mundo", exact=False).count() == 1
+    assert hero_intro.get_by_text("Estás viendo una demostración:", exact=False).count() == 0
+    assert page.get_by_text("Gráficos ilustrativos, no indicadores de disponibilidad actual", exact=False).count() == 1
     assert hero_intro.get_by_role("link", name="Explorar servicios").get_attribute("href") == "/web-downdetector-ve/servicios/"
     assert hero_intro.get_by_role("link", name="Cómo se usa").get_attribute("href") == "#como-funciona"
     steps = hero_intro.locator("#como-funciona ol.intro-steps > li")
@@ -45,7 +46,7 @@ with sync_playwright() as playwright:
     assert charts.count() == 60, "All 60 visible cards need illustrative charts"
     assert page.locator("main .card .demo-label").count() == 0, "No redundant demo label in cards"
     assert page.locator("main .card .notice").count() == 0, "No repeated disclaimer beneath each chart"
-    assert page.locator(".banner").count() == 1, "One global static-preview disclosure"
+    assert page.locator(".banner").count() == 0, "No loud preview banner"
     assert page.locator("#nube .card .name").first.is_visible()
     assert page.locator("main .card .card-cta").count() == 0, "No redundant Ver detalles CTA"
     assert page.locator("#nube .card .card-actions").first.is_visible()
@@ -98,17 +99,24 @@ with sync_playwright() as playwright:
     page.keyboard.press("Escape")
     assert page.locator("main .card:visible").count() == 60
     theme = page.locator("#theme-toggle")
+    assert theme.get_attribute("aria-label") == "Cambiar a modo oscuro"
+    assert theme.locator("svg[aria-hidden=true]").count() == 1
+    assert theme.inner_text().strip() == "", "Theme button should contain only an icon"
+    assert theme.evaluate("(el) => el.getBoundingClientRect().width") >= 44
     assert page.locator("body").get_attribute("data-theme") == "light", "Light is the initial high-contrast presentation"
     theme.click()
     assert page.locator("body").get_attribute("data-theme") == "dark"
-    assert theme.get_attribute("aria-pressed") == "false"
+    assert theme.get_attribute("aria-pressed") == "true"
+    assert theme.get_attribute("aria-label") == "Cambiar a modo claro"
+    assert theme.locator("svg[aria-hidden=true]").count() == 1
+    assert theme.inner_text().strip() == ""
     page.reload(wait_until="networkidle")
     assert page.locator("body").get_attribute("data-theme") == "dark"
     page.locator("#theme-toggle").click()
     assert page.locator("body").get_attribute("data-theme") == "light"
-    assert "ficticio" in charts.first.get_attribute("aria-label")
+    assert "ilustrativo" in charts.first.get_attribute("aria-label")
     assert charts.nth(0).locator("polyline").get_attribute("points") != charts.nth(1).locator("polyline").get_attribute("points")
-    assert page.get_by_text("Gráficos ficticios de ejemplo").count() >= 1
+    assert page.get_by_text("Gráficos ficticios de ejemplo").count() == 0
 
 
     # Inspect real rendered geometry: actions may not occupy the chart column,
@@ -184,10 +192,10 @@ with sync_playwright() as playwright:
     assert page.locator("#demo-report-service").inner_text() == "Cloudflare"
     assert page.locator("#demo-issue option").count() >= 2
     assert page.locator("#demo-state option").count() == 25
-    assert page.get_by_text("esta demo no envía ni almacena reportes").count() == 1
+    assert page.get_by_text("Este formulario no envía ni almacena reportes.").count() == 1
     page.locator("#demo-state").select_option("VE-A")
     page.locator("#demo-consent").check()
-    page.get_by_role("button", name="Probar reporte (demo)").click()
+    page.get_by_role("button", name="Probar formulario").click()
     assert "No se envió ni guardó" in page.locator("#demo-report-feedback").inner_text()
     page.get_by_role("button", name="Cancelar").click()
     assert not dialog.is_visible()
@@ -300,7 +308,7 @@ with sync_playwright() as playwright:
     assert page.get_by_role("heading", name="Acerca de la empresa y el servicio").count() == 1
     assert "correo" in page.locator(".profile-panel.profile-wide").first.inner_text().lower()
     assert page.locator("#demo-point option").count() == 24
-    assert "puntos FICTICIOS" in page.locator("#demo-chart-readout").inner_text()
+    assert "puntos ilustrativos" in page.locator("#demo-chart-readout").inner_text()
     old_plot = page.locator("#detail-chart").inner_html()
     page.locator("#demo-range").select_option("7d")
     assert page.locator("#demo-point option").count() == 7
@@ -308,7 +316,7 @@ with sync_playwright() as playwright:
     page.locator("#demo-mode").select_option("barras")
     assert page.locator("#detail-chart rect[fill='#50cbb9']").count() == 7
     page.locator("#demo-point").select_option("1")
-    assert "Anotación ficticia" in page.locator("#demo-observation-text").inner_text()
+    assert "ilustrativo" in page.locator("#demo-observation-text").inner_text()
     page.locator("#demo-range").select_option("90d")
     assert page.locator("#demo-point option").count() == 90
     before_hover = page.locator("#demo-chart-readout").inner_text()
@@ -320,11 +328,11 @@ with sync_playwright() as playwright:
     assert page.locator("#detail-chart path[fill='#2ab8a3']").count() == 1
     page.locator("#detail-chart").focus()
     page.keyboard.press("ArrowLeft")
-    assert "puntos FICTICIOS" in page.locator("#demo-chart-readout").inner_text()
+    assert "puntos ilustrativos" in page.locator("#demo-chart-readout").inner_text()
     page.locator("#demo-range").select_option("30d")
     assert page.locator("#demo-point option").count() == 30
     assert page.get_by_role("link", name="Consultar la fuente").count() == 1
-    assert "datos simulados" in page.locator(".profile-panel.profile-wide").nth(1).inner_text()
+    assert "Gráfico ilustrativo" in page.locator(".profile-panel.profile-wide").nth(1).inner_text()
     for width in (320, 390, 768, 1280):
         page.set_viewport_size({"width": width, "height": 844})
         assert page.evaluate("document.documentElement.scrollWidth <= window.innerWidth + 2"), ("detail overflow", width)
@@ -334,7 +342,7 @@ with sync_playwright() as playwright:
     page.goto(ROOT + "servicios/cloudflare/", wait_until="networkidle")
     assert page.get_by_role("heading", name="Cloudflare", exact=True).count() == 1
     assert "Cloudflare, Inc." in page.locator(".profile-panel").first.inner_text()
-    assert "Sin datos reales suficientes" in page.locator(".profile-panel").nth(1).inner_text()
+    assert "Estado actual no consultado" in page.locator(".profile-panel").nth(1).inner_text()
     assert page.locator(".profile-tags span").count() >= 3
     assert remote == [], "Demo must not request third-party hosts"
     print("PASS: 211 services; logos exclusive with fallback, 211 quick-report modal actions, simulated form without backend, responsive cards and no external requests")
