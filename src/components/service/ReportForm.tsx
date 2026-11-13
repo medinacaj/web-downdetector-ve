@@ -128,6 +128,13 @@ export function ReportForm({
           </select>
         </div>
 
+      </div>
+
+      <details className="group rounded-lg border border-border/80 p-3">
+        <summary className="cursor-pointer text-sm font-medium text-brand-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-pulse-500">
+          Añadir detalles (opcional)
+        </summary>
+        <div className="mt-4 grid gap-4 sm:grid-cols-2">
         <div>
           <label htmlFor={`${formId}-city`} className="text-sm font-medium">
             Ciudad <span className="font-normal text-ink-muted">(opcional)</span>
@@ -154,20 +161,20 @@ export function ReportForm({
             className="mt-1 w-full rounded-md border border-border bg-surface px-3 py-2 text-sm focus:border-pulse-500"
           />
         </div>
-      </div>
-
-      <div>
-        <label htmlFor={`${formId}-comment`} className="text-sm font-medium">
-          Comentario <span className="font-normal text-ink-muted">(opcional, máx. 280 caracteres)</span>
-        </label>
-        <textarea
-          id={`${formId}-comment`}
-          name="comment"
-          maxLength={280}
-          rows={2}
-          className="mt-1 w-full rounded-md border border-border bg-surface px-3 py-2 text-sm focus:border-pulse-500"
-        />
-      </div>
+        </div>
+        <div className="mt-4">
+  <label htmlFor={`${formId}-comment`} className="text-sm font-medium">
+            Comentario <span className="font-normal text-ink-muted">(opcional, máx. 280 caracteres)</span>
+          </label>
+          <textarea
+            id={`${formId}-comment`}
+            name="comment"
+            maxLength={280}
+            rows={2}
+            className="mt-1 w-full rounded-md border border-border bg-surface px-3 py-2 text-sm focus:border-pulse-500"
+          />
+        </div>
+      </details>
 
       <label className="flex items-start gap-2 text-sm text-ink-muted">
         <input
