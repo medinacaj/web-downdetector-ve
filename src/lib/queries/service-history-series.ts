@@ -57,3 +57,13 @@ export function incidentInBucket(incidentIso: string, point: Pick<HistoryPoint, 
   const ms = Date.parse(incidentIso);
   return Number.isFinite(ms) && ms >= Date.parse(point.startIso) && ms < Date.parse(point.endIso);
 }
+
+/**
+ * Resolve chart clicks by their axis label rather than a visible-range index.
+ * A Recharts Brush can shift the visible range and change tooltip indices.
+ * Labels are unique within a 24h, 7d, 30d or 90d history series.
+ */
+export function historyIndexFromLabel(points: readonly HistoryPoint[], label: string | number | undefined): number {
+  if (label === undefined) return -1;
+  return points.findIndex((point) => point.label === String(label));
+}
