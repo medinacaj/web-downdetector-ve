@@ -111,7 +111,7 @@ for (const slug of PRIORITY) {
   if(!profile.includes('/brands/'+slug+'.svg'))throw Error('Requested brand absent from profile: '+slug);
 }
 const files = readdirSync(join(root,'brands'));
-if(files.length!==EXPECTED_LOGOS)throw Error('Missing or unexpected local brand assets: '+files.length);
+if(files.length!==expectedLogos)throw Error('Missing or unexpected local brand assets: '+files.length);
 for(const file of files) {
   const full=join(root,'brands',file);
   const data=readFileSync(full);
