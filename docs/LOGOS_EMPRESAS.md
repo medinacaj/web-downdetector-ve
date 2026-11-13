@@ -83,3 +83,15 @@ Se agregan recursos locales para **BBVA Provincial**, **AOL Mail** y **Mobile Le
 - **Mobile Legends:** [Mobile Legends Bang Bang en Arcticons](https://github.com/deathrashed/iconography/blob/main/iconify/arcticons/mobile-legends-bang-bang.svg), licencia del [repositorio](https://github.com/deathrashed/iconography/blob/main/LICENSE). Es una representación comunitaria, no se afirma que sea el logo oficial del juego.
 
 Las marcas siguen siendo propiedad de sus titulares. Los SVG se sirven desde `public/brands`, sin contenido activo ni enlaces remotos. **Cobertura total: 170/211 servicios (80,6 %); 41 pendientes de imagen validada.** Los monogramas continúan para los servicios restantes.
+
+## Cinco identificadores del catálogo venezolano · 13 de noviembre de 2026
+
+Se incorporan cinco ilustraciones vectoriales comunitarias, autohospedadas y sin scripts, con trazabilidad de archivo y licencia:
+
+- **Cashea:** [Lawnicons](https://github.com/LawnchairLauncher/lawnicons/blob/develop/svgs/cashea.svg), licencia [Apache-2.0 del repositorio](https://github.com/LawnchairLauncher/lawnicons/blob/develop/LICENSE).
+- **BNC (Banco Nacional de Crédito):** [Arcticons](https://github.com/deathrashed/iconography/blob/main/iconify/arcticons/bnc.svg), [licencia de la biblioteca](https://github.com/deathrashed/iconography/blob/main/LICENSE).
+- **Ridery:** [Arcticons](https://github.com/deathrashed/iconography/blob/main/iconify/arcticons/ridery.svg), licencia indicada arriba.
+- **Zinli:** [Arcticons](https://github.com/deathrashed/iconography/blob/main/iconify/arcticons/zinli.svg), licencia indicada arriba.
+- **Zupper:** [Arcticons](https://github.com/deathrashed/iconography/blob/main/iconify/arcticons/zupper.svg), licencia indicada arriba.
+
+Estas imágenes sirven como referencias editoriales de terceros, **no** como avales ni como logos oficiales garantizados. Marcas reservadas a sus propietarios. El inventario pasa a **175 de 211 servicios (82,9 %)** y **36 monogramas** para entradas aún sin recurso adecuadamente verificado.
