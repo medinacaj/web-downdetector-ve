@@ -16,6 +16,12 @@ on:
       - 'tests/global-platforms.test.ts'
       - 'tests/home-*.test.ts'
       - 'tests/home-cards-browser.py'
+      - 'src/lib/comments/**'
+      - 'src/app/api/services/**'
+      - 'src/lib/validation/service-comments.ts'
+      - 'scripts/moderate-comments.ts'
+      - 'tests/api-comments.test.ts'
+      - 'tests/comment-moderation-policy.test.ts'
       - '.github/workflows/home-cards-ci.yml'
   push:
     branches: [main, 'feat/home-service-pulse-cards-20261112', 'feat/global-platforms-catalog-20261112']
