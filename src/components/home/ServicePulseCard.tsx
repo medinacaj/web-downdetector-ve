@@ -21,7 +21,7 @@ export function ServicePulseCard({
     <li className="relative min-w-0">
       <article
         data-category={service.categorySlug}
-        className="service-tile flex h-full min-h-[267px] min-w-0 flex-col overflow-hidden rounded-2xl border border-border bg-surface shadow-sm transition-all focus-within:shadow-lg sm:min-h-[280px]"
+        className="service-tile flex h-full min-h-[260px] min-w-0 flex-col overflow-hidden rounded-2xl border border-border bg-surface shadow-sm transition-all focus-within:shadow-lg sm:min-h-[270px]"
       >
         <Link
           href={`/servicios/${encodeURIComponent(service.slug)}`}
@@ -71,8 +71,7 @@ export function ServicePulseCard({
           </div>
         </Link>
 
-        <div data-card-actions className="service-tile-actions flex h-11 shrink-0 items-center justify-end gap-1.5 px-3 sm:px-4">
-          <span aria-hidden="true" className="mr-auto text-[10px] font-semibold text-ink-muted">Acciones</span>
+        <div data-card-actions className="service-tile-actions flex h-10 shrink-0 items-center justify-end gap-2 px-3 sm:px-4">
           <Link
             href={`/servicios/${encodeURIComponent(service.slug)}#reportar`}
             aria-label={`Reportar falla de ${service.name}`}

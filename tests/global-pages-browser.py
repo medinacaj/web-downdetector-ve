@@ -58,13 +58,14 @@ with sync_playwright() as playwright:
     page.keyboard.press("Escape")
     assert page.locator("main .card:visible").count() == 60
     theme = page.locator("#theme-toggle")
+    assert page.locator("body").get_attribute("data-theme") == "light", "Light is the initial high-contrast presentation"
     theme.click()
-    assert page.locator("body").get_attribute("data-theme") == "light"
-    assert theme.get_attribute("aria-pressed") == "true"
-    page.reload(wait_until="networkidle")
-    assert page.locator("body").get_attribute("data-theme") == "light"
-    page.locator("#theme-toggle").click()
     assert page.locator("body").get_attribute("data-theme") == "dark"
+    assert theme.get_attribute("aria-pressed") == "false"
+    page.reload(wait_until="networkidle")
+    assert page.locator("body").get_attribute("data-theme") == "dark"
+    page.locator("#theme-toggle").click()
+    assert page.locator("body").get_attribute("data-theme") == "light"
     assert "ficticio" in charts.first.get_attribute("aria-label")
     assert charts.nth(0).locator("polyline").get_attribute("points") != charts.nth(1).locator("polyline").get_attribute("points")
     assert page.get_by_text("Gráficos ficticios de ejemplo").count() >= 1

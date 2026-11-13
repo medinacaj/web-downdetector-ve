@@ -28,7 +28,7 @@ export default async function HomePage() {
   return (
     <>
       {/* Hero — izquierda: el trabajo real (buscar); derecha: pulso nacional en vivo */}
-      <section className="border-b border-border">
+      <section className="home-hero border-b border-border">
         <div className="mx-auto grid max-w-6xl gap-10 px-4 py-14 sm:px-6 lg:grid-cols-[1.1fr_0.9fr] lg:items-center lg:py-20">
           <div>
             <h1 className="font-display text-3xl font-semibold leading-tight tracking-tight sm:text-4xl">
