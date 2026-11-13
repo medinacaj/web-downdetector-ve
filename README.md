@@ -6,11 +6,8 @@ plataformas digitales, streaming, videojuegos, delivery y movilidad, y
 apuestas y loterías. No es una copia de Downdetector ni de ninguna plataforma
 existente: identidad visual, arquitectura, código y metodología propios.
 
-**Estado actual del código: base 4c + páginas informativas 4d (mapa esquemático, incidentes, estadísticas, metodología).**
-Ver `docs/00-PLAN-MAESTRO.md` para la evaluación completa, la arquitectura y
-el plan de etapas. Ya se puede reportar una falla desde la interfaz, de
-verdad — no solo vía la API. Falta: mapa, incidentes, estadísticas,
-metodología, y el gráfico de la página de servicio.
+**Estado del código (13/11/2026):** catálogo ampliado a 579 fichas, 18 categorías y 47 tipos de problema. La aplicación Next.js dispone de reportes, incidentes, mapas, estadísticas y metodología para trabajar con una base PostgreSQL; el sitio GitHub Pages es solo una demostración sin backend.
+Ver `docs/00-PLAN-MAESTRO.md` y `docs/CATALOGO-SERVICIOS.md` para arquitectura, criterios de incorporación y restricciones de cobertura.
 
 **Todavía no está listo para publicarse:** falta la capa de SEO técnico
 (`robots.txt`, `sitemap.xml`, canonical, Open Graph, favicon, datos
@@ -21,14 +18,7 @@ estructurados y dominio). Ver `docs/SEO-PENDIENTE.md`.
 - Esquema completo de base de datos (17 tablas) en Drizzle ORM, con
   migraciones generadas y verificadas contra PostgreSQL 16 real (incluida
   una segunda migración aditiva: `reports.network_carrier`).
-- Datos semilla verificados: 24 estados (códigos ISO 3166-2:VE reales), 8
-  categorías, 25 tipos de problema y 71 servicios de demostración: los 16
-  de la sección 4.2 del brief, Cashea y el resto del catálogo ampliado
-  (más bancos y billeteras, portales públicos, redes, streaming,
-  videojuegos, delivery y movilidad, apuestas y loterías), cada uno con
-  evidencia pública fechada en `docs/CATALOGO-SERVICIOS.md`. Todo marcado
-  `is_demo: true`; ningún dato inventado (URLs oficiales, cobertura,
-  estadísticas — ver sección "Datos de demostración" más abajo).
+- Datos semilla: 24 estados de Venezuela (códigos ISO 3166-2:VE), **579 servicios únicos en 18 categorías**, y 47 tipos de problema. Los 211 servicios previos se conservan; las 368 incorporaciones de listas de Chile, Venezuela e internacionales son candidatas solicitadas y **no tienen verificación individual de presencia o funcionamiento**. Todo servicio semilla está marcado `is_demo: true`; no se inventan URLs oficiales, logos o estadísticas. La geografía de reportes ciudadanos sigue limitada a Venezuela hasta ampliar el modelo de regiones.
 - **API pública real y probada**: 9 endpoints (ver tabla abajo), con
   validación (zod), rate limiting por identidad anónima (Redis opcional /
   memoria), hash de privacidad (identidad anónima + IP truncada), sobre de
@@ -330,7 +320,7 @@ Nunca guardar `DATABASE_URL` ni `ANONYMIZATION_SALT` de producción en Git o en 
 El catálogo y la aplicación Next.js comparten código y recursos de marca, pero **no son el mismo despliegue**:
 
 - **Next.js + PostgreSQL**: los reportes, gráficos e incidentes consumen datos reales de la base configurada. Para afirmar operación pública es necesario verificar el entorno, su esquema migrado, variables seguras y versión exacta de la aplicación desplegada.
-- **Vista previa estática de GitHub Pages**: genera 211 fichas demostrativas con gráficos ficticios claramente identificados y sin transmisión de reportes. Su aprobación en CI no confirma la publicación del bundle ni demuestra monitorización activa.
+- **Vista previa estática de GitHub Pages**: genera 579 fichas demostrativas con gráficos ficticios claramente identificados y sin transmisión de reportes. Su aprobación en CI no confirma la publicación del bundle ni demuestra monitorización activa.
 - **Logos**: recursos locales con procedencia documentada y fallback tipográfico. Véase `docs/LOGOS_EMPRESAS.md`. No se deben sustituir recursos faltantes con logotipos inventados o de otras empresas.
 
 El `package-lock.json` revisado resuelve `next@16.4.1`, `zod@4.6.7`,
@@ -342,5 +332,5 @@ también falla de forma explícita ante avisos altos/críticos o resultados inco
 
 Antes de declarar una entrega pública completa deben comprobarse el despliegue
 real, la configuración y migración de la base de datos, el servicio publicado, la
-seguridad de reportes y la experiencia visual en el sitio final. Los 211 servicios
+seguridad de reportes y la experiencia visual en el sitio final. Los 579 servicios
 del seed no implican monitorización técnica individual de cada proveedor.

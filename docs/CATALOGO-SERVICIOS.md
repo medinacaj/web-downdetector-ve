@@ -4,12 +4,50 @@ Qué servicios monitorea PulsoVE, por qué cada uno está aquí y cómo añadir 
 retirar otros. Los datos viven en `src/lib/db/seed-data/` (categorías, tipos de
 problema, servicios) y se cargan con `npm run db:seed`.
 
-- **Estado actual:** 211 servicios en 12 categorías, 35 tipos de problema.
-- **Última revisión de fuentes:** 12 de noviembre de 2026 (expansión internacional solicitada por el propietario).
+- **Estado actual:** 579 servicios semilla (211 anteriores + 368 nuevos) en 18 categorías y 47 tipos de problema.
+- **Última revisión del catálogo:** 13 de noviembre de 2026. Las 368 fichas nuevas derivan de nombres entregados directamente por la persona solicitante; **no** tienen aún verificación individual de presencia, vigencia, logo o URL oficial.
 - **Naturaleza de los datos:** todos los servicios son **demostrativos**
   (`is_demo = true`) y ninguno tiene `official_url` (queda `null` hasta que una
   persona la verifique). Estar en el catálogo **no** afirma que el servicio
   funcione, que esté autorizado ni que PulsoVE tenga relación con él.
+
+
+## Ampliación solicitada — 13 de noviembre de 2026
+
+Se incorporaron **650 renglones recibidos** (150 del listado de Chile y 500 del listado de Venezuela/internacional). Las variantes, alias y repeticiones —por ejemplo Genshin Impact, Bancaribe y Mercado Libre— se concilian con el catálogo preexistente mediante `catalog-requested.ts`. Resultado: **579 servicios únicos** y **368 altas nuevas**. Los 211 slugs previos permanecen inalterados.
+
+- `catalog-chile.ts`, `catalog-venezuela.ts` y `catalog-global.ts` conservan los nombres solicitados, separados por procedencia.
+- `catalog-requested.ts` normaliza slugs y resuelve nombres equivalentes sin crear múltiples fichas del mismo servicio. **Movistar Chile** es una ficha diferenciada de **Movistar Venezuela**, porque corresponde a operaciones locales distintas.
+- Los nombres solicitados por el usuario son **candidatos editoriales**: figurar aquí no confirma que una marca siga activa, tenga atención local, autorice su uso o que PulsoVE tenga monitoreo técnico de sus sistemas.
+- Las marcas históricas **Skype** y **Star+** quedan señaladas como descontinuadas en la descripción; no deben interpretarse como plataformas operativas. **Magis TV** se registra sin enlaces ni validación de licencias.
+- La recepción de fallas geolocalizadas de PulsoVE sigue configurada para **estados de Venezuela**. Agregar plataformas chilenas o internacionales al catálogo **no habilita por sí solo reportes geográficos de Chile**. Esa cobertura exige modelo de regiones, consentimiento y pruebas propias.
+- No se inventan enlaces ni logos: las marcas nuevas sin imágenes locales verificadas muestran un **monograma de respaldo**. El catálogo de GitHub Pages es demostrativo, sin reportes reales.
+
+Resumen de todas las categorías (incluye las nuevas fichas):
+
+| Categoría | Servicios |
+|---|---:|
+| `telecomunicaciones` | 47 |
+| `banca-y-pagos` | 94 |
+| `servicios-publicos` | 17 |
+| `plataformas-digitales` | 63 |
+| `streaming` | 24 |
+| `videojuegos` | 53 |
+| `delivery-y-movilidad` | 22 |
+| `apuestas-y-loterias` | 5 |
+| `correo-y-productividad` | 53 |
+| `nube-e-infraestructura` | 51 |
+| `inteligencia-artificial` | 11 |
+| `comercio-global` | 45 |
+| `viajes-y-turismo` | 30 |
+| `salud-y-farmacias` | 10 |
+| `logistica-y-envios` | 14 |
+| `seguridad-y-privacidad` | 25 |
+| `educacion-y-contenidos` | 12 |
+| `clima-y-datos` | 3 |
+| **Total** | **579** |
+
+Los cambios de naturaleza legal/regulatoria, nombres discontinuados y URLs oficiales requieren revisión posterior antes de cualquier puesta en producción.
 
 ## 1. Criterio de inclusión
 

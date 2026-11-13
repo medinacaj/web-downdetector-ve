@@ -346,6 +346,13 @@ const CATEGORY_CONTEXT: Readonly<Record<string, string>> = {
   'comercio-global': 'Es útil distinguir catálogo, autenticación, carrito, pago y entrega; una falla en el proceso no indica necesariamente caída total.',
   'delivery-y-movilidad': 'La experiencia depende de ubicación, asignación y conectividad. Los reportes se interpretan con su contexto regional.',
   'apuestas-y-loterias': 'PulsoVE registra incidencias técnicas sin promover el servicio ni confirmar autorización legal de sus operaciones.',
+  'viajes-y-turismo': 'Reservas, itinerarios, emisión de pasajes y acceso a cuentas pueden fallar por separado. Un reporte no confirma cancelaciones ni cambios de vuelos.',
+  'salud-y-farmacias': 'Diferenciar acceso al portal, búsqueda, disponibilidad de pedidos y entrega. Los reportes no sustituyen información sanitaria ni la confirmación de una compra.',
+  'logistica-y-envios': 'Los retrasos y la falta de actualización del seguimiento pueden depender de cada envío. Una anomalía no confirma indisponibilidad del operador completo.',
+  'seguridad-y-privacidad': 'Separar autenticación, conexión segura y administración del servicio; los reportes no implican que un producto haya perdido sus garantías de seguridad.',
+  'educacion-y-contenidos': 'Problemas de sesión, aula y acceso a contenidos pueden variar por centro, cuenta y conectividad local.',
+  'clima-y-datos': 'La actualización de pronósticos y paneles no debe confundirse con una medición propia de condiciones meteorológicas.',
+
 };
 
 export function getServiceProfile(input: {

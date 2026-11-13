@@ -241,7 +241,7 @@ with sync_playwright() as playwright:
 
     response = page.goto(ROOT + "servicios/", wait_until="networkidle")
     assert response and response.status == 200
-    assert page.locator("#directory-cards .card").count() == 211
+    assert page.locator("#directory-cards .card").count() == 579
     # Every specifically reported missing brand must render a real local icon.
     priority_logos = ["aliexpress", "ebay", "minecraft", "amazon", "tumblr",
                       "youtube-music", "overwatch-2", "pokemon-go", "gta-online",
@@ -318,7 +318,7 @@ with sync_playwright() as playwright:
     assert warzone_logo.evaluate("(el) => el.complete && el.naturalWidth > 0")
     assert warzone.locator(".monogram").get_attribute("hidden") is not None
 
-    assert page.locator("#directory-cards button[data-report]").count() == 211
+    assert page.locator("#directory-cards button[data-report]").count() == 579
     assert page.locator("#directory-cards .demo-label").count() == 0
     assert page.locator("#directory-cards .notice").count() == 0
     page.locator("#directory-sort").select_option("category")
@@ -382,13 +382,28 @@ with sync_playwright() as playwright:
         assert page.evaluate("document.documentElement.scrollWidth <= window.innerWidth + 2"), ("detail overflow", width)
     page.get_by_role("link", name="Volver a servicios").click()
     assert page.url.endswith("/web-pulso-ve/servicios/")
-    assert page.locator("#directory-cards .card").count() == 211
+    assert page.locator("#directory-cards .card").count() == 579
     page.goto(ROOT + "servicios/cloudflare/", wait_until="networkidle")
     assert page.get_by_role("heading", name="Cloudflare", exact=True).count() == 1
     assert "Cloudflare, Inc." in page.locator(".profile-panel").first.inner_text()
     assert "Estado actual no consultado" in page.locator(".profile-panel").nth(1).inner_text()
     assert page.locator(".profile-tags span").count() >= 3
     assert remote == [], "Demo must not request third-party hosts"
+    # Newly requested Chile and Venezuela names must resolve to individual
+    # static profiles, with local monogram fallback for missing approved logos.
+    for slug, title in [
+        ("bancoestado", "BancoEstado"),
+        ("movistar-chile", "Movistar Chile"),
+        ("aba-cantv", "ABA CANTV"),
+        ("claveunica", "ClaveÚnica"),
+        ("starlink", "Starlink"),
+    ]:
+        page.goto(ROOT + "servicios/" + slug + "/", wait_until="networkidle")
+        assert page.get_by_role("heading", name=title, exact=True).count() == 1, slug
+        assert page.get_by_text("Estado actual no consultado").count() == 1, slug
+        assert "Referencia solicitada:" in page.locator(".profile-hero").inner_text(), slug
+    assert remote == [], "Newly added services must never load unverified external logos"
+
     # The documentation lives in Pages too, without claiming that this
     # static preview collects reports or monitors providers in real time.
     page.goto(ROOT + "metodologia/", wait_until="networkidle")
@@ -405,5 +420,5 @@ with sync_playwright() as playwright:
     page.set_viewport_size({"width": 390, "height": 844})
     page.screenshot(path="artifacts/global-pages-methodology-390.png", full_page=False, animations="disabled")
 
-    print("PASS: 211 services; logos exclusive with fallback, 211 quick-report modal actions, simulated form without backend, responsive cards and no external requests")
+    print("PASS: 579 services; logos exclusive with fallback, 579 quick-report modal actions, simulated form without backend, responsive cards and no external requests")
     browser.close()

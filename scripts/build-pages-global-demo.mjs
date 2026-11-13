@@ -26,7 +26,7 @@ const catalog=servicesSeed.map((s)=>({
   description:s.description,logo:logoForService(s.slug)
 }));
 const bySlug=new Map(catalog.map((s)=>[s.slug,s]));
-if(catalog.length!==211||new Set(catalog.map((s)=>s.slug)).size!==catalog.length)
+if(catalog.length!==579||new Set(catalog.map((s)=>s.slug)).size!==catalog.length)
   throw Error('Global catalogue is missing or contains duplicate services');
 for(const slug of ['cloudflare','gmail','outlook','fortnite'])if(!bySlug.has(slug))throw Error('Missing '+slug);
 

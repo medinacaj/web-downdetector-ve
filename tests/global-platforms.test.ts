@@ -10,8 +10,8 @@ const categorySlugs = new Set<string>(categoriesSeed.map((category) => category.
 
 describe('worldwide platform catalogue', () => {
   it('includes more than 140 services across at least 12 categories', () => {
-    expect(servicesSeed.length).toBeGreaterThanOrEqual(211);
-    expect(categoriesSeed.length).toBeGreaterThanOrEqual(12);
+    expect(servicesSeed.length).toBe(579);
+    expect(categoriesSeed.length).toBe(18);
     expect(new Set(servicesSeed.map((service) => service.slug)).size).toBe(servicesSeed.length);
   });
 

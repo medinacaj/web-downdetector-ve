@@ -120,7 +120,7 @@ describe('service editorial profile', () => {
   });
 
   it('can produce a profile for every catalogue item without losing category', () => {
-    const categories = new Map(categoriesSeed.map(({ slug, name }) => [slug, name]));
+    const categories = new Map<string, string>(categoriesSeed.map(({ slug, name }) => [slug, name]));
     for (const service of servicesSeed) {
       const categoryName = categories.get(service.categorySlug);
       expect(categoryName).toBeTruthy();
