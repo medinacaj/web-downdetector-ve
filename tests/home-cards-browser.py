@@ -399,6 +399,27 @@ with sync_playwright() as playwright:
     assert page.locator('select[name="sort"]').input_value() == "activity"
     assert page.get_by_text("El orden se actualiza cada minuto", exact=False).count() == 1
     assert page.locator("[data-directory-grid] > li[data-rapid-surge]").count() >= 200
+    # The entire directory now carries the same reviewed brand identity as
+    # the homepage. Quick reports are independent links, not nested actions.
+    assert page.locator("[data-directory-grid] [data-directory-brand]").count() >= 200
+    assert page.locator("[data-directory-grid] a[aria-label^='Reportar falla de']").count() >= 200
+    for name in ("CANTV", "Mercantil", "SENIAT"):
+        entry = page.locator("[data-directory-grid] > li").filter(
+            has=page.get_by_role("link", name="Ver estado y reportes de " + name)
+        )
+        assert entry.count() == 1, name
+        logo = entry.locator("img[alt='Logotipo identificativo de " + name + "']")
+        assert logo.count() == 1, name
+        logo.scroll_into_view_if_needed()
+        logo.evaluate("(el) => el.decode()")
+        assert logo.evaluate("(el) => el.complete && el.naturalWidth > 0"), name
+        report = entry.get_by_role("link", name="Reportar falla de " + name)
+        assert report.get_attribute("href") == "/servicios/" + (
+            "banco-de-venezuela" if name == "Banco de Venezuela" else
+            {"CANTV": "cantv", "Mercantil": "mercantil", "SENIAT": "seniat"}[name]
+        ) + "#reportar"
+    assert page.locator("[data-directory-grid] a a, [data-directory-grid] a button").count() == 0
+
     only = page.locator("[data-favorites-only]")
     assert only.count() == 1
     assert only.get_attribute("aria-pressed") == "false"
@@ -435,6 +456,10 @@ with sync_playwright() as playwright:
     page.get_by_role("button", name="Lista", exact=True).click()
     assert page.locator("[data-directory-list] > li").count() >= 200
     assert page.locator("[data-directory-list] > li[data-rapid-surge]").count() >= 200
+    assert page.locator("[data-directory-list] [data-directory-brand]").count() >= 200
+    assert page.locator("[data-directory-list] a[aria-label^='Reportar falla de']").count() >= 200
+    assert page.locator("[data-directory-list] a a, [data-directory-list] a button").count() == 0
+
     only = page.locator("[data-favorites-only]")
     only.click()
     assert page.locator("[data-directory-list] > li").count() == 1

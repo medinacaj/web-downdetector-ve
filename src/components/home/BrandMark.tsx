@@ -62,7 +62,7 @@ export function BrandMark({
       <span
         aria-label={`Identificador tipográfico de ${name}`}
         role="img"
-        className={`flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl text-2xl font-bold tracking-tight ${tone.background} ${tone.foreground}`}
+        className={`flex h-full w-full max-h-16 max-w-16 shrink-0 items-center justify-center rounded-xl text-xl font-bold tracking-tight sm:text-2xl ${tone.background} ${tone.foreground}`}
       >
         {monogram(name)}
       </span>

@@ -3,7 +3,7 @@ from pathlib import Path
 import shutil
 from playwright.sync_api import sync_playwright
 
-ROOT = "http://127.0.0.1:3434/web-downdetector-ve/"
+ROOT = "http://127.0.0.1:3434/web-pulso-ve/"
 with sync_playwright() as playwright:
     chrome = shutil.which("google-chrome") or shutil.which("google-chrome-stable") or shutil.which("chromium")
     assert chrome, "Chromium executable unavailable"
@@ -31,7 +31,7 @@ with sync_playwright() as playwright:
     assert hero_intro.get_by_text("Busca tu servicio y consulta su información en PulsoVE.").count() == 1
     assert hero_intro.locator(".stats").count() == 0
     assert hero_intro.locator(".intro-guide").count() == 0
-    assert hero_intro.get_by_role("link", name="Ver plataformas").get_attribute("href") == "/web-downdetector-ve/servicios/"
+    assert hero_intro.get_by_role("link", name="Ver plataformas").get_attribute("href") == "/web-pulso-ve/servicios/"
     assert hero_intro.locator("#quicksearch").count() == 1
     assert hero_intro.locator("#home-search-count").inner_text().strip() == "Destacados"
     assert page.locator("header.top .navlinks a").all_inner_texts() == ["Inicio", "Servicios"]
@@ -42,7 +42,7 @@ with sync_playwright() as playwright:
     assert steps.count() == 3
     for heading in ("Busca", "Revisa", "Reporta"):
         assert steps.get_by_text(heading, exact=True).count() == 1
-    assert page.locator("footer").get_by_role("link", name="Logos y créditos").get_attribute("href") == "/web-downdetector-ve/creditos-marcas/"
+    assert page.locator("footer").get_by_role("link", name="Logos y créditos").get_attribute("href") == "/web-pulso-ve/creditos-marcas/"
     assert page.locator("header").get_by_text("Logos y créditos").count() == 0
 
     for name in ("Cloudflare", "Gmail", "Outlook", "Fortnite"):
@@ -343,8 +343,8 @@ with sync_playwright() as playwright:
     footer_box = outlook.locator(":scope > .card-actions").bounding_box()
     assert footer_box is not None
     page.mouse.click(footer_box["x"] + 8, footer_box["y"] + footer_box["height"] / 2)
-    page.wait_for_url("**/web-downdetector-ve/servicios/outlook/", timeout=30000)
-    assert page.url.endswith("/web-downdetector-ve/servicios/outlook/")
+    page.wait_for_url("**/web-pulso-ve/servicios/outlook/", timeout=30000)
+    assert page.url.endswith("/web-pulso-ve/servicios/outlook/")
     assert page.get_by_role("heading", name="Outlook", exact=True).count() == 1
     assert "Microsoft" in page.locator(".profile-panel").first.inner_text()
     assert page.get_by_role("heading", name="Historial de incidentes", exact=True).count() == 1
@@ -381,7 +381,7 @@ with sync_playwright() as playwright:
         page.set_viewport_size({"width": width, "height": 844})
         assert page.evaluate("document.documentElement.scrollWidth <= window.innerWidth + 2"), ("detail overflow", width)
     page.get_by_role("link", name="Volver a servicios").click()
-    assert page.url.endswith("/web-downdetector-ve/servicios/")
+    assert page.url.endswith("/web-pulso-ve/servicios/")
     assert page.locator("#directory-cards .card").count() == 211
     page.goto(ROOT + "servicios/cloudflare/", wait_until="networkidle")
     assert page.get_by_role("heading", name="Cloudflare", exact=True).count() == 1
