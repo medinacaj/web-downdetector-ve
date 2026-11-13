@@ -38,7 +38,7 @@ if(!homepage.includes('.card-header{display:flex')||!homepage.includes('.demo-ch
   throw Error('Uniform, full-width card layout CSS missing');
 if(homepage.includes('padding-right:75px')||homepage.includes('padding-right:88px'))
   throw Error('Whole-card right padding would shrink charts behind action icons');
-if(!homepage.includes('.report-quick{position:absolute')||!homepage.includes('background:#dc2626'))throw Error('Report icon must be compact and red');
+if(!homepage.includes('.card-actions{display:flex')||!homepage.includes('.report-quick{border:1px solid #b91c1c;background:#dc2626'))throw Error('Report icon must be compact, red, and inside its toolbar');
 if(!directory.includes('id="directory-cards"'))throw Error('Interactive directory missing');
 if(!credits.includes('Banesco'))throw Error('Brand credits missing');
 const files = readdirSync(join(root,'brands'));
