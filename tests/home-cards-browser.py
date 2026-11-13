@@ -44,7 +44,7 @@ with sync_playwright() as playwright:
     banking = page.locator('article.service-tile[data-category="banca-y-pagos"]').first
     assert telecom.count() and banking.count()
     assert telecom.evaluate("(el) => getComputedStyle(el).getPropertyValue('--tile-accent')") != banking.evaluate("(el) => getComputedStyle(el).getPropertyValue('--tile-accent')")
-    # Ensure small category labels and "Ver ficha" accents stay readable,
+    # Ensure small category labels remain readable,
     # including the highlighted tile surface, without decorative top stripes.
     contrast_js = """(card) => {
       const channels = value => (value.match(/[0-9.]+/g) || []).slice(0, 3).map(Number);
@@ -68,10 +68,22 @@ with sync_playwright() as playwright:
     page.evaluate("document.documentElement.classList.remove('dark')")
     page.wait_for_timeout(250)
 
+    # One native detail link is stretched over each whole tile. The small
+    # redundant "Ver ficha" CTA is gone. Report and favorite remain separate
+    # controls, not nested within that link.
+    assert page.get_by_text("Ver ficha", exact=False).count() == 0
     for article in grid.locator("article.service-tile").all():
         assert article.locator("[data-card-title]").first.is_visible()
         assert article.locator("[data-card-actions]").first.is_visible()
         assert article.locator("[data-card-actions]").evaluate("(el) => el.previousElementSibling?.tagName") == "A"
+        detail_link = article.locator('a[aria-label^="Ver estado y reportes"]')
+        assert detail_link.count() == 1
+        assert detail_link.evaluate("(el) => getComputedStyle(el, '::after').position") == "absolute"
+        assert detail_link.evaluate("(el) => getComputedStyle(el, '::after').cursor") == "pointer"
+        assert article.locator("[data-card-actions]").evaluate("(el) => getComputedStyle(el).pointerEvents") == "none"
+        for control in article.locator("[data-card-actions] a, [data-card-actions] button").all():
+            assert control.evaluate("(el) => getComputedStyle(el).pointerEvents") == "auto"
+        assert article.locator('a a, a button, button a').count() == 0
 
     # Empty data is not an alert. The full text should stand on its own,
     # without a tiny question-mark glyph that looks like a rendering error.
@@ -222,6 +234,17 @@ with sync_playwright() as playwright:
     page.set_viewport_size({"width": 390, "height": 844})
     link = page.get_by_role("link", name="Ver estado y reportes de CANTV")
     assert link.get_attribute("href") == "/servicios/cantv"
+    # Click the empty lower-left part of the footer, outside both action
+    # buttons. It must open the service even though the content link ends
+    # above the footer. Verify real navigation, not just CSS declarations.
+    first_article = link.locator("xpath=..")
+    footer = first_article.locator("[data-card-actions]")
+    footer_box = footer.bounding_box()
+    assert footer_box is not None
+    page.mouse.click(footer_box["x"] + 12, footer_box["y"] + footer_box["height"] / 2)
+    page.wait_for_url("**/servicios/cantv", timeout=30000)
+    assert page.get_by_role("heading", name="Acerca de la empresa y el servicio").count() == 1
+    page.go_back(wait_until="networkidle")
     quick = page.get_by_role("link", name="Reportar falla de CANTV")
     assert quick.count() == 1
     assert quick.get_attribute("href") == "/servicios/cantv#reportar"
