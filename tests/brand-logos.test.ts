@@ -11,11 +11,11 @@ const requested = [
 ] as const;
 
 describe('Local brand logo inventory', () => {
-  it('maps 164 distinct files into real catalogue entries, never remote runtime links', () => {
+  it('maps 165 distinct files into real catalogue entries, never remote runtime links', () => {
     const slugs = new Set<string>(servicesSeed.map((service) => service.slug));
     expect(servicesSeed).toHaveLength(211);
-    expect(Object.keys(HOME_BRAND_LOGOS)).toHaveLength(164);
-    expect(Object.keys(HOME_BRAND_LOGOS).filter(isAdditionalLogo)).toHaveLength(114);
+    expect(Object.keys(HOME_BRAND_LOGOS)).toHaveLength(165);
+    expect(Object.keys(HOME_BRAND_LOGOS).filter(isAdditionalLogo)).toHaveLength(115);
 
     for (const [slug, path] of Object.entries(HOME_BRAND_LOGOS)) {
       expect(slugs.has(slug), slug).toBe(true);
@@ -45,6 +45,11 @@ describe('Local brand logo inventory', () => {
       expect(logoForService(slug), slug).toBe('/brands/' + slug + '.svg');
       expect(isAdditionalLogo(slug)).toBe(true);
     }
+  });
+
+  it('uses the correctly attributed EA publisher icon for EA app', () => {
+    expect(logoForService('ea-app')).toBe('/brands/ea-app.svg');
+    expect(brandLogoSource('ea-app', '/brands/ea-app.svg').url).toBe('https://github.com/simple-icons/simple-icons/blob/develop/icons/ea.svg');
   });
 
   it('keeps an honest fallback for missing/unchecked brands', () => {
