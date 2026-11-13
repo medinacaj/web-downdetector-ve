@@ -380,6 +380,9 @@ with sync_playwright() as playwright:
     # All directory entries can now be starred, including those not featured.
     directory = page.goto("http://127.0.0.1:3000/servicios", wait_until="networkidle", timeout=60000)
     assert directory and directory.status == 200
+    assert page.locator('select[name="sort"]').input_value() == "activity"
+    assert page.get_by_text("El orden se actualiza cada minuto", exact=False).count() == 1
+    assert page.locator("[data-directory-grid] > li[data-rapid-surge]").count() >= 200
     only = page.locator("[data-favorites-only]")
     assert only.count() == 1
     assert only.get_attribute("aria-pressed") == "false"
@@ -415,6 +418,7 @@ with sync_playwright() as playwright:
     page.goto("http://127.0.0.1:3000/servicios", wait_until="networkidle", timeout=60000)
     page.get_by_role("button", name="Lista", exact=True).click()
     assert page.locator("[data-directory-list] > li").count() >= 200
+    assert page.locator("[data-directory-list] > li[data-rapid-surge]").count() >= 200
     only = page.locator("[data-favorites-only]")
     only.click()
     assert page.locator("[data-directory-list] > li").count() == 1
