@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { FAVORITES_KEY, parseFavoriteSlugs, toggleFavorite } from '@/lib/favorites';
 
-export function FavoriteButton({ slug, name }: { slug: string; name: string }) {
+export function FavoriteButton({ slug, name, inline = false }: { slug: string; name: string; inline?: boolean }) {
   const [isFavorite, setIsFavorite] = useState(false);
 
   useEffect(() => {
@@ -35,7 +35,7 @@ export function FavoriteButton({ slug, name }: { slug: string; name: string }) {
       aria-pressed={isFavorite}
       title={isFavorite ? 'Quitar de favoritos' : 'Guardar favorito en este navegador'}
       onClick={onToggle}
-      className="absolute right-3 top-3 z-10 flex h-10 w-10 items-center justify-center rounded-full text-pulse-600 transition-colors hover:bg-pulse-500/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-pulse-500 sm:right-4 sm:top-4"
+      className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-pulse-600 transition-colors hover:bg-pulse-500/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-pulse-500 ${inline ? "relative" : "absolute right-3 top-3 z-10 sm:right-4 sm:top-4"}`}
     >
       <svg viewBox="0 0 24 24" width="25" height="25" aria-hidden="true"
         fill={isFavorite ? 'currentColor' : 'none'} stroke="currentColor"
