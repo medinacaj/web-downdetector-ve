@@ -206,6 +206,19 @@ with sync_playwright() as playwright:
     assert history.get_by_role("button", name="Barras").count() == 1
     assert history.get_by_role("button", name="Área").count() == 1
     assert history.get_by_text("Sin reportes registrados en este periodo").count() == 1
+    # A range brush with no plotted points is a non-functional control.
+    # The date picker and keyboard interval navigation remain available.
+    assert history.get_by_role("button", name="Explorar rango / zoom").is_disabled()
+    previous = history.get_by_role("button", name="← Anterior")
+    next_interval = history.get_by_role("button", name="Siguiente →")
+    picker = history.locator("select")
+    assert picker.input_value() == "23"
+    assert next_interval.is_disabled()
+    previous.click()
+    assert picker.input_value() == "22"
+    next_interval.click()
+    assert picker.input_value() == "23"
+
     history.get_by_role("button", name="90d").click()
     assert history.get_by_role("button", name="90d").get_attribute("aria-pressed") == "true"
     assert history.locator("select option").count() == 90
