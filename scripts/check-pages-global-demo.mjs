@@ -7,8 +7,22 @@ const html = (path) => readFileSync(join(root,path),'utf8');
 const homepage = html('index.html');
 const directory = html('servicios/index.html');
 const credits = html('creditos-marcas/index.html');
+const methodology = html('metodologia/index.html');
 const info = html('build-info.txt');
 if(!info.includes('catalogue=211')) throw Error('Unexpected catalogue size in public output');
+if(!methodology.includes('Examinamos reportes ciudadanos para identificar posibles problemas de servicio.') ||
+   !methodology.includes('Siete elementos de una ficha de servicio') ||
+   !methodology.includes('id="deteccion"') ||
+   !methodology.includes('90 días') || !methodology.includes('15 min') ||
+   !methodology.includes('no envía ni almacena reportes') ||
+   (methodology.match(/class="guide-item"/g)||[]).length !== 7 ||
+   !methodology.includes('noindex,nofollow'))
+  throw Error('Public methodology must explain the seven functions, data limitations and detection defaults');
+if(!homepage.includes('/metodologia/') || !directory.includes('/metodologia/'))
+  throw Error('Public methodology must be accessible from the shared footer');
+if(/DATABASE_URL|ANONYMIZATION_SALT|postgresql:|authorization:\\s*Bearer/i.test(methodology))
+  throw Error('Secrets or backend reference leaked in methodology');
+
 // Compare the generated preview with the canonical explicit local allowlist.
 // Keep a regression floor, rather than pinning the inventory to an exact number
 // every time a verified service image is added.
@@ -156,7 +170,7 @@ for(const file of files) {
 }
 const top=new Set(readdirSync(root));
 for(const x of top){
-  if(!new Set(['index.html','servicios','creditos-marcas','brands','.nojekyll','build-info.txt']).has(x))
+  if(!new Set(['index.html','servicios','creditos-marcas','metodologia','brands','.nojekyll','build-info.txt']).has(x))
     throw Error('Unexpected public artifact '+x);
 }
 console.log('PASS: 211 demo services, 8 worldwide sections, 50 local logos, synthetic-only charts and no backend requests');
