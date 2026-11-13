@@ -36,8 +36,8 @@ export function BrandMark({
 
   if (logo && !broken) {
     return (
-      <div className="flex w-full flex-col items-center justify-center gap-2">
-        <div className="flex h-[90px] w-full max-w-[174px] items-center justify-center rounded-xl bg-white p-2 sm:h-[104px] sm:max-w-[220px]">
+      <div className="flex h-full w-full items-center justify-center">
+        <div className="flex h-full w-full max-w-[175px] items-center justify-center rounded-lg bg-white p-1">
           <Image
             src={logo}
             alt={`Logotipo identificativo de ${name}`}
@@ -46,7 +46,7 @@ export function BrandMark({
             sizes="(max-width: 640px) 160px, 220px"
             unoptimized
             onError={() => setBroken(true)}
-            className="h-full w-full object-contain"
+            className="h-full max-h-[76px] w-full object-contain"
           />
         </div>
       </div>
@@ -54,16 +54,13 @@ export function BrandMark({
   }
 
   return (
-    <div className="flex w-full flex-col items-center justify-center gap-2">
+    <div className="flex h-full w-full items-center justify-center">
       <span
         aria-label={`Identificador tipográfico de ${name}`}
         role="img"
-        className={`flex h-[74px] w-[74px] items-center justify-center rounded-[20px] text-3xl font-bold tracking-tight sm:h-20 sm:w-20 ${tone.background} ${tone.foreground}`}
+        className={`flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl text-2xl font-bold tracking-tight ${tone.background} ${tone.foreground}`}
       >
         {monogram(name)}
-      </span>
-      <span className={`line-clamp-2 max-w-full text-center text-xs font-semibold sm:text-sm ${tone.foreground}`}>
-        {name}
       </span>
     </div>
   );
