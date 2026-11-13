@@ -19,6 +19,7 @@ const DASHBOARD_ALIASES: Record<string, string> = {
   "yahoo-mail": "yahoo"
 };
 const CUSTOM_SOURCES: Record<string, LogoProvenance> = {
+  'call-of-duty-warzone': {provider: 'Icons Plus (ilustración de videojuego no oficial)', url: 'https://github.com/chouhan-rahul/icons_plus/blob/main/assets/images/logos/video-games/call-of-duty-warzone.svg', licenseUrl: 'https://github.com/chouhan-rahul/icons_plus/blob/main/LICENSE'},
   'cashea': {provider: 'Lawnicons (ilustración comunitaria)', url: 'https://github.com/LawnchairLauncher/lawnicons/blob/develop/svgs/cashea.svg', licenseUrl: 'https://github.com/LawnchairLauncher/lawnicons/blob/develop/LICENSE'},
   'bnc': {provider: 'Arcticons (ilustración comunitaria)', url: 'https://github.com/deathrashed/iconography/blob/main/iconify/arcticons/bnc.svg', licenseUrl: 'https://github.com/deathrashed/iconography/blob/main/LICENSE'},
   'ridery': {provider: 'Arcticons (ilustración comunitaria)', url: 'https://github.com/deathrashed/iconography/blob/main/iconify/arcticons/ridery.svg', licenseUrl: 'https://github.com/deathrashed/iconography/blob/main/LICENSE'},
