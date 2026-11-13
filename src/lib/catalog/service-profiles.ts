@@ -24,6 +24,10 @@ const PROVIDERS: Readonly<Record<string, string>> = {
   'banco-de-venezuela': 'Banco de Venezuela',
   'banesco': 'Banesco',
   'mercantil': 'Mercantil',
+  'netflix': 'Netflix',
+  'spotify': 'Spotify',
+  'telegram': 'Telegram',
+  'youtube': 'Google',
   'whatsapp': 'WhatsApp (Meta)',
   'instagram': 'Meta Platforms',
   'cloudflare': 'Cloudflare, Inc.',
@@ -152,6 +156,31 @@ const COMPANY_EDITORIAL: Readonly<Record<string, {
     overview: 'YouTube Music es un servicio de música y contenido de audio del ecosistema YouTube de Google. El acceso, la búsqueda, la reproducción y las listas pueden presentar problemas diferentes dependiendo del dispositivo y la conexión.',
     uses: ['Escuchar música', 'Buscar artistas y canciones', 'Crear listas', 'Reproducción en distintos dispositivos'],
     source: 'https://music.youtube.com/',
+  },
+  netflix: {
+    overview: 'Netflix es un servicio de entretenimiento en línea que ofrece series, películas y juegos. El catálogo y las funciones pueden variar según la ubicación y el dispositivo. Un problema de reproducción, de inicio de sesión o de facturación no implica necesariamente que todo el servicio esté interrumpido.',
+    uses: ['Reproducción de series y películas', 'Descubrimiento de contenidos', 'Perfiles y acceso', 'Aplicaciones para distintos dispositivos'],
+    source: 'https://about.netflix.com/es',
+  },
+  spotify: {
+    overview: 'Spotify es una plataforma de audio digital que ofrece música, podcasts y audiolibros en determinados mercados. Permite descubrir contenido, guardar bibliotecas y escuchar desde varias plataformas. Las incidencias en búsqueda, autenticación o reproducción deben distinguirse de problemas con la red local.',
+    uses: ['Música en streaming', 'Podcasts y audiolibros', 'Bibliotecas y listas', 'Reproducción en dispositivos'],
+    source: 'https://newsroom.spotify.com/company-info/',
+  },
+  telegram: {
+    overview: 'Telegram es una aplicación de mensajería basada en la nube con sincronización entre dispositivos. Incluye chats privados, grupos, canales, archivos y bots. El envío de mensajes, las notificaciones y el acceso a una cuenta son funciones separadas que pueden presentar incidencias diferentes.',
+    uses: ['Mensajes y archivos', 'Grupos y canales', 'Bots y aplicaciones', 'Sincronización entre dispositivos'],
+    source: 'https://telegram.org/faq/es',
+  },
+  youtube: {
+    overview: 'YouTube es una plataforma de videos y contenidos de creadores del ecosistema Google. Sus servicios incluyen búsqueda, reproducción, canales y transmisión en vivo. Una dificultad para subir videos no significa necesariamente que la reproducción o la navegación también estén afectadas.',
+    uses: ['Ver videos', 'Publicar y gestionar canales', 'Transmisiones en vivo', 'Búsqueda y descubrimiento'],
+    source: 'https://about.youtube/',
+  },
+  signal: {
+    overview: 'Signal es una aplicación de mensajería privada mantenida por una organización independiente sin ánimo de lucro. Ofrece mensajes, grupos y llamadas con cifrado de extremo a extremo. Los incidentes de registro, envío de mensajes y llamadas pueden tener síntomas diferentes.',
+    uses: ['Mensajes privados', 'Llamadas y videollamadas', 'Grupos', 'Uso en móvil y escritorio'],
+    source: 'https://signal.org/es/',
   },
   cloudflare: {
     overview: 'Cloudflare es una empresa de infraestructura de Internet fundada en 2009, con sede en San Francisco. Su red global ofrece protección de aplicaciones, distribución de contenido, servicios DNS, acceso Zero Trust y herramientas para desarrollar y ejecutar aplicaciones. Una incidencia puede tener efectos distintos según los productos usados por cada sitio.',
