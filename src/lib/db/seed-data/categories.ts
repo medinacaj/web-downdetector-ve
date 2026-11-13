@@ -82,4 +82,12 @@ export const categoriesSeed = [
   { slug: "nube-e-infraestructura", name: "Nube e infraestructura", description: "CDN, DNS, hosting, servidores, repositorios de código y herramientas de desarrollo.", icon: "cloud", sortOrder: 10 },
   { slug: "inteligencia-artificial", name: "Inteligencia artificial", description: "Servicios y asistentes de inteligencia artificial accesibles en línea.", icon: "brain-circuit", sortOrder: 11 },
   { slug: "comercio-global", name: "Comercio global", description: "Mercados, tiendas y plataformas internacionales de comercio y pagos.", icon: "shopping-bag", sortOrder: 12 },
+
+  // New editorial groupings for the requested Chilean, Venezuelan and global catalog.
+  { slug: "viajes-y-turismo", name: "Viajes y turismo", description: "Reservas, aerolíneas, transporte interurbano y servicios digitales de viajes.", icon: "plane", sortOrder: 13 },
+  { slug: "salud-y-farmacias", name: "Salud y farmacias", description: "Farmacias, bienestar, actividad física y servicios digitales de salud.", icon: "heart-pulse", sortOrder: 14 },
+  { slug: "logistica-y-envios", name: "Logística y envíos", description: "Operadores postales, encomiendas y seguimiento de envíos.", icon: "package", sortOrder: 15 },
+  { slug: "seguridad-y-privacidad", name: "Seguridad y privacidad", description: "VPN, antivirus, identidad digital, autenticación y ciberseguridad.", icon: "shield-check", sortOrder: 16 },
+  { slug: "educacion-y-contenidos", name: "Educación y contenidos", description: "Cursos, aulas virtuales y herramientas educativas.", icon: "graduation-cap", sortOrder: 17 },
+  { slug: "clima-y-datos", name: "Clima y datos", description: "Pronósticos meteorológicos y plataformas de datos en línea.", icon: "cloud-sun", sortOrder: 18 },
 ] as const;
