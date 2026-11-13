@@ -38,6 +38,8 @@ const CUSTOM_SOURCES: Record<string, LogoProvenance> = {
   'clash-of-clans': {provider: "Arcticons", url: 'https://github.com/deathrashed/iconography/blob/main/iconify/arcticons/clash-of-clans.svg'},
   'world-of-warcraft': {provider: "Icons Plus", url: 'https://github.com/HemantKArya/BloomeeTunes/blob/main/packages/icons_plus/assets/images/logos/video-games/world-of-warcraft.svg'},
   'efootball': {provider: "Lawnicons", url: 'https://github.com/LawnchairLauncher/lawnicons/blob/develop/svgs/efootball.svg', licenseUrl: "https://github.com/LawnchairLauncher/lawnicons/blob/develop/LICENSE"},
+  'pedidosya': {provider: "Lawnicons (representación comunitaria)", url: 'https://github.com/LawnchairLauncher/lawnicons/blob/develop/svgs/pedidosya.svg', licenseUrl: "https://github.com/LawnchairLauncher/lawnicons/blob/develop/LICENSE"},
+  'yango': {provider: "Lawnicons (representación comunitaria)", url: 'https://github.com/LawnchairLauncher/lawnicons/blob/develop/svgs/yango.svg', licenseUrl: "https://github.com/LawnchairLauncher/lawnicons/blob/develop/LICENSE"},
   'honkai-star-rail': {provider: "Arcticons", url: 'https://github.com/deathrashed/iconography/blob/main/iconify/arcticons/honkai-star-rail.svg'},
 };
 const WIKIMEDIA_URLS: Record<string, string> = {
