@@ -28,13 +28,16 @@ with sync_playwright() as playwright:
     assert global_section.locator("img[alt^='Logotipo identificativo de']").count() >= 15
 
 
-    # Editorial cards must not fall back to AI-style frames, colored top borders or shadows.
+    # Top stripes were the unwanted decoration. Rounded corners and a soft shadow remain.
     for card in grid.locator("article.service-tile").all():
         appearance = card.evaluate("""(el) => {
             const s = getComputedStyle(el);
             return {border:s.borderTopWidth, radius:s.borderTopLeftRadius, shadow:s.boxShadow, gradient:s.backgroundImage};
         }""")
-        assert appearance == {"border":"0px","radius":"0px","shadow":"none","gradient":"none"}, appearance
+        assert appearance["border"] == "0px", appearance
+        assert appearance["radius"] == "13px", appearance
+        assert appearance["shadow"] != "none", appearance
+        assert appearance["gradient"] == "none", appearance
 
     # Each product category has a distinct editorial accent; it is not uptime status.
     telecom = page.locator('article.service-tile[data-category="telecomunicaciones"]').first

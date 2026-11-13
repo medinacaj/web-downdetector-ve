@@ -34,6 +34,11 @@ with sync_playwright() as playwright:
     assert page.locator("#nube .card .name").first.is_visible()
     assert page.locator("#nube .card .card-cta").first.is_visible()
     assert page.locator("#nube .card .card-actions").first.is_visible()
+    # The removed decoration is the colored line, not radius or shadow.
+    borderless = page.locator("#nube .card").first
+    assert borderless.evaluate("(el) => getComputedStyle(el).borderTopWidth") == "0px"
+    assert borderless.evaluate("(el) => getComputedStyle(el).borderTopLeftRadius") == "13px"
+    assert borderless.evaluate("(el) => getComputedStyle(el).boxShadow") != "none"
     colors = page.locator("#nube .card").first.evaluate("(el) => getComputedStyle(el).getPropertyValue('--plot').trim()")
     games_color = page.locator("#juegos .card").first.evaluate("(el) => getComputedStyle(el).getPropertyValue('--plot').trim()")
     assert colors != games_color, "Chart traces identify categories without decorative borders"
@@ -43,12 +48,13 @@ with sync_playwright() as playwright:
           const s = getComputedStyle(el);
           return { border: s.borderTopWidth, radius: s.borderTopLeftRadius, shadow: s.boxShadow }
         }""")
-        assert appearance["border"] == "0px", ("Card border must be removed", appearance)
-        assert appearance["radius"] == "0px", ("Card rounded corners must be removed", appearance)
-        assert appearance["shadow"] == "none", ("Card drop-shadow must be removed", appearance)
+        assert appearance["border"] == "0px", ("No colored top border", appearance)
+        assert appearance["radius"] == "13px", ("Restore softly rounded cards", appearance)
+        assert appearance["shadow"] != "none", ("Restore restrained depth", appearance)
     hero = page.locator(".wrap.hero").first
-    assert hero.evaluate("(el) => getComputedStyle(el).borderTopLeftRadius") == "0px"
-    assert hero.evaluate("(el) => getComputedStyle(el).boxShadow") == "none"
+    assert hero.evaluate("(el) => getComputedStyle(el).borderTopWidth") == "0px"
+    assert hero.evaluate("(el) => getComputedStyle(el).borderTopLeftRadius") == "16px"
+    assert hero.evaluate("(el) => getComputedStyle(el).boxShadow") != "none"
 
     # Quick filters, search reset, keyboard search and display mode are real controls.
     page.get_by_role("button", name="Nube", exact=True).click()
