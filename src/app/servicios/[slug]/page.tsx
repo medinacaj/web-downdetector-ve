@@ -38,7 +38,7 @@ export async function generateMetadata({
   const service = await getServiceBySlug(slug);
   if (!service || !service.active) return { title: 'Servicio no encontrado' };
   return {
-    title: `Estado de ${service.name} en Venezuela`,
+    title: `Reportes de ${service.name} | PulsoVE`,
     alternates: { canonical: `/servicios/${encodeURIComponent(service.slug)}` },
     description: `${service.name}: ${service.description || service.category.name}. Consulta reportes e incidentes registrados, sin confundirlos con disponibilidad confirmada.`,
   };
@@ -71,6 +71,18 @@ export default async function ServiceDetailPage({ params }: { params: Promise<{ 
               <StatusBadge status={statusDetail.status} />
             </div>
             <p className="mt-3 max-w-3xl text-sm leading-relaxed text-ink-muted">{profile.description}</p>
+            {service.description?.includes('Referencia solicitada: Chile') && (
+              <p className="mt-3 rounded-lg bg-amber-50 px-3 py-2 text-xs leading-5 text-amber-900 dark:bg-amber-950 dark:text-amber-200">
+                Esta plataforma figura en el catálogo solicitado para Chile. El formulario geográfico de PulsoVE
+                actualmente utiliza estados de Venezuela: no representa un monitoreo local ni disponibilidad verificada en Chile.
+              </p>
+            )}
+            {service.description?.includes('servicio descontinuado') && (
+              <p className="mt-3 rounded-lg bg-slate-100 px-3 py-2 text-xs leading-5 text-slate-800 dark:bg-slate-800 dark:text-slate-100">
+                Servicio histórico descontinuado. Se conserva como referencia editorial; no interpretar esta ficha
+                como una plataforma actualmente operativa.
+              </p>
+            )}
             <div className="mt-4 flex flex-wrap gap-2" aria-label="Etiquetas">
               {profile.tags.map((tag) => <span key={tag} className="rounded-full border border-border bg-bg px-3 py-1 text-xs text-ink-muted">{tag}</span>)}
             </div>
