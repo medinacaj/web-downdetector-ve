@@ -115,7 +115,7 @@ export default async function HomePage() {
             )}
           </div>
         </div>
-        <div className="mx-auto max-w-6xl border-t border-white/15 px-4 pb-7 pt-6 sm:px-6" aria-labelledby="getting-started-title">
+        <div className="home-intro-steps mx-auto max-w-6xl border-t border-white/15 px-4 sm:px-6" aria-labelledby="getting-started-title">
           <h2 id="getting-started-title" className="text-sm font-bold text-white">¿Qué puedes hacer aquí?</h2>
           <ol className="mt-4 grid gap-4 sm:grid-cols-3 sm:gap-7">
             <li className="flex items-start gap-3">
