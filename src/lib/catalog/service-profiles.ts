@@ -260,7 +260,7 @@ export function getServiceProfile(input: {
     companyOverview: editorial?.overview ?? (
       (provider ? `Sobre ${provider}: ` : 'Sobre este servicio: ') +
       `${name} figura en el catálogo de PulsoVE por su función: ${description} ` +
-      'Aún no disponemos de una reseña corporativa individual contrastada; esta ficha se ampliará con fuentes del proveedor.'
+      'Reseña corporativa individual pendiente de verificación; esta ficha se ampliará con fuentes del proveedor.'
     ),
     mainUses: [...(editorial?.uses ?? [description])],
     monitoringContext: CATEGORY_CONTEXT[input.categorySlug ?? ''] ??
