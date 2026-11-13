@@ -24,6 +24,16 @@ with sync_playwright() as playwright:
     assert page.locator("#juegos .card").count() == 6
     assert page.locator("#ia-comunidad .card").count() == 6
     assert page.locator("#comercio .card").count() == 6
+    for section in ("redes-globales", "entretenimiento", "juegos-nuevos"):
+        assert page.locator("#" + section + " .card").count() == 6
+    charts = page.locator("main .card .demo-chart")
+    assert charts.count() == 60, "All 60 visible cards need illustrative charts"
+    assert page.locator("main .card .demo-label").count() == 60
+    assert page.locator("main .card .notice").first.inner_text() == "Sin mediciones reales en esta demo"
+    assert "ficticio" in charts.first.get_attribute("aria-label")
+    assert charts.nth(0).locator("polyline").get_attribute("points") != charts.nth(1).locator("polyline").get_attribute("points")
+    assert page.get_by_text("Gráficos ficticios de ejemplo").count() >= 1
+
 
     for width in (320, 390, 768):
         page.set_viewport_size({"width": width, "height": 844})
@@ -48,10 +58,18 @@ with sync_playwright() as playwright:
     assert not logo.is_visible(), "Broken logo should be hidden"
     page.reload(wait_until="networkidle")
     cloudflare_card = page.locator("#nube .card[data-slug='cloudflare']")
+    assert cloudflare_card.locator("svg.demo-chart polyline").get_attribute("points") == example_line, "Demo must be deterministic across reloads"
     assert cloudflare_card.locator(".logo").is_visible()
     assert not cloudflare_card.locator(".monogram").is_visible()
     report = cloudflare_card.locator("button[data-report='cloudflare']")
     assert report.count() == 1, "Every card needs a quick report action"
+    assert report.inner_text() == "!", "Report must be a compact icon, not a large text button"
+    assert report.evaluate("(el) => Math.round(el.getBoundingClientRect().width)") <= 40
+    assert report.evaluate("(el) => getComputedStyle(el).backgroundColor") == "rgb(220, 38, 38)"
+    star = cloudflare_card.locator("button[data-fav='cloudflare']")
+    assert report.evaluate("(el) => el.getBoundingClientRect().right") < star.evaluate("(el) => el.getBoundingClientRect().left")
+    example_line = cloudflare_card.locator("svg.demo-chart polyline").get_attribute("points")
+
     report.click()
     dialog = page.locator("#demo-report-dialog")
     assert dialog.is_visible(), "Quick report preview should open as a modal"
@@ -86,5 +104,5 @@ with sync_playwright() as playwright:
     page.locator("#category-filter").select_option("videojuegos")
     assert page.locator("#directory-cards .card:visible").count() >= 20
     assert remote == [], "Demo must not request third-party hosts"
-    print("PASS: 211 services; logos exclusive with fallback, 142 quick-report modal actions, simulated form without backend, responsive cards and no external requests")
+    print("PASS: 211 services; logos exclusive with fallback, 211 quick-report modal actions, simulated form without backend, responsive cards and no external requests")
     browser.close()
