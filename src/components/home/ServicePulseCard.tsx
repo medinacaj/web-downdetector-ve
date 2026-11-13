@@ -76,7 +76,7 @@ export function ServicePulseCard({
             href={`/servicios/${encodeURIComponent(service.slug)}#reportar`}
             aria-label={`Reportar falla de ${service.name}`}
             title={`Reportar falla de ${service.name}`}
-            className="relative flex h-9 w-9 shrink-0 items-center justify-center rounded-none bg-red-600 text-white transition-colors hover:bg-red-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-500"
+            className="relative flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-red-600 text-white transition-[background-color,transform,box-shadow] duration-150 hover:-translate-y-0.5 hover:bg-red-700 hover:shadow-md active:translate-y-0 active:scale-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-500"
           >
             <span aria-hidden="true" className="text-xl font-black leading-none">!</span>
           </Link>
