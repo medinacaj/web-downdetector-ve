@@ -27,7 +27,7 @@ async function handleGET(request: Request) {
   // Los filtros sobre `reports` van en el ON del LEFT JOIN, no en un WHERE
   // aparte: si fueran WHERE, cualquier estado sin reportes en la ventana
   // quedaría excluido del resultado en vez de aparecer con conteo 0.
-  const joinConditions = [eq(reports.stateId, states.id), gte(reports.createdAt, since)];
+  const joinConditions = [eq(reports.stateId, states.id), eq(reports.suspicious, false), gte(reports.createdAt, since)];
   if (serviceId) joinConditions.push(eq(reports.serviceId, serviceId));
 
   const rows = await db
