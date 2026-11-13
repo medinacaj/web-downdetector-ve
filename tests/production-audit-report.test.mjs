@@ -28,3 +28,11 @@ test('escapes Markdown injection in advisory fields',()=>{
  assert.match(report,/unsafe pkg/);
  assert.doesNotMatch(report,/unsafe\|pkg|a\nmalicious/);
 });
+
+test('distinguishes full audits including development dependencies',()=>{
+ const data={metadata:{vulnerabilities:{critical:0,high:0,moderate:0,low:0}},vulnerabilities:{}};
+ const report=formatProductionAudit(data,'all');
+ assert.match(report,/todas las dependencias/);
+ assert.match(report,/`npm audit --json`/);
+ assert.doesNotMatch(report,/--omit=dev/);
+});
