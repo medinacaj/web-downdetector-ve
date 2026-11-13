@@ -31,7 +31,7 @@ with sync_playwright() as playwright:
     # The complete seed catalogue is not synonymous with technical monitoring.
     assert page.get_by_text("Servicios en catálogo", exact=True).count() == 1
     assert page.get_by_text("Servicios monitoreados", exact=True).count() == 0
-    assert page.get_by_text("señales técnicas cuando están disponibles", exact=False).count() >= 1
+    assert hero.get_by_text("si no hay reportes suficientes, no significa que el servicio funcione", exact=False).count() == 1
     assert page.get_by_text("Consulta:", exact=False).count() >= 1
     zero_incidents = page.locator("section.home-hero dt").filter(has_text="Incidentes activos").locator("xpath=following-sibling::dd")
     if zero_incidents.count() and zero_incidents.inner_text().strip() == "0":
