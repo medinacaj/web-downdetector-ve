@@ -94,6 +94,16 @@ if(!homepage.includes('.card{border:0;border-top:0;border-radius:13px;box-shadow
   throw Error('Cards should have rounded corners, subtle shadows, but never a colored top border');
 if(!homepage.includes('.wrap.hero,body[data-theme="light"] .wrap.hero{border:0;border-radius:16px;box-shadow:0 8px 26px'))
   throw Error('Hero should be rounded with subtle depth and no colored frame');
+if(!homepage.includes('¿Tu internet, banco o aplicación está fallando?') ||
+   !homepage.includes('Estás viendo una demostración:') ||
+   !homepage.includes('En tres pasos') ||
+   !homepage.includes('esta demo no se envían datos') ||
+   !homepage.includes('href="#como-funciona"') ||
+   !homepage.includes('class="intro-primary" href="/web-downdetector-ve/servicios/"'))
+  throw Error('Static homepage must explain the purpose and distinguish preview from live monitoring');
+if((homepage.match(/class="intro-steps"/g)||[]).length!==1 ||
+   (homepage.match(/<li><strong>[123] · /g)||[]).length!==3)
+  throw Error('First-time visitors need a single, accessible three-step guide');
 if((homepage.match(/class="section-index"/g)||[]).length!==9)
   throw Error('Numbered editorial sections missing');
 if(homepage.includes('linear-gradient('))
