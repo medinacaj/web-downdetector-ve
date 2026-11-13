@@ -4,7 +4,7 @@ Qué servicios monitorea PulsoVE, por qué cada uno está aquí y cómo añadir 
 retirar otros. Los datos viven en `src/lib/db/seed-data/` (categorías, tipos de
 problema, servicios) y se cargan con `npm run db:seed`.
 
-- **Estado actual:** 142 servicios en 12 categorías, 35 tipos de problema.
+- **Estado actual:** 211 servicios en 12 categorías, 35 tipos de problema.
 - **Última revisión de fuentes:** 12 de noviembre de 2026 (expansión internacional solicitada por el propietario).
 - **Naturaleza de los datos:** todos los servicios son **demostrativos**
   (`is_demo = true`) y ninguno tiene `official_url` (queda `null` hasta que una
@@ -272,3 +272,18 @@ El propietario solicitó que PulsoVE incluya servicios que se utilizan de manera
 **Logos y licencias:** se sumaron 20 logotipos SVG locales de [Simple Icons](https://github.com/simple-icons/simple-icons) con representación vectorial bajo CC0, sin que ello elimine los derechos sobre las marcas comerciales. [Créditos locales](LOGOS_EMPRESAS.md). Las marcas sin archivo verificado usan monogramas tipográficos. No se descargan imágenes desde servicios externos en el navegador.
 
 **Vista previa pública:** GitHub Pages es exclusivamente una demo sintética estática; no acepta reportes ni sustituye el backend de Next.js/PostgreSQL. El catálogo internacional aparecerá en producción solo cuando la rama se integre, el servicio se despliegue y se ejecute npm run db:seed con autorización y credenciales de la base de datos. Ese paso no puede inferirse de un CI verde en PostgreSQL temporal.
+
+
+## 8. Ampliación del catálogo y demostración visual · 12 de noviembre de 2026
+
+Se sumaron **69 servicios internacionales**, alcanzando **211** servicios definidos, distribuidos en las doce categorías actuales. Ejemplos: Fastly, Akamai, Railway, Render, MongoDB Atlas, Zoho Mail, Fastmail, Tuta, Dota 2, Overwatch 2, Destiny 2, GTA Online, Pokémon GO, Signal, WeChat, Bluesky, Apple Music, Crunchyroll, Deezer, Wise, Airbnb y Uber. Son **entradas editoriales**, no una medición comprobada de su cuota de mercado ni de su estado operativo.
+
+La portada destaca **48 servicios globales** agrupados en ocho secciones y sigue mostrando una selección venezolana. Los demás están disponibles en el directorio con búsqueda por nombre y categoría.
+
+**Gráficos de demostración:** exclusivamente en la demo estática de GitHub Pages, cada tarjeta muestra una curva **determinística y sintética** de 25 puntos, generada desde su identificador. **No son reportes, errores, incidentes, disponibilidad, estadísticas ni información histórica de usuarios**. Se etiquetan en cada tarjeta como «Ejemplo visual · datos simulados», y en el encabezado como gráficas ficticias. No se transmiten ni almacenan datos personales. La aplicación Next.js operativa conserva las tendencias basadas en reportes PostgreSQL realmente registrados o una vista vacía sin curvas inventadas.
+
+**Acceso a reportar:** icono rojo y accesible «!» al lado del favorito; en la aplicación Next.js enlaza al formulario real del servicio con validación y controles antiabuso originales. En Pages abre únicamente un modal de **simulación sin transmisión**, con aviso explícito. La interfaz estática no recibe reportes ciudadanos.
+
+Se incorporaron 21 SVG locales de marcas con procedencia verificada de Simple Icons (50 gráficos locales en total). Todas las marcas pertenecen a sus titulares y su presencia no implica aval comercial. En caso de ausencia o error de imagen se usa un monograma tipográfico, nunca ambos a la vez.
+
+La fuente del catálogo y el código del sitio se mantienen sincronizados por el generador Pages y tests de integridad. La publicación del backend/Vercel y el seed PostgreSQL productivo necesitan verificación independiente.

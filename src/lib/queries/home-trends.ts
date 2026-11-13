@@ -75,6 +75,15 @@ export const WORLDWIDE_SPOTLIGHT = [
   { id: 'comercio', title: 'Comercio y pagos internacionales', description: 'Tiendas y servicios de transacciones globales.', slugs: [
     'amazon', 'paypal', 'shopify', 'stripe', 'aliexpress', 'ebay',
   ] },
+  { id: 'redes-globales', title: 'Mensajería y comunidades', description: 'Redes sociales y mensajería de distintos países.', slugs: [
+    'signal', 'wechat', 'line', 'bluesky', 'mastodon', 'tumblr',
+  ] },
+  { id: 'entretenimiento', title: 'Música y entretenimiento', description: 'Música, anime, streaming y contenido audiovisual.', slugs: [
+    'apple-music', 'youtube-music', 'crunchyroll', 'pluto-tv', 'soundcloud', 'deezer',
+  ] },
+  { id: 'juegos-nuevos', title: 'Más juegos populares', description: 'Nuevos títulos y servicios de juego multijugador.', slugs: [
+    'dota-2', 'overwatch-2', 'pokemon-go', 'gta-online', 'brawl-stars', 'among-us',
+  ] },
 ] as const;
 
 export function selectWorldwideSpotlights<T extends { slug: string }>(

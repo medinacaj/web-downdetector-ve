@@ -17,10 +17,18 @@ export function ServicePulseCard({
     <li className="relative min-w-0">
       <article className="relative h-full overflow-hidden rounded-2xl border border-border bg-surface shadow-sm transition-all hover:-translate-y-0.5 hover:border-pulse-500/60 hover:shadow-md focus-within:border-pulse-500">
         <FavoriteButton slug={service.slug} name={service.name} />
+        <Link
+          href={`/servicios/${encodeURIComponent(service.slug)}#reportar`}
+          aria-label={`Reportar falla de ${service.name}`}
+          title={`Reportar falla de ${service.name}`}
+          className="absolute right-[54px] top-3 z-10 flex h-10 w-10 items-center justify-center rounded-full border border-red-500 bg-red-600 text-white transition-colors hover:bg-red-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-500 sm:right-[62px] sm:top-4"
+        >
+          <span aria-hidden="true" className="text-xl font-black leading-none">!</span>
+        </Link>
         <Link href={`/servicios/${encodeURIComponent(service.slug)}`}
           aria-label={`Ver estado y reportes de ${service.name}`}
-          className="flex h-full min-h-[266px] flex-col p-3.5 pr-12 focus-visible:outline-offset-[-4px] sm:min-h-[286px] sm:p-5 sm:pr-14">
-          <div className="min-h-12">
+          className="flex h-full min-h-[266px] flex-col p-3.5 focus-visible:outline-offset-[-4px] sm:min-h-[286px] sm:p-5">
+          <div className="min-h-12 pr-[75px] sm:pr-[90px]">
             <h3 className="line-clamp-2 font-display text-base font-semibold leading-snug tracking-tight text-ink sm:text-lg">
               {service.name}
             </h3>
@@ -57,13 +65,6 @@ export function ServicePulseCard({
               {service.isDemo && <p className="mt-1 text-[10px] text-ink-muted">Servicio en catálogo de demostración</p>}
             </div>
           </div>
-        </Link>
-        <Link
-          href={`/servicios/${encodeURIComponent(service.slug)}#reportar`}
-          aria-label={`Reportar falla de ${service.name}`}
-          className="mx-3 mb-3 flex min-h-11 items-center justify-center rounded-lg bg-brand-600 px-3 py-2 text-center text-xs font-semibold text-white transition-colors hover:bg-brand-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-pulse-500 sm:mx-4 sm:mb-4 sm:text-sm"
-        >
-          Reportar falla
         </Link>
       </article>
     </li>

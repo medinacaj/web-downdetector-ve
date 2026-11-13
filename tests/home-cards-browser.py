@@ -22,7 +22,7 @@ with sync_playwright() as playwright:
     # The international catalogue is visible on the index, not just in seed files.
     global_section = page.locator("section[aria-labelledby='global-platforms-title']")
     assert global_section.count() == 1
-    assert global_section.locator("ul > li").count() == 30, "30 global services must appear in the homepage"
+    assert global_section.locator("ul > li").count() == 48, "48 global services must appear in the homepage"
     for name in ("Cloudflare", "Gmail", "Outlook", "Fortnite"):
         assert global_section.get_by_role("link", name="Ver estado y reportes de " + name).count() == 1
     assert global_section.locator("img[alt^='Logotipo identificativo de']").count() >= 15
@@ -90,6 +90,9 @@ with sync_playwright() as playwright:
     quick = page.get_by_role("link", name="Reportar falla de CANTV")
     assert quick.count() == 1
     assert quick.get_attribute("href") == "/servicios/cantv#reportar"
+    assert "bg-red-600" in (quick.get_attribute("class") or ""), "Alert must have red danger styling"
+    assert quick.evaluate("(el) => Math.round(el.getBoundingClientRect().width)") <= 40, "Quick report icon must be small"
+    assert quick.inner_text().strip() == "!", "Exclamation icon should replace large report button"
     quick.click()
     page.wait_for_url("**/servicios/cantv*", timeout=30000)
     print("QUICK REPORT TARGET:", page.url, flush=True)
