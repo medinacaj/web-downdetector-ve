@@ -100,15 +100,23 @@ if(!homepage.includes('.card{border:0;border-top:0;border-radius:13px;box-shadow
 if(!homepage.includes('.wrap.hero,body[data-theme="light"] .wrap.hero{border:0;border-radius:16px;box-shadow:0 8px 26px'))
   throw Error('Hero should be rounded with subtle depth and no colored frame');
 if(!homepage.includes('¿Tu internet, banco o aplicación está fallando?') ||
-   homepage.includes('Estás viendo una demostración:') ||
-   !homepage.includes('En tres pasos') ||
-   !homepage.includes('Gráficos ilustrativos, no indicadores de disponibilidad actual') ||
-   !homepage.includes('href="#como-funciona"') ||
-   !homepage.includes('class="intro-primary" href="/web-downdetector-ve/servicios/"'))
-  throw Error('Static homepage must explain the purpose while keeping a compact data disclaimer');
-if((homepage.match(/class="intro-steps"/g)||[]).length!==1 ||
-   (homepage.match(/<li><strong>[123] · /g)||[]).length!==3)
-  throw Error('First-time visitors need a single, accessible three-step guide');
+   !homepage.includes('id="quicksearch"') ||
+   homepage.includes('PULSOVE · FALLAS DE SERVICIOS Y APLICACIONES') ||
+   homepage.includes('class="intro-guide"') ||
+   homepage.includes('class="stats"') ||
+   homepage.includes('Ver los 211 servicios') ||
+   !homepage.includes('>Destacados</p>'))
+  throw Error('Home must prioritize search, not a long explanation or catalogue counters');
+for(const page of [homepage,directory,html('servicios/cloudflare/index.html')]) {
+  const top=page.match(/<header class="top">([\\s\\S]*?)<\\/header>/)?.[1]||'';
+  const footer=page.match(/<footer class="footer">([\\s\\S]*?)<\\/footer>/)?.[1]||'';
+  if(!top.includes('>Servicios</a>') || top.includes('Logos y créditos') ||
+     !footer.includes('id="ayuda"') ||
+     !footer.includes('¿Cómo usar PulsoVE?') ||
+     !footer.includes('>Logos y créditos</a>') ||
+     (footer.match(/<li><strong>(?:Busca|Revisa|Reporta)<\\/strong>/g)||[]).length!==3)
+    throw Error('Navigation and accessible help/credits footer must exist on every page');
+}
 if((homepage.match(/class="section-index"/g)||[]).length!==9)
   throw Error('Numbered editorial sections missing');
 if(homepage.includes('linear-gradient('))
