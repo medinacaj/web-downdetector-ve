@@ -52,95 +52,72 @@ body {
 }
 
 
-/* Editorial category colors communicate the nature of a service, never uptime. */
-.service-tile {
-  --tile-accent: #1675a3;
-  --tile-glow: 22 117 163;
-  border-top: 4px solid var(--tile-accent);
-  background-image: linear-gradient(165deg, rgb(var(--surface)) 0%, rgb(var(--surface)) 73%, rgb(var(--tile-glow) / .09) 100%);
-  transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
-}
-.service-tile:hover, .service-tile:focus-within {
-  transform: translateY(-3px);
-  box-shadow: 0 13px 30px rgb(3 18 33 / .16);
-  border-color: var(--tile-accent);
-}
-.service-tile-chart, .service-tile-cta { color: var(--tile-accent); }
-.service-tile-cta { white-space: nowrap; }
-.service-tile-actions {
-  border-top: 1px solid rgb(var(--border) / .95);
-  background: rgb(var(--tile-glow) / .045);
-}
-.service-tile[data-category="telecomunicaciones"],
-.service-tile[data-category="nube-e-infraestructura"] { --tile-accent:#1275a9; --tile-glow:18 117 169; }
-.service-tile[data-category="correo-y-productividad"],
-.service-tile[data-category="plataformas-digitales"] { --tile-accent:#7851bd; --tile-glow:120 81 189; }
-.service-tile[data-category="videojuegos"],
-.service-tile[data-category="streaming"] { --tile-accent:#c14a79; --tile-glow:193 74 121; }
-.service-tile[data-category="banca-y-pagos"],
-.service-tile[data-category="comercio-global"] { --tile-accent:#a96a19; --tile-glow:169 106 25; }
-.service-tile[data-category="servicios-publicos"],
-.service-tile[data-category="delivery-y-movilidad"] { --tile-accent:#258264; --tile-glow:37 130 100; }
-.service-tile[data-category="inteligencia-artificial"] { --tile-accent:#684ec1; --tile-glow:104 78 193; }
-.service-tile[data-category="apuestas-y-loterias"] { --tile-accent:#9b5764; --tile-glow:155 87 100; }
 
-.home-featured-band {
-  border: 1px solid rgb(var(--border) / .9);
-  border-radius: 22px;
-  background: linear-gradient(142deg, rgb(221 239 255 / .45), rgb(232 223 253 / .29), transparent 68%);
-}
-.home-platform-band { background: linear-gradient(130deg, rgb(197 235 245 / .28), rgb(232 219 250 / .27), transparent 65%); }
-.dark .home-featured-band { background: linear-gradient(142deg, rgb(17 51 78 / .72), rgb(49 31 71 / .48)); }
-.dark .home-platform-band { background: linear-gradient(130deg, rgb(16 48 69 / .54), rgb(43 30 67 / .42)); }
-@media (prefers-reduced-motion: reduce) { .service-tile:hover { transform: none; } }
-
-/* PulsoVE observatory: a single strong hero, quiet sections, clear report controls. */
+/* PulsoVE: a flat information index, not a set of framed marketing cards. */
+:root { --bg: 242 243 242; --surface: 255 255 255; --ink: 23 40 45; --ink-muted: 83 100 104; --border: 203 213 211; }
+.dark { --bg: 16 28 32; --surface: 30 48 52; --ink: 234 244 239; --ink-muted: 177 203 196; --border: 59 81 81; }
 .home-hero {
-  background: #14243e;
-  border-color: #263d5d;
-  color: #f7fbff;
+  color: #fff;
+  background: #152c33;
+  border: 0;
 }
 .home-hero h1 {
-  max-width: 630px;
   color: #fff;
-  font-weight: 750;
-  letter-spacing: -.04em;
+  max-width: 650px;
+  font-weight: 800;
+  letter-spacing: -.045em;
 }
-.home-hero p { color: #c2d3e2; }
-.home-hero a:not([class*="bg-"]) { color: #a6e6de; }
-.home-hero > div { padding-top: 50px; padding-bottom: 50px; }
+.home-hero p { color: #bdd4cf; }
+.home-hero a:not([class*="bg-"]) { color: #84ded0; }
+.home-hero > div { padding-top: 52px; padding-bottom: 52px; }
 .home-hero > div > div:last-child {
-  border-radius: 16px;
-  border-color: #d8e4ee;
-  box-shadow: 0 8px 32px rgb(4 17 33 / .12);
+  border: 0;
+  border-radius: 0;
+  background: #213d41;
+  box-shadow: none;
 }
-.home-hero > div > div:last-child p { color: rgb(var(--ink-muted)); }
+.home-hero > div > div:last-child p { color: #c3dad3; }
 .home-featured-band, .dark .home-featured-band {
-  background: transparent;
-  border: none;
-  border-bottom: 1px solid rgb(var(--border));
+  background: none;
+  border: 0;
   border-radius: 0;
 }
 .home-platform-band, .dark .home-platform-band {
-  background: rgb(var(--surface) / .48);
-  border-top: 1px solid rgb(var(--border));
+  background: rgb(var(--surface) / .46);
+  border: 0;
 }
 .service-tile {
-  border-top: 3px solid var(--tile-accent);
+  --tile-accent: #16787f;
+  border: 0 !important;
+  border-radius: 0 !important;
   background: rgb(var(--surface));
   background-image: none;
-  border-radius: 14px;
-  box-shadow: 0 2px 10px rgb(14 31 49 / .06);
+  box-shadow: none !important;
+  transition: background .16s ease;
 }
 .service-tile:hover, .service-tile:focus-within {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 24px rgb(13 29 47 / .13);
+  background: #e4f0ee;
+  transform: none;
+  box-shadow: none !important;
 }
-.service-tile-actions { background: rgb(var(--bg) / .5); }
+.dark .service-tile:hover, .dark .service-tile:focus-within { background: #2b4445; }
+.service-tile-chart, .service-tile-cta { color: var(--tile-accent); }
+.service-tile-cta { white-space: nowrap; }
+.service-tile-actions { border: 0; background: transparent; }
+.service-tile-actions button { border-radius: 0; }
+.service-tile[data-category="telecomunicaciones"],
+.service-tile[data-category="nube-e-infraestructura"] { --tile-accent: #146e97; }
+.service-tile[data-category="correo-y-productividad"],
+.service-tile[data-category="plataformas-digitales"] { --tile-accent: #7660a2; }
+.service-tile[data-category="videojuegos"],
+.service-tile[data-category="streaming"] { --tile-accent: #b95177; }
+.service-tile[data-category="banca-y-pagos"],
+.service-tile[data-category="comercio-global"] { --tile-accent: #9a691c; }
+.service-tile[data-category="servicios-publicos"],
+.service-tile[data-category="delivery-y-movilidad"] { --tile-accent: #23816b; }
+.service-tile[data-category="inteligencia-artificial"] { --tile-accent: #7056b3; }
+.service-tile[data-category="apuestas-y-loterias"] { --tile-accent: #93516c; }
 @media (max-width: 639px) {
-  .home-hero > div { padding-top: 34px; padding-bottom: 34px; }
+  .home-hero > div { padding-top: 32px; padding-bottom: 32px; }
   .home-hero h1 { font-size: 30px; }
-}
-@media (prefers-reduced-motion: reduce) {
-  .service-tile:hover { transform: none; }
 }

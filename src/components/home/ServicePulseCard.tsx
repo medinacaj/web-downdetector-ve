@@ -21,7 +21,7 @@ export function ServicePulseCard({
     <li className="relative min-w-0">
       <article
         data-category={service.categorySlug}
-        className="service-tile flex h-full min-h-[260px] min-w-0 flex-col overflow-hidden rounded-2xl border border-border bg-surface shadow-sm transition-all focus-within:shadow-lg sm:min-h-[270px]"
+        className="service-tile flex h-full min-h-[260px] min-w-0 flex-col overflow-hidden bg-surface transition-colors sm:min-h-[270px]"
       >
         <Link
           href={`/servicios/${encodeURIComponent(service.slug)}`}
@@ -64,7 +64,7 @@ export function ServicePulseCard({
                 </div>
               )}
             </div>
-            <div className="mt-2 flex min-w-0 flex-wrap items-center justify-between gap-1 border-t border-border/70 pt-2">
+            <div className="mt-2 flex min-w-0 flex-wrap items-center justify-between gap-1 pt-2">
               <StatusBadge status={service.status} size="sm" />
               <span className="service-tile-cta text-[10px] font-semibold sm:text-xs">Ver ficha ↗</span>
             </div>
@@ -76,7 +76,7 @@ export function ServicePulseCard({
             href={`/servicios/${encodeURIComponent(service.slug)}#reportar`}
             aria-label={`Reportar falla de ${service.name}`}
             title={`Reportar falla de ${service.name}`}
-            className="relative flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-red-500 bg-red-600 text-white transition-colors hover:bg-red-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-500"
+            className="relative flex h-9 w-9 shrink-0 items-center justify-center rounded-none bg-red-600 text-white transition-colors hover:bg-red-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-500"
           >
             <span aria-hidden="true" className="text-xl font-black leading-none">!</span>
           </Link>

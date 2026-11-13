@@ -28,6 +28,14 @@ with sync_playwright() as playwright:
     assert global_section.locator("img[alt^='Logotipo identificativo de']").count() >= 15
 
 
+    # Editorial cards must not fall back to AI-style frames, colored top borders or shadows.
+    for card in grid.locator("article.service-tile").all():
+        appearance = card.evaluate("""(el) => {
+            const s = getComputedStyle(el);
+            return {border:s.borderTopWidth, radius:s.borderTopLeftRadius, shadow:s.boxShadow, gradient:s.backgroundImage};
+        }""")
+        assert appearance == {"border":"0px","radius":"0px","shadow":"none","gradient":"none"}, appearance
+
     # Each product category has a distinct editorial accent; it is not uptime status.
     telecom = page.locator('article.service-tile[data-category="telecomunicaciones"]').first
     banking = page.locator('article.service-tile[data-category="banca-y-pagos"]').first
