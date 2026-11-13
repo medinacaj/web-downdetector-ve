@@ -33,8 +33,9 @@ export async function getServiceHistory(serviceId: string) {
   ]);
 
   const latest = latestWindow[0];
-  const durationMs = latest?.windowEnd.getTime() - latest?.windowStart.getTime();
-  const durationMinutes = Number.isFinite(durationMs) ? durationMs / 60_000 : 0;
+  const durationMinutes = latest
+    ? (latest.windowEnd.getTime() - latest.windowStart.getTime()) / 60_000
+    : 0;
 
   return withHistoricalReference(toServiceHistory(rows, now), referenceRows, durationMinutes);
 }
