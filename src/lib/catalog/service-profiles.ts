@@ -123,6 +123,36 @@ const COMPANY_EDITORIAL: Readonly<Record<string, {
   uses: readonly string[];
   source: string | null;
 }>> = {
+  aliexpress: {
+    overview: 'AliExpress es una plataforma internacional de comercio electrónico del ecosistema Alibaba. Reúne vendedores y compradores en un catálogo de productos de distintas categorías; los problemas de acceso, búsqueda, pago y seguimiento de pedidos pueden afectar funciones diferentes.',
+    uses: ['Explorar productos', 'Compras en línea', 'Gestión de pedidos', 'Seguimiento de envíos'],
+    source: 'https://www.aliexpress.com/',
+  },
+  ebay: {
+    overview: 'eBay es una plataforma de comercio electrónico que conecta compradores y vendedores. Ofrece anuncios de productos y distintos formatos de compra. La búsqueda, la publicación de anuncios, la cuenta y el pago son componentes que conviene evaluar por separado.',
+    uses: ['Buscar artículos', 'Comprar y vender', 'Publicar anuncios', 'Gestionar pedidos'],
+    source: 'https://www.ebayinc.com/company/',
+  },
+  minecraft: {
+    overview: 'Minecraft es un videojuego de construcción y exploración desarrollado por Mojang Studios. Sus experiencias incluyen partidas individuales, multijugador y servidores; una incidencia de autenticación o de servidores no implica que el juego local deje de funcionar.',
+    uses: ['Construcción y exploración', 'Partidas multijugador', 'Servidores y mundos', 'Acceso a cuentas'],
+    source: 'https://www.minecraft.net/',
+  },
+  amazon: {
+    overview: 'Amazon opera una plataforma de comercio electrónico con catálogo, cuentas, pedidos y servicios de entrega. Los problemas de acceso, búsqueda, compras y logística pueden tener alcance distinto según el país y el servicio.',
+    uses: ['Compras en línea', 'Búsqueda de productos', 'Pedidos y entregas', 'Gestión de cuenta'],
+    source: 'https://www.aboutamazon.com/',
+  },
+  tumblr: {
+    overview: 'Tumblr es una plataforma de publicación y comunidades en la que los usuarios crean blogs y comparten contenido. Las incidencias pueden afectar el inicio de sesión, la publicación, las notificaciones o la visualización del contenido.',
+    uses: ['Publicar entradas', 'Seguir blogs', 'Compartir contenido', 'Mensajes y comunidades'],
+    source: 'https://www.tumblr.com/about',
+  },
+  'youtube-music': {
+    overview: 'YouTube Music es un servicio de música y contenido de audio del ecosistema YouTube de Google. El acceso, la búsqueda, la reproducción y las listas pueden presentar problemas diferentes dependiendo del dispositivo y la conexión.',
+    uses: ['Escuchar música', 'Buscar artistas y canciones', 'Crear listas', 'Reproducción en distintos dispositivos'],
+    source: 'https://music.youtube.com/',
+  },
   cloudflare: {
     overview: 'Cloudflare es una empresa de infraestructura de Internet fundada en 2009, con sede en San Francisco. Su red global ofrece protección de aplicaciones, distribución de contenido, servicios DNS, acceso Zero Trust y herramientas para desarrollar y ejecutar aplicaciones. Una incidencia puede tener efectos distintos según los productos usados por cada sitio.',
     uses: ['Protección contra ataques DDoS', 'CDN y aceleración de sitios web', 'DNS y servicios de red', 'Plataforma para desarrolladores'],
