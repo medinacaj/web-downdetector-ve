@@ -14,6 +14,14 @@ with sync_playwright() as playwright:
     page.on("request", lambda request: remote.append(request.url) if not request.url.startswith("http://127.0.0.1:3434/") else None)
     response = page.goto(ROOT, wait_until="networkidle")
     assert response and response.status == 200
+    # Compact header stays one row, with the theme icon accessible above cards.
+    topbar = page.locator("header.top")
+    nav = topbar.locator(".wrap.nav")
+    assert topbar.count() == 1
+    assert nav.evaluate("(el) => Math.round(el.getBoundingClientRect().height)") == 54
+    assert topbar.get_by_role("navigation").count() == 1
+    assert topbar.locator(".theme-toggle svg").count() == 1
+
     assert page.get_by_text("VISTA PREVIA PÚBLICA").count() == 0
     assert page.locator(".banner").count() == 0
 
@@ -34,6 +42,14 @@ with sync_playwright() as playwright:
 
     for name in ("Cloudflare", "Gmail", "Outlook", "Fortnite"):
         assert page.get_by_role("link", name="Ver ficha de " + name).count() == 1, name
+
+    # Editorial category identity belongs inside the cards, never as an
+    # artificial top border or a status warning.
+    sky_wash = page.locator("#nube .card .logo-area").first.evaluate(
+        "(el) => getComputedStyle(el).backgroundColor")
+    rose_wash = page.locator("#juegos .card .logo-area").first.evaluate(
+        "(el) => getComputedStyle(el).backgroundColor")
+    assert sky_wash != rose_wash, ("Distinct category washes", sky_wash, rose_wash)
 
     assert page.locator("#nube .card").count() == 6
     assert page.locator("#correo .card").count() == 6
@@ -123,6 +139,15 @@ with sync_playwright() as playwright:
     # and the brand/chart bands must align across an entire grid row.
     for width in (320, 390, 768, 1280):
         page.set_viewport_size({"width": width, "height": 844})
+        top_height = topbar.evaluate("(el) => Math.round(el.getBoundingClientRect().height)")
+        assert top_height <= 56, ("Header must not wrap into a second row", width, top_height)
+        controls = topbar.locator(".navlinks a")
+        assert controls.count() == 3
+        theme_box = topbar.locator("#theme-toggle").bounding_box()
+        assert theme_box is not None
+        assert theme_box["x"] + theme_box["width"] <= width + 1, ("Theme icon off screen", width)
+        assert topbar.locator(".navlinks").evaluate(
+            "(el) => getComputedStyle(el).overflowX") == "auto"
         count = page.locator("#juegos .cards").evaluate(
             "(el) => getComputedStyle(el).gridTemplateColumns.split(' ').filter(Boolean).length"
         )

@@ -69,8 +69,8 @@ body {
 }
 .home-hero p { color: #bdd4cf; }
 .home-hero a:not([class*="bg-"]) { color: #84ded0; }
-.home-hero > div { padding-top: 52px; padding-bottom: 52px; }
-.home-hero > .home-intro-steps { padding-top: 20px; padding-bottom: 28px; }
+.home-hero > div { padding-top: 36px; padding-bottom: 36px; }
+.home-hero > .home-intro-steps { padding-top: 17px; padding-bottom: 22px; }
 .home-hero > div > div:last-child {
   border: 0;
   border-radius: 0;
@@ -89,6 +89,7 @@ body {
 }
 .service-tile {
   --tile-accent: #126c72;
+  --tile-wash: #e7f5f2;
   border: 0 !important;
   border-top: 0 !important;
   border-radius: 13px !important;
@@ -140,19 +141,19 @@ body {
   .service-tile-actions a:active, .service-tile-actions button:active { transform: none; }
 }
 .service-tile[data-category="telecomunicaciones"],
-.service-tile[data-category="nube-e-infraestructura"] { --tile-accent: #146e97; }
+.service-tile[data-category="nube-e-infraestructura"] { --tile-accent: #146e97; --tile-wash: #e7f3fc; }
 .service-tile[data-category="correo-y-productividad"],
-.service-tile[data-category="plataformas-digitales"] { --tile-accent: #7660a2; }
+.service-tile[data-category="plataformas-digitales"] { --tile-accent: #7660a2; --tile-wash: #f1edfc; }
 .service-tile[data-category="videojuegos"],
-.service-tile[data-category="streaming"] { --tile-accent: #a63761; }
+.service-tile[data-category="streaming"] { --tile-accent: #a63761; --tile-wash: #fbeaf0; }
 .service-tile[data-category="banca-y-pagos"],
-.service-tile[data-category="comercio-global"] { --tile-accent: #80520e; }
+.service-tile[data-category="comercio-global"] { --tile-accent: #80520e; --tile-wash: #fff3dc; }
 .service-tile[data-category="servicios-publicos"],
-.service-tile[data-category="delivery-y-movilidad"] { --tile-accent: #136956; }
-.service-tile[data-category="inteligencia-artificial"] { --tile-accent: #7056b3; }
-.service-tile[data-category="apuestas-y-loterias"] { --tile-accent: #93516c; }
+.service-tile[data-category="delivery-y-movilidad"] { --tile-accent: #136956; --tile-wash: #e8f6e8; }
+.service-tile[data-category="inteligencia-artificial"] { --tile-accent: #7056b3; --tile-wash: #f1eaff; }
+.service-tile[data-category="apuestas-y-loterias"] { --tile-accent: #93516c; --tile-wash: #fbeef2; }
 @media (max-width: 639px) {
-  .home-hero > div { padding-top: 32px; padding-bottom: 32px; }
+  .home-hero > div { padding-top: 26px; padding-bottom: 26px; }
   .home-hero h1 { font-size: 30px; }
 }
 
@@ -201,3 +202,50 @@ body {
 }
 .directory-favorite-action { pointer-events: none; }
 .directory-favorite-action button { pointer-events: auto; }
+
+/* Compact navigation remains a single line, with accessible 44px theme icon. */
+.pulsove-header { box-shadow: 0 2px 10px rgb(25 42 51 / .065); }
+.dark .pulsove-header { box-shadow: 0 2px 12px rgb(0 0 0 / .2); }
+.pulsove-brand { color: #173e46; }
+.dark .pulsove-brand { color: #eef8f5; }
+.pulsove-nav-link { color: #176e83; }
+.pulsove-nav-link:nth-child(2) { color: #684a9d; }
+.pulsove-nav-link:nth-child(3) { color: #98621e; }
+.pulsove-nav-link:nth-child(4) { color: #a43962; }
+.pulsove-nav-link:nth-child(5) { color: #136c61; }
+.pulsove-nav-link:hover { color: #092b40; text-decoration: underline; text-underline-offset: 5px; }
+.dark .pulsove-nav-link { color: #94d4ed; }
+.dark .pulsove-nav-link:nth-child(2) { color: #c6b1fa; }
+.dark .pulsove-nav-link:nth-child(3) { color: #f8cc87; }
+.dark .pulsove-nav-link:nth-child(4) { color: #f8a7c7; }
+.dark .pulsove-nav-link:nth-child(5) { color: #9be2d2; }
+.dark .pulsove-nav-link:hover { color: #fff; }
+.pulsove-header-report { background-color: #a43b61; }
+.pulsove-header-report:hover { background-color: #822849; }
+
+/* More varied editorial color, not fake alerts or decorative border strips. */
+.home-hero .home-intro-steps li:nth-child(2) > span { color: #f5cd82; }
+.home-hero .home-intro-steps li:nth-child(3) > span { color: #ffb3b7; }
+.home-featured-band > div:first-child p:first-child { color: #684a9d; }
+.dark .home-featured-band > div:first-child p:first-child { color: #c6b1fa; }
+.home-platform-band > div > div:first-child > p:first-child { color: #146e97; }
+.dark .home-platform-band > div > div:first-child > p:first-child { color: #94d4ed; }
+.service-tile [data-card-logo] {
+  background: var(--tile-wash);
+  border-radius: 11px;
+  margin: 5px 6px 1px;
+  width: calc(100% - 12px);
+}
+.dark .service-tile { --tile-wash: #e7f5f2; }
+.dark .service-tile[data-category="telecomunicaciones"],
+.dark .service-tile[data-category="nube-e-infraestructura"] { --tile-wash: #e7f3fc; }
+.dark .service-tile[data-category="correo-y-productividad"],
+.dark .service-tile[data-category="plataformas-digitales"] { --tile-wash: #f1edfc; }
+.dark .service-tile[data-category="videojuegos"],
+.dark .service-tile[data-category="streaming"] { --tile-wash: #fbeaf0; }
+.dark .service-tile[data-category="banca-y-pagos"],
+.dark .service-tile[data-category="comercio-global"] { --tile-wash: #fff3dc; }
+.dark .service-tile[data-category="servicios-publicos"],
+.dark .service-tile[data-category="delivery-y-movilidad"] { --tile-wash: #e8f6e8; }
+.dark .service-tile[data-category="inteligencia-artificial"] { --tile-wash: #f1eaff; }
+.dark .service-tile[data-category="apuestas-y-loterias"] { --tile-wash: #fbeef2; }
