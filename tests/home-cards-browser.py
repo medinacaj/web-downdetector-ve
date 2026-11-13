@@ -116,6 +116,39 @@ with sync_playwright() as playwright:
             width, "Charts in a row must have identical widths"
         )
 
+    # Regression contract for the requested soft corners and elevation at all
+    # target widths. Never replace it with a colored border or top stripe.
+    for width in (320, 390, 768, 1280):
+        page.set_viewport_size({"width": width, "height": 844})
+        article = grid.locator("article.service-tile").first
+        appearance = article.evaluate("""(el) => {
+            const style = getComputedStyle(el);
+            return {
+              top: style.borderTopWidth,
+              radius: style.borderTopLeftRadius,
+              shadow: style.boxShadow,
+              image: style.backgroundImage,
+            };
+        }""")
+        assert appearance["top"] == "0px", (width, appearance)
+        assert appearance["radius"] == "13px", (width, appearance)
+        assert appearance["shadow"] != "none", (width, appearance)
+        assert appearance["image"] == "none", (width, appearance)
+        assert page.evaluate("document.documentElement.scrollWidth <= window.innerWidth + 2"), width
+
+    article = grid.locator("article.service-tile").first
+    default_shadow = article.evaluate("(el) => getComputedStyle(el).boxShadow")
+    article.hover()
+    page.wait_for_timeout(300)
+    raised_shadow = article.evaluate("(el) => getComputedStyle(el).boxShadow")
+    assert raised_shadow != default_shadow, "Hover must provide tactile elevation"
+    article.locator('a[aria-label^="Ver estado y reportes"]').focus()
+    assert article.evaluate("(el) => el.matches(':focus-within')"), "Keyboard focus must reach the card"
+    page.evaluate("document.documentElement.classList.add('dark')")
+    dark_shadow = article.evaluate("(el) => getComputedStyle(el).boxShadow")
+    assert dark_shadow != "none", "Dark mode should keep depth"
+    page.evaluate("document.documentElement.classList.remove('dark')")
+
     page.set_viewport_size({"width": 390, "height": 844})
     star = page.get_by_role("button", name="Añadir CANTV a favoritos")
     assert star.count() == 1
@@ -136,6 +169,13 @@ with sync_playwright() as playwright:
         path="artifacts/pulsove-home-320.png", animations="disabled"
     )
 
+    for width in (768, 1280):
+        page.set_viewport_size({"width": width, "height": 844})
+        page.locator("section[aria-labelledby='home-services-title']").screenshot(
+            path=f"artifacts/pulsove-home-{width}.png", animations="disabled"
+        )
+
+    page.set_viewport_size({"width": 390, "height": 844})
     link = page.get_by_role("link", name="Ver estado y reportes de CANTV")
     assert link.get_attribute("href") == "/servicios/cantv"
     quick = page.get_by_role("link", name="Reportar falla de CANTV")
