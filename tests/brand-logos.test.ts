@@ -109,6 +109,15 @@ describe('Local brand logo inventory', () => {
     expect(isAdditionalLogo('call-of-duty-warzone')).toBe(true);
   });
 
+  it('never attributes arbitrary prototype keys as custom logo sources', () => {
+    for (const slug of ['__proto__', 'constructor', 'toString']) {
+      const provenance = brandLogoSource(slug, '/brands/unknown.svg');
+      expect(typeof provenance.provider).toBe('string');
+      expect(provenance.provider.length).toBeGreaterThan(0);
+      expect(provenance.url).toMatch(/^https:\/\//);
+    }
+  });
+
   it('keeps an honest fallback for missing/unchecked brands', () => {
     expect(logoForService('seniat')).toBeNull();
     expect(logoForService('no-existe')).toBeNull();
