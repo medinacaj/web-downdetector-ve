@@ -492,5 +492,16 @@ with sync_playwright() as playwright:
     page.set_viewport_size({"width": 390, "height": 844})
     page.screenshot(path="artifacts/pulsove-directory-390.png", full_page=False, animations="disabled")
 
+    # Regional scope: a Chile-only listing must never claim that reports
+    # from the Venezuela-only geographic form measure Chilean availability.
+    page.goto("http://127.0.0.1:3000/servicios/movistar-chile", wait_until="networkidle", timeout=60000)
+    assert page.get_by_role("heading", name="Movistar Chile", exact=True).count() == 1
+    assert page.get_by_text("no representa un monitoreo local", exact=False).count() == 1
+    assert page.get_by_text("estados de Venezuela", exact=False).count() >= 1
+    page.goto("http://127.0.0.1:3000/servicios/bancoestado", wait_until="networkidle", timeout=60000)
+    assert page.get_by_role("heading", name="BancoEstado", exact=True).count() == 1
+    page.goto("http://127.0.0.1:3000/servicios/aba-cantv", wait_until="networkidle", timeout=60000)
+    assert page.get_by_role("heading", name="ABA CANTV", exact=True).count() == 1
+
     print("Mobile cards responsive; quick report links to real protected service form; optional fields collapsed; favorites persist.")
     browser.close()
