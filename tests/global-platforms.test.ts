@@ -61,6 +61,6 @@ describe('worldwide platform catalogue', () => {
     }
     expect(logoForService('outlook')).toBe('/brands/outlook.svg');
     expect(logoForService('minecraft')).toBe('/brands/minecraft.svg');
-    expect(logoForService('seniat')).toBeNull();
+    expect(logoForService('seniat')).toBe('/brands/seniat.svg');
   });
 });
