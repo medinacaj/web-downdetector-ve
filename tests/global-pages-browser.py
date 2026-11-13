@@ -389,5 +389,21 @@ with sync_playwright() as playwright:
     assert "Estado actual no consultado" in page.locator(".profile-panel").nth(1).inner_text()
     assert page.locator(".profile-tags span").count() >= 3
     assert remote == [], "Demo must not request third-party hosts"
+    # The documentation lives in Pages too, without claiming that this
+    # static preview collects reports or monitors providers in real time.
+    page.goto(ROOT + "metodologia/", wait_until="networkidle")
+    assert page.get_by_role("heading", name="Examinamos reportes ciudadanos para identificar posibles problemas de servicio.").count() == 1
+    assert page.locator(".method-page .guide-item").count() == 7
+    assert page.get_by_role("heading", name="Cómo identificamos un posible incidente").count() == 1
+    assert "90 días" in page.locator(".method-page .figures").inner_text()
+    assert "15 min" in page.locator(".method-page .figures").inner_text()
+    assert "no envía ni almacena reportes" in page.locator(".method-page").inner_text()
+    assert page.locator("footer a[href$='/metodologia/']").count() == 1
+    for width in (320, 390, 768, 1280):
+        page.set_viewport_size({"width": width, "height": 844})
+        assert page.evaluate("document.documentElement.scrollWidth <= window.innerWidth + 2"), ("methodology overflow", width)
+    page.set_viewport_size({"width": 390, "height": 844})
+    page.screenshot(path="artifacts/global-pages-methodology-390.png", full_page=False, animations="disabled")
+
     print("PASS: 211 services; logos exclusive with fallback, 211 quick-report modal actions, simulated form without backend, responsive cards and no external requests")
     browser.close()
