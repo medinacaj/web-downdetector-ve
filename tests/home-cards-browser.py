@@ -14,6 +14,11 @@ with sync_playwright() as playwright:
     page = context.new_page()
     response = page.goto("http://127.0.0.1:3000/", wait_until="networkidle", timeout=45000)
     assert response and response.status == 200, "Home must serve HTTP 200"
+    header = page.locator("header.pulsove-header")
+    assert header.count() == 1
+    assert header.evaluate("(el) => Math.round(el.getBoundingClientRect().height)") <= 56
+    assert header.get_by_role("navigation", name="Principal").count() == 1
+    assert header.get_by_role("button", name="Cambiar a modo oscuro").count() == 1
 
     # Both versions of PulsoVE use a top-right icon-only theme toggle.
     theme_toggle = page.get_by_role("button", name="Cambiar a modo oscuro")
@@ -91,6 +96,11 @@ with sync_playwright() as playwright:
     banking = page.locator('article.service-tile[data-category="banca-y-pagos"]').first
     assert telecom.count() and banking.count()
     assert telecom.evaluate("(el) => getComputedStyle(el).getPropertyValue('--tile-accent')") != banking.evaluate("(el) => getComputedStyle(el).getPropertyValue('--tile-accent')")
+    sky_wash = telecom.locator("[data-card-logo]").evaluate("(el) => getComputedStyle(el).backgroundColor")
+    gold_wash = banking.locator("[data-card-logo]").evaluate("(el) => getComputedStyle(el).backgroundColor")
+    assert sky_wash != gold_wash, ("Category colors should feel visibly different", sky_wash, gold_wash)
+    assert telecom.locator("[data-card-logo]").evaluate(
+        "(el) => getComputedStyle(el).backgroundImage") == "none"
     # Ensure small category labels remain readable,
     # including the highlighted tile surface, without decorative top stripes.
     contrast_js = """(card) => {
@@ -171,6 +181,12 @@ with sync_playwright() as playwright:
 
     for width in (320, 390, 768):
         page.set_viewport_size({"width": width, "height": 844})
+        header_height = header.evaluate("(el) => Math.round(el.getBoundingClientRect().height)")
+        assert header_height <= 56, ("Header must stay compact", width, header_height)
+        switch_bounds = page.locator("header.pulsove-header button[aria-label^='Cambiar a modo']").bounding_box()
+        assert switch_bounds is not None
+        assert switch_bounds["x"] + switch_bounds["width"] <= width + 1, ("Theme icon off screen", width)
+        assert header.locator("nav").evaluate("(el) => getComputedStyle(el).overflowX") == "auto"
         grid_columns = grid.evaluate("(el) => getComputedStyle(el).gridTemplateColumns.split(' ').filter(Boolean).length")
         assert grid_columns == 2, f"Expected 2 columns at {width}px, got {grid_columns}"
         overflow = page.evaluate("document.documentElement.scrollWidth - window.innerWidth")
