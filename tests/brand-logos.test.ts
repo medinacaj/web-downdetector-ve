@@ -11,11 +11,11 @@ const requested = [
 ] as const;
 
 describe('Local brand logo inventory', () => {
-  it('maps 165 distinct files into real catalogue entries, never remote runtime links', () => {
+  it('maps 167 distinct files into real catalogue entries, never remote runtime links', () => {
     const slugs = new Set<string>(servicesSeed.map((service) => service.slug));
     expect(servicesSeed).toHaveLength(211);
-    expect(Object.keys(HOME_BRAND_LOGOS)).toHaveLength(165);
-    expect(Object.keys(HOME_BRAND_LOGOS).filter(isAdditionalLogo)).toHaveLength(115);
+    expect(Object.keys(HOME_BRAND_LOGOS)).toHaveLength(167);
+    expect(Object.keys(HOME_BRAND_LOGOS).filter(isAdditionalLogo)).toHaveLength(117);
 
     for (const [slug, path] of Object.entries(HOME_BRAND_LOGOS)) {
       expect(slugs.has(slug), slug).toBe(true);
@@ -50,6 +50,18 @@ describe('Local brand logo inventory', () => {
   it('uses the correctly attributed EA publisher icon for EA app', () => {
     expect(logoForService('ea-app')).toBe('/brands/ea-app.svg');
     expect(brandLogoSource('ea-app', '/brands/ea-app.svg').url).toBe('https://github.com/simple-icons/simple-icons/blob/develop/icons/ea.svg');
+  });
+
+  it('attributes local community illustrations for PedidosYa and Yango', () => {
+    for (const slug of ['pedidosya', 'yango']) {
+      const path = logoForService(slug);
+      expect(path).toBe('/brands/' + slug + '.svg');
+      expect(isAdditionalLogo(slug)).toBe(true);
+      const source = brandLogoSource(slug, path!);
+      expect(source.provider).toContain('Lawnicons');
+      expect(source.url).toBe('https://github.com/LawnchairLauncher/lawnicons/blob/develop/svgs/' + slug + '.svg');
+      expect(source.licenseUrl).toContain('/LICENSE');
+    }
   });
 
   it('keeps an honest fallback for missing/unchecked brands', () => {
