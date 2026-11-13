@@ -6,7 +6,7 @@ const remedy=fix=>{
  if(typeof fix==='object')return clean(fix.name?fix.name+'@'+fix.version:fix.version);
  return clean(fix);
 };
-export function formatProductionAudit(data){
+export function formatProductionAudit(data, scope='production'){
  if(!data||typeof data!=='object'||!data.metadata||!data.vulnerabilities||data.error)
    throw Error('Resultado npm audit incompleto; no se puede afirmar una auditoría exitosa');
  const levels=data.metadata.vulnerabilities??{};
@@ -17,8 +17,10 @@ export function formatProductionAudit(data){
   via:Array.isArray(item?.via)?item.via.map(v=>typeof v==='string'?v:v?.name).filter(Boolean).slice(0,3).join(', '):''
  })).sort((a,b)=>(severityOrder[a.severity]??99)-(severityOrder[b.severity]??99)||a.name.localeCompare(b.name));
  const heading=[
-  '## Auditoría de dependencias de producción (npm)',
-  'Comando de origen: `npm audit --omit=dev --json`. Solo advierte sobre dependencias de producción; no demuestra explotación.',
+  scope==='all'?'## Auditoría de todas las dependencias (npm)':'## Auditoría de dependencias de producción (npm)',
+  scope==='all'
+    ? 'Comando de origen: `npm audit --json`. Incluye herramientas de desarrollo; los avisos no demuestran explotación.'
+    : 'Comando de origen: `npm audit --omit=dev --json`. Solo advierte sobre dependencias de producción; no demuestra explotación.',
   '',
   ...['critical','high','moderate','low'].map(k=>'- **'+k+'**: '+(levels[k]??'sin dato')),
   '',
