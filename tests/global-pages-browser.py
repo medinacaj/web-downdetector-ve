@@ -28,8 +28,43 @@ with sync_playwright() as playwright:
         assert page.locator("#" + section + " .card").count() == 6
     charts = page.locator("main .card .demo-chart")
     assert charts.count() == 60, "All 60 visible cards need illustrative charts"
-    assert page.locator("main .card .demo-label").count() == 60
-    assert page.locator("main .card .notice").first.inner_text() == "Sin mediciones reales en esta demo"
+    assert page.locator("main .card .demo-label").count() == 0, "No redundant demo label in cards"
+    assert page.locator("main .card .notice").count() == 0, "No repeated disclaimer beneath each chart"
+    assert page.locator(".banner").count() == 1, "One global static-preview disclosure"
+    assert page.locator("#nube .card .name").first.is_visible()
+    assert page.locator("#nube .card .card-cta").first.is_visible()
+    assert page.locator("#nube .card .card-actions").first.is_visible()
+    colors = page.locator("#nube .card").first.evaluate("(el) => getComputedStyle(el).getPropertyValue('--accent').trim()")
+    games_color = page.locator("#juegos .card").first.evaluate("(el) => getComputedStyle(el).getPropertyValue('--accent').trim()")
+    assert colors != games_color, "Distinct category colors for varied visual hierarchy"
+
+    # Quick filters, search reset, keyboard search and display mode are real controls.
+    page.get_by_role("button", name="Nube", exact=True).click()
+    assert page.get_by_role("button", name="Nube", exact=True).get_attribute("aria-pressed") == "true"
+    assert page.locator("main .card:visible").count() >= 6
+    assert page.locator("#home-search-count").inner_text().endswith("servicios destacados")
+    page.get_by_role("button", name="Todos", exact=True).click()
+    assert page.locator("main .card:visible").count() == 60
+    page.locator("#quicksearch").fill("zzzzsinresultados")
+    assert page.locator("main .card:visible").count() == 0
+    assert page.locator("#home-empty").is_visible()
+    page.get_by_role("button", name="Limpiar").click()
+    assert page.locator("main .card:visible").count() == 60
+    page.locator("#quicksearch").blur()
+    page.keyboard.press("/")
+    assert page.locator("#quicksearch").evaluate("(el) => document.activeElement === el")
+    page.locator("#quicksearch").fill("fortnite")
+    assert page.locator("main .card:visible").count() >= 1
+    page.keyboard.press("Escape")
+    assert page.locator("main .card:visible").count() == 60
+    theme = page.locator("#theme-toggle")
+    theme.click()
+    assert page.locator("body").get_attribute("data-theme") == "light"
+    assert theme.get_attribute("aria-pressed") == "true"
+    page.reload(wait_until="networkidle")
+    assert page.locator("body").get_attribute("data-theme") == "light"
+    page.locator("#theme-toggle").click()
+    assert page.locator("body").get_attribute("data-theme") == "dark"
     assert "ficticio" in charts.first.get_attribute("aria-label")
     assert charts.nth(0).locator("polyline").get_attribute("points") != charts.nth(1).locator("polyline").get_attribute("points")
     assert page.get_by_text("Gráficos ficticios de ejemplo").count() >= 1
@@ -58,9 +93,11 @@ with sync_playwright() as playwright:
           };
         })""")
         for box in measurements:
-            assert box["toolbar"]["bottom"] <= box["header"]["top"] + 1, (width, "toolbar overlap", box)
-            assert box["header"]["bottom"] <= box["logo"]["top"] + 1, (width, "header overlap", box)
+            assert box["header"]["top"] >= box["link"]["top"] - 1, (width, "header should start in full-width link", box)
+            assert box["header"]["bottom"] <= box["logo"]["top"] + 1, (width, "header/logo overlap", box)
             assert box["logo"]["bottom"] <= box["signal"]["top"] + 2, (width, "logo/chart overlap", box)
+            assert box["link"]["bottom"] <= box["toolbar"]["top"] + 1, (width, "actions must be below card content", box)
+            assert box["signal"]["bottom"] <= box["toolbar"]["top"] + 1, (width, "footer overlaps trend", box)
             assert box["graph"]["width"] >= box["link"]["width"] - 32, (width, "graph too narrow", box)
             assert box["alert"]["right"] + 2 <= box["star"]["left"], (width, "actions overlap", box)
             assert box["alert"]["top"] >= box["card"]["top"] - 1
@@ -123,6 +160,14 @@ with sync_playwright() as playwright:
     assert response and response.status == 200
     assert page.locator("#directory-cards .card").count() == 211
     assert page.locator("#directory-cards button[data-report]").count() == 211
+    assert page.locator("#directory-cards .demo-label").count() == 0
+    assert page.locator("#directory-cards .notice").count() == 0
+    page.locator("#directory-sort").select_option("category")
+    cats = page.locator("#directory-cards .card").evaluate_all("(items) => items.map(item => item.dataset.category)")
+    assert cats == sorted(cats), "Directory groups by category when selected"
+    page.locator("#directory-sort").select_option("favorites")
+    assert page.locator("#directory-cards .card").first.get_attribute("data-slug") == "cloudflare", "Favorited platform should be first"
+    page.locator("#directory-sort").select_option("name")
     page.locator("#directory-search").fill("outlook")
     assert page.locator("#directory-cards .card:visible").count() == 1
     assert page.locator("#directory-cards .card:visible .name").inner_text() == "Outlook"

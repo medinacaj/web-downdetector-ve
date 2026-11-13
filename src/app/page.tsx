@@ -127,7 +127,7 @@ export default async function HomePage() {
       )}
 
       {/* Servicios de interés: cuadrícula responsive y tendencias reales de reportes. */}
-      <section className="mx-auto max-w-6xl px-3 py-12 sm:px-6" aria-labelledby="home-services-title">
+      <section className="home-featured-band mx-auto max-w-6xl px-3 py-12 sm:px-6" aria-labelledby="home-services-title">
         <div className="flex items-start justify-between gap-3 px-1 sm:items-center">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.18em] text-pulse-600">Explora el pulso</p>
@@ -160,7 +160,7 @@ export default async function HomePage() {
       </section>
 
       {/* International services: curated groups, real data only; not an uptime guarantee. */}
-      <section className="border-t border-border bg-surface/50" aria-labelledby="global-platforms-title">
+      <section className="home-platform-band border-t border-border bg-surface/50" aria-labelledby="global-platforms-title">
         <div className="mx-auto max-w-6xl px-3 py-12 sm:px-6">
           <div className="px-1">
             <p className="text-xs font-semibold uppercase tracking-[0.18em] text-pulse-600">

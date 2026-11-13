@@ -28,6 +28,16 @@ with sync_playwright() as playwright:
     assert global_section.locator("img[alt^='Logotipo identificativo de']").count() >= 15
 
 
+    # Each product category has a distinct editorial accent; it is not uptime status.
+    telecom = page.locator('article.service-tile[data-category="telecomunicaciones"]').first
+    banking = page.locator('article.service-tile[data-category="banca-y-pagos"]').first
+    assert telecom.count() and banking.count()
+    assert telecom.evaluate("(el) => getComputedStyle(el).getPropertyValue('--tile-accent')") != banking.evaluate("(el) => getComputedStyle(el).getPropertyValue('--tile-accent')")
+    for article in grid.locator("article.service-tile").all():
+        assert article.locator("[data-card-title]").first.is_visible()
+        assert article.locator("[data-card-actions]").first.is_visible()
+        assert article.locator("[data-card-actions]").evaluate("(el) => el.previousElementSibling?.tagName") == "A"
+
     # Logos come from a reviewed, self-hosted allowlist; the browser must
     # never receive a broken external logo or a third-party tracking request.
     logo_images = grid.locator('img[alt^="Logotipo identificativo de"]')
@@ -72,6 +82,7 @@ with sync_playwright() as playwright:
           };
           return {
             article:box(card),
+            link:box(card.querySelector('a[aria-label^="Ver estado y reportes"]')),
             toolbar:box(card.querySelector('[data-card-actions]')),
             title:box(card.querySelector('[data-card-title]')),
             logo:box(card.querySelector('[data-card-logo]')),
@@ -81,8 +92,11 @@ with sync_playwright() as playwright:
           };
         })""")
         for rect in geometry:
-            assert rect["toolbar"]["bottom"] <= rect["title"]["top"] + 1, (width, "toolbar/title collision")
-            assert rect["title"]["bottom"] <= rect["logo"]["top"] + 1, (width, "title/logo collision")
+            assert rect["title"]["top"] >= rect["link"]["top"] - 1, (width, "title must begin full-width card", rect)
+            assert rect["title"]["width"] >= rect["article"]["width"] - 42, (width, "title too narrow", rect)
+            assert rect["title"]["bottom"] <= rect["logo"]["top"] + 1, (width, "title/logo collision", rect)
+            assert rect["link"]["bottom"] <= rect["toolbar"]["top"] + 1, (width, "toolbar must be beneath details", rect)
+            assert rect["toolbar"]["bottom"] <= rect["article"]["bottom"] + 1, (width, "actions escape card", rect)
             assert rect["logo"]["bottom"] <= rect["chart"]["top"] + 30, (width, "logo/chart collision")
             assert rect["alert"]["right"] + 1 <= rect["star"]["left"], (width, "buttons collide")
             assert rect["chart"]["width"] >= rect["article"]["width"] - 42, (width, "chart too narrow")

@@ -65,7 +65,13 @@ const CSS=[
 '@media (min-width:760px){.cards{grid-template-columns:repeat(3,minmax(0,1fr))}.card-link{min-height:259px;padding:6px 15px 14px}.card-actions{min-height:46px;padding:7px 15px 0}.star,.report-quick{width:38px;height:38px}.logo-area{height:88px}.logo{width:170px;height:76px}.demo-chart{height:58px}.signal{min-height:111px}.name{font-size:16px}}',
 '@media (min-width:1060px){.cards{grid-template-columns:repeat(6,minmax(0,1fr))}.card-link{min-height:251px;padding:5px 11px 12px}.card-actions{min-height:42px;padding:6px 10px 0}.star,.report-quick{width:34px;height:34px}.logo-area{height:80px}.logo{width:145px;height:70px}.demo-chart{height:54px}.signal{min-height:106px}.name{font-size:14px}}',
 '@media (max-width:375px){.wrap{padding:0 11px}.cards{gap:9px}.card-link{min-height:250px;padding:5px 9px 10px}.card-actions{min-height:38px;padding:5px 8px 0}.star,.report-quick{width:32px;height:32px;font-size:20px}.name{font-size:13px}.logo-area{height:78px}.logo{width:125px;height:68px}.navlinks{gap:9px;font-size:12px}}',
-'@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}'
+'@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}',
+".card{--accent:#176f91;--accent-rgb:23,111,145;border:1px solid #d5e4ed;border-top:4px solid var(--accent);position:relative;background:linear-gradient(158deg,#fff 0%,#fff 72%,rgba(var(--accent-rgb),.09));box-shadow:0 5px 15px #070e2225;transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease}.card:hover,.card:focus-within{transform:translateY(-4px);box-shadow:0 14px 32px #0513223f;border-color:var(--accent)}.card-link{order:1;min-height:0!important;padding:11px 12px 5px!important}.card-header{min-height:56px}.name{color:#10233a;font-size:clamp(13px,1.6vw,16px);line-height:1.23;min-height:34px}.category{font-size:10px;font-weight:700;color:var(--accent)}.logo-area{height:78px}.signal{min-height:80px;padding-top:4px;margin-top:auto;border-top:1px solid rgba(var(--accent-rgb),.18)}.demo-chart{height:55px!important;color:var(--accent);transition:opacity .2s ease}.card:hover .demo-chart{opacity:.9}.card-cta{display:flex;align-items:center;justify-content:space-between;gap:5px;min-height:20px;margin-top:2px;color:var(--accent);font-weight:780;font-size:11px;line-height:1.2}.card-cta .arrow{font-size:17px;line-height:1;transition:transform .2s}.card:hover .card-cta .arrow{transform:translateX(3px)}.card-actions{order:2;justify-content:flex-end;gap:8px;min-height:45px!important;padding:5px 11px!important;border-top:1px solid #d9e4ec;background:rgba(var(--accent-rgb),.045)}.actions-label{font-size:10px;font-weight:750;color:#526677;margin-right:auto}.star,.report-quick{width:35px!important;height:35px!important;font-size:20px;transition:transform .18s,filter .18s}.star:hover,.report-quick:hover{transform:scale(1.1)}.star{border-color:#bfd6e8;background:#ecf7ff}.star[aria-pressed=true]{color:#075587;background:#bde8ff;border-color:#75b6d6}.card[hidden],.group[hidden],#home-empty[hidden],#reset-home-search[hidden]{display:none!important}",
+".card[data-category=\"nube-e-infraestructura\"],.card[data-category=\"telecomunicaciones\"]{--accent:#1275a9;--accent-rgb:18,117,169}.card[data-category=\"correo-y-productividad\"],.card[data-category=\"plataformas-digitales\"]{--accent:#7851bd;--accent-rgb:120,81,189}.card[data-category=\"videojuegos\"]{--accent:#c14a79;--accent-rgb:193,74,121}.card[data-category=\"streaming\"]{--accent:#b64f6b;--accent-rgb:182,79,107}.card[data-category=\"banca-y-pagos\"],.card[data-category=\"comercio-global\"]{--accent:#a96a19;--accent-rgb:169,106,25}.card[data-category=\"servicios-publicos\"],.card[data-category=\"delivery-y-movilidad\"]{--accent:#258264;--accent-rgb:37,130,100}.card[data-category=\"inteligencia-artificial\"]{--accent:#684ec1;--accent-rgb:104,78,193}.card[data-category=\"apuestas-y-loterias\"]{--accent:#9b5764;--accent-rgb:155,87,100}",
+".top{background:linear-gradient(100deg,#101d37,#26203c 53%,#0c3443);border-bottom:1px solid #445a71}.brand{font-size:26px;letter-spacing:-1px}.brand span{color:#6cfae4}.navlinks a{padding:6px 9px;border-radius:8px;transition:background .16s,color .16s}.navlinks a:hover,.navlinks a:focus-visible{background:#ffffff20;color:#fff}.navlinks a[aria-current=page]{color:#83f7e4;background:#ffffff12}.theme-toggle{border:1px solid #63849b;background:#243d50;color:#e4fcff;border-radius:11px;min-height:39px;padding:7px 10px;cursor:pointer;flex:none;font-size:12px;font-weight:750}.theme-toggle:hover{background:#35556b;border-color:#87f5e6}.banner{background:#123347;border-color:#2a6476;font-size:12px;padding:7px 0}.hero{padding-top:39px}.wrap.hero{background:radial-gradient(circle at 88% 4%,#39457a 0%,transparent 34%),radial-gradient(circle at 0% 82%,#144f51 0%,transparent 34%),linear-gradient(125deg,#12233a,#171d32);padding:37px 23px 24px;border:1px solid #37516b;border-radius:23px;margin-top:20px}.hero h1{font-size:clamp(27px,4.6vw,48px)}.hero p{color:#c7d9e7}.stat{background:#20374dbd;border-color:#52667d;box-shadow:0 3px 12px #0002}.stat strong{color:#9ef5db}.group{padding:23px 17px 25px;margin:18px 0 23px;border:1px solid #33516e;border-radius:21px;background:linear-gradient(140deg,#152c43,#101b2e);box-shadow:0 10px 26px #0002}.group:nth-of-type(2n){background:linear-gradient(135deg,#27243f,#161e37);border-color:#524465}.group:nth-of-type(3n){background:linear-gradient(145deg,#1e3e3c,#132a35);border-color:#40655b}.group:nth-of-type(5n){background:linear-gradient(145deg,#3b3044,#242037);border-color:#63516c}.group .section-title h2{color:#f5f7fd}.section-title a{color:#aafbea;font-weight:800}.section-title a:hover{text-decoration:underline}.group .hint{color:#bdd0dd}.chip{border-color:#4b6c80;background:#203349;color:#ebf8ff;font-weight:650;transition:background .18s,transform .18s,border-color .18s;cursor:pointer}.chip:hover,.chip[aria-pressed=true]{border-color:#74f4e4;background:#1d6264;color:#fff;transform:translateY(-1px)}.filters button.chip{font:inherit;font-size:12px;min-height:36px}.home-search-status{font-size:12px;color:#adf4e7;font-weight:750;margin:4px 0 0}.reset-home-search{background:#2a5668;color:#fff;border:1px solid #7ac8cd;border-radius:10px;padding:8px 12px;cursor:pointer}.noresults{border:1px dashed #7192aa;background:#15334c;color:#f5faff}",
+".directory>.hero{padding:24px 0 8px}.directory .filterbar{background:linear-gradient(115deg,#1b3349,#292844);padding:15px;border:1px solid #435e76;border-radius:16px}.filterbar select{min-width:165px;max-width:240px}.filterbar label.chip{display:flex;align-items:center;gap:7px}.filterbar #directory-sort{min-width:155px;max-width:220px}.directory .cards{margin-top:22px}.directory .result{font-size:13px;color:#b9e9e0;font-weight:700}.footer{background:#0e1e2e}.legal{background:linear-gradient(130deg,#172b40,#1a3a40);color:#cae1e7}",
+"body[data-theme=\"light\"]{background:#edf3fa;color:#1c2a3c}body[data-theme=\"light\"] .top{background:linear-gradient(100deg,#edf7fc,#edf1ff);border-color:#b9d2e1}body[data-theme=\"light\"] .brand{color:#102f42}body[data-theme=\"light\"] .brand span{color:#078a88}body[data-theme=\"light\"] .navlinks{color:#29425c}body[data-theme=\"light\"] .navlinks a:hover,body[data-theme=\"light\"] .navlinks a[aria-current=page]{color:#10334c;background:#d8e8f1}body[data-theme=\"light\"] .theme-toggle{background:#fff;border-color:#7da9be;color:#193349}body[data-theme=\"light\"] .banner{color:#124353;background:#dcf5f2;border-color:#92d2cf}body[data-theme=\"light\"] .wrap.hero{background:radial-gradient(circle at 82% 2%,#e9d9fd 0%,transparent 35%),linear-gradient(135deg,#e6f3fa,#f4ecf8);border-color:#b7cddf}body[data-theme=\"light\"] .hero h1,body[data-theme=\"light\"] .hero p{color:#192c42}body[data-theme=\"light\"] .eyebrow{color:#147f80}body[data-theme=\"light\"] .stat{background:#fff;border-color:#c0d6e0}body[data-theme=\"light\"] .stat strong{color:#145e73}body[data-theme=\"light\"] .stat small{color:#496177}body[data-theme=\"light\"] .group{background:linear-gradient(145deg,#e4f0ff,#f6f9ff);border-color:#bfd5ea}body[data-theme=\"light\"] .group:nth-of-type(2n){background:linear-gradient(145deg,#eee7ff,#f6f3fd);border-color:#d4c6ec}body[data-theme=\"light\"] .group:nth-of-type(3n){background:linear-gradient(145deg,#dff2e8,#f2fcf6);border-color:#aedbc8}body[data-theme=\"light\"] .group .section-title h2,body[data-theme=\"light\"] .section-title a{color:#19486c}body[data-theme=\"light\"] .group .hint{color:#425d70}body[data-theme=\"light\"] .chip{background:#fff;color:#1e4c63;border-color:#b9d1df}body[data-theme=\"light\"] .chip[aria-pressed=true],body[data-theme=\"light\"] .chip:hover{color:#fff;background:#187475;border-color:#187475}body[data-theme=\"light\"] .home-search-status{color:#23646e}body[data-theme=\"light\"] .directory .filterbar{background:linear-gradient(120deg,#e8f3fb,#f2eafc);border-color:#b6cdda}body[data-theme=\"light\"] .directory .result{color:#25566c}body[data-theme=\"light\"] .directory>.hero h1,body[data-theme=\"light\"] .directory>.hero p{color:#233e55}body[data-theme=\"light\"] .footer{background:#d8e6f0;color:#385061;border-color:#bdd1de}body[data-theme=\"light\"] .legal{background:#e2f2f5;color:#22505b;border-color:#9ed5d0}",
+"@media(min-width:760px){.card-link{padding:13px 14px 7px!important}.logo-area{height:84px}.card-actions{min-height:45px!important;padding:5px 12px!important}.name{font-size:15px}}@media(min-width:1060px){.card-link{padding:12px 11px 5px!important}.logo-area{height:76px}.card-actions{min-height:44px!important;padding:4px 9px!important}.name{font-size:14px}}@media(max-width:375px){.wrap.hero{padding:25px 12px 18px}.group{padding:17px 10px}.card-link{padding:9px 8px 4px!important}.name{font-size:13px}.logo-area{height:70px}.star,.report-quick{width:32px!important;height:32px!important}.card-actions{padding:3px 7px!important}.actions-label{font-size:9px}}@media(prefers-reduced-motion:reduce){.card,.card-cta .arrow,.chip,.star,.report-quick{transition:none!important}.card:hover{transform:none!important}}"
 ].join('\n');
 
 function monogram(name){const parts=name.trim().split(/\s+/);return parts.length>1?parts.slice(0,2).map((s)=>s[0]).join('').toUpperCase():name.slice(0,2).toUpperCase();}
@@ -94,18 +100,20 @@ function card(s) {
     '<span class="monogram" hidden>'+escape(monogram(s.name))+'</span>'
     :'<span class="monogram">'+escape(monogram(s.name))+'</span>';
   return '<li class="card" data-name="'+escape(s.name.toLocaleLowerCase('es'))+'" data-category="'+escape(s.categorySlug)+'" data-slug="'+escape(s.slug)+'">'+
-    '<div class="card-actions" role="group" aria-label="Acciones de '+escape(s.name)+'">'+
-    '<button type="button" class="report-quick" data-report="'+escape(s.slug)+'" aria-label="Reportar falla de '+escape(s.name)+'" title="Reportar falla de '+escape(s.name)+'"><span aria-hidden="true">!</span></button>'+
-    '<button type="button" class="star" data-fav="'+escape(s.slug)+'" aria-pressed="false" aria-label="Añadir '+escape(s.name)+' a favoritos">☆</button></div>'+
     '<a class="card-link" href="'+BASE+'/servicios/'+encodeURIComponent(s.slug)+'/'+'" aria-label="Ver ficha de '+escape(s.name)+'">'+
-    '<span class="card-header"><span class="name">'+escape(s.name)+'</span><span class="category">'+escape(s.categoryName)+'</span></span>'+
-    '<span class="logo-area">'+logo+'</span>'+
-    '<span class="signal"><span class="demo-label">Ejemplo visual · datos simulados</span>'+illustrativeSparkline(s.slug)+
-    '<span class="notice">Sin mediciones reales en esta demo</span></span></a></li>';
+      '<span class="card-header"><span class="name">'+escape(s.name)+'</span><span class="category">'+escape(s.categoryName)+'</span></span>'+
+      '<span class="logo-area">'+logo+'</span>'+
+      '<span class="signal">'+illustrativeSparkline(s.slug)+
+        '<span class="card-cta"><span>Explorar plataforma</span><span class="arrow" aria-hidden="true">↗</span></span></span></a>'+
+    '<div class="card-actions" role="group" aria-label="Acciones de '+escape(s.name)+'">'+
+      '<span class="actions-label" aria-hidden="true">Acciones</span>'+
+      '<button type="button" class="report-quick" data-report="'+escape(s.slug)+'" aria-label="Reportar falla de '+escape(s.name)+'" title="Reportar falla de '+escape(s.name)+'"><span aria-hidden="true">!</span></button>'+
+      '<button type="button" class="star" data-fav="'+escape(s.slug)+'" aria-pressed="false" aria-label="Añadir '+escape(s.name)+' a favoritos">☆</button></div></li>';
 }
 function header(){
  return '<header class="top"><div class="wrap nav"><a class="brand" href="'+BASE+'/">Pulso<span>VE</span></a>'+
-   '<nav class="navlinks" aria-label="Navegación"><a href="'+BASE+'/">Inicio</a><a href="'+BASE+'/servicios/">'+catalog.length+' servicios</a><a href="'+BASE+'/creditos-marcas/">Logos y créditos</a></nav></div></header>'+
+   '<nav class="navlinks" aria-label="Navegación"><a href="'+BASE+'/">Inicio</a><a href="'+BASE+'/servicios/">'+catalog.length+' servicios</a><a href="'+BASE+'/creditos-marcas/">Logos y créditos</a></nav>'+
+   '<button type="button" id="theme-toggle" class="theme-toggle" aria-label="Cambiar entre tema claro y oscuro" title="Cambiar contraste" aria-pressed="false">☼ Vista</button></div></header>'+
    '<div class="banner" role="note"><div class="wrap"><strong>VISTA PREVIA PÚBLICA</strong> · Gráficos ficticios de ejemplo, sin reportes ni mediciones reales de caídas. La app operativa requiere servidor y base de datos.</div></div>';
 }
 
@@ -152,9 +160,16 @@ const hero='<div class="wrap hero"><div class="eyebrow">Monitorea las plataforma
 '<div class="stats"><div class="stat"><strong>'+catalog.length+'</strong><small>Servicios del catálogo</small></div>'+
 '<div class="stat"><strong>'+categoriesSeed.length+'</strong><small>Categorías</small></div>'+
 '<div class="stat"><strong>'+homeSections.length*6+'</strong><small>Plataformas internacionales destacadas</small></div></div>'+
-'<div class="filters"><input id="quicksearch" type="search" class="input" placeholder="Buscar Gmail, Cloudflare, Fortnite…" aria-label="Buscar entre tarjetas visibles">'+
+'<div class="filters"><input id="quicksearch" type="search" class="input" placeholder="Buscar Gmail, Cloudflare, Fortnite… (/) " aria-label="Buscar entre tarjetas visibles">'+
+'<button id="reset-home-search" class="reset-home-search" type="button" hidden>Limpiar</button>'+
 '<a class="chip" href="'+BASE+'/servicios/">Abrir directorio de '+catalog.length+' servicios</a></div>'+
-'<div class="filters">'+homeSections.map((s)=>'<a class="chip" href="#'+escape(s.id)+'">'+escape(s.title)+'</a>').join('')+'</div></div>';
+'<div class="filters" role="group" aria-label="Filtrar destacados por tipo">'+
+'<button type="button" class="chip" data-home-filter="" aria-pressed="true">Todos</button>'+
+'<button type="button" class="chip" data-home-filter="nube-e-infraestructura" aria-pressed="false">Nube</button>'+
+'<button type="button" class="chip" data-home-filter="correo-y-productividad" aria-pressed="false">Correo</button>'+
+'<button type="button" class="chip" data-home-filter="videojuegos" aria-pressed="false">Videojuegos</button>'+
+'<button type="button" class="chip" data-home-filter="inteligencia-artificial" aria-pressed="false">IA</button>'+
+'</div><p class="home-search-status" id="home-search-count" aria-live="polite">60 servicios destacados</p></div>';
 const officialSourcesPanel='<section class="group" id="microsoft-status"><div class="section-title"><h2>Estado oficial de Microsoft</h2></div>'+
 '<p class="hint">En esta vista previa estática no se consulta el RSS ni se afirman estados actuales. La aplicación conectada actualiza las fuentes cada cinco minutos.</p>'+
 '<ul class="cards">'+MICROSOFT_FEEDS.map((feed)=>'<li class="card"><div class="card-link"><strong class="name">'+escape(feed.name)+'</strong>'+
@@ -162,7 +177,8 @@ const officialSourcesPanel='<section class="group" id="microsoft-status"><div cl
 '<span class="signal">Estado actual: no consultado en esta demo</span><a class="chip" target="_blank" rel="noopener noreferrer" href="'+escape(feed.statusUrl)+'">Fuente oficial</a></div></li>').join('')+'</ul></section>';
 const indexBody=hero+'<div class="wrap">'+group('Destacados de Venezuela','Servicios tradicionales del catálogo, con identificadores de marca cuando hay archivos verificados.',homeSelected,'ve')+
 homeSections.map((s)=>group(s.title,s.description,s.items,s.id)).join('')+
-'<p class="legal">Las curvas de las tarjetas son ejemplos gráficos ficticios. No representan caídas, reportes ni estadísticas reales. Los favoritos se guardan solo en este navegador y el botón de alerta abre una simulación sin envío al servidor.</p></div>';
+'<p id="home-empty" class="noresults" hidden>No encontramos servicios destacados con esa búsqueda. Prueba otro término o abre el directorio completo.</p>'+
+'<p class="legal">Explora los servicios, guarda favoritos en este dispositivo o prueba el botón de reporte. Las funciones de la vista previa no envían información a un servidor.</p></div>';
 const indexHtml=layout('Servicios y plataformas internacionales',indexBody,'Catálogo demostrativo de plataformas internacionales y servicios venezolanos.');
 
 const options=categoriesSeed.map((cat)=>'<option value="'+escape(cat.slug)+'">'+escape(cat.name)+'</option>').join('');
@@ -171,6 +187,7 @@ const dirBody='<div class="wrap directory"><div class="hero"><div class="eyebrow
 '<p>Correo, nube, inteligencia artificial, videojuegos, redes y servicios de Venezuela. Este directorio es una demostración sin seguimiento de incidentes.</p>'+
 '<div class="filterbar"><input id="directory-search" class="input" type="search" placeholder="Buscar plataforma por nombre…" aria-label="Buscar plataformas">'+
 '<select id="category-filter" aria-label="Filtrar por categoría"><option value="">Todas las categorías</option>'+options+'</select>'+
+'<select id="directory-sort" aria-label="Ordenar servicios"><option value="name">Nombre A–Z</option><option value="category">Por categoría</option><option value="favorites">Favoritos primero</option></select>'+
 '<label class="chip"><input type="checkbox" id="favorites-only"> Solo mis favoritos</label></div>'+
 '<p class="result" id="result-count" aria-live="polite">'+catalog.length+' servicios</p></div>'+
 '<ul class="cards" id="directory-cards">'+catalog.map(card).join('')+'</ul>'+
@@ -255,11 +272,22 @@ function clientEnhance(){
    const text=(document.querySelector('#directory-search')?.value||'').trim().toLocaleLowerCase('es');
    const cat=document.querySelector('#category-filter')?.value||'';
    const fav=!!document.querySelector('#favorites-only')?.checked;
+   const order=document.querySelector('#directory-sort')?.value||'name';
    const saved=read();let visible=0;
-   document.querySelectorAll('#directory-cards .card').forEach((el)=>{
-      const ok=(!text||el.dataset.name.includes(text)||el.dataset.slug.includes(text))&&(!cat||el.dataset.category===cat)&&(!fav||saved.includes(el.dataset.slug));
-      el.hidden=!ok;if(ok)visible++;
+   const container=document.querySelector('#directory-cards');
+   if(!container)return;
+   const cards=Array.from(container.querySelectorAll('.card'));
+   const nameSort=(a,b)=>a.dataset.name.localeCompare(b.dataset.name,'es');
+   cards.sort((a,b)=>{
+     if(order==='favorites'){const delta=Number(saved.includes(b.dataset.slug))-Number(saved.includes(a.dataset.slug));if(delta)return delta;}
+     if(order==='category'){const delta=a.dataset.category.localeCompare(b.dataset.category,'es');if(delta)return delta;}
+     return nameSort(a,b);
    });
+   container.append(...cards);
+   for(const el of cards){
+     const ok=(!text||el.dataset.name.includes(text)||el.dataset.slug.includes(text))&&(!cat||el.dataset.category===cat)&&(!fav||saved.includes(el.dataset.slug));
+     el.hidden=!ok;if(ok)visible++;
+   }
    const count=document.querySelector('#result-count');if(count)count.textContent=visible+' servicios';
    const empty=document.querySelector('#empty-result');if(empty)empty.hidden=visible!==0;
  }
@@ -269,7 +297,7 @@ function clientEnhance(){
    try{localStorage.setItem(KEY,JSON.stringify(updated))}catch{}
    refresh();
  }));
- for(const selector of ['#directory-search','#category-filter','#favorites-only']){
+ for(const selector of ['#directory-search','#category-filter','#favorites-only','#directory-sort']){
    const field=document.querySelector(selector);field?.addEventListener('input',filterDirectory);field?.addEventListener('change',filterDirectory);
  }
  const demoDialog=document.querySelector('#demo-report-dialog');
@@ -299,10 +327,76 @@ function clientEnhance(){
    if(!reportForm.reportValidity())return;
    reportResult.textContent='Simulación completada. No se envió ni guardó ningún reporte.';
  });
- const quick=document.querySelector('#quicksearch');quick?.addEventListener('input',()=>{
-   const text=quick.value.toLocaleLowerCase('es').trim();
-   document.querySelectorAll('main .card').forEach((el)=>{el.hidden=!!text&&!(el.dataset.name.includes(text)||el.dataset.slug.includes(text))});
+ // Theme is a visual preference only. No personal data is sent to a server.
+ const themeKey='pulsove:appearance:v1';
+ const themeToggle=document.querySelector('#theme-toggle');
+ let selectedTheme='dark';
+ try { selectedTheme=localStorage.getItem(themeKey)==='light'?'light':'dark'; } catch{}
+ function setTheme(theme){
+   document.body.dataset.theme=theme;
+   if(themeToggle){
+     themeToggle.setAttribute('aria-pressed',String(theme==='light'));
+     themeToggle.textContent=theme==='light'?'☾ Oscuro':'☼ Claro';
+     themeToggle.title=theme==='light'?'Cambiar a modo oscuro':'Cambiar a modo claro';
+   }
+ }
+ setTheme(selectedTheme);
+ themeToggle?.addEventListener('click',()=>{
+   const theme=document.body.dataset.theme==='light'?'dark':'light';
+   setTheme(theme);
+   try{localStorage.setItem(themeKey,theme)}catch{}
  });
+ const pathname=location.pathname;
+ document.querySelectorAll('.navlinks a').forEach((anchor)=>{
+   const target=new URL(anchor.href,location.href).pathname;
+   if(pathname===target||(target.endsWith('/servicios/')&&pathname.includes('/servicios/'))){
+     anchor.setAttribute('aria-current','page');
+   }
+ });
+ const quick=document.querySelector('#quicksearch');
+ const homeFilters=Array.from(document.querySelectorAll('[data-home-filter]'));
+ function filterHome(){
+   const query=(quick?.value||'').toLocaleLowerCase('es').trim();
+   const selected=homeFilters.find(el=>el.getAttribute('aria-pressed')==='true')?.dataset.homeFilter||'';
+   let count=0;
+   document.querySelectorAll('main .group').forEach((group)=>{
+     let visible=0;
+     group.querySelectorAll('.card').forEach((card)=>{
+       const ok=(!query||card.dataset.name.includes(query)||card.dataset.slug.includes(query))&&(!selected||card.dataset.category===selected);
+       card.hidden=!ok;
+       if(ok){visible++;count++;}
+     });
+     group.hidden=visible===0;
+   });
+   const total=document.querySelector('#home-search-count');
+   if(total)total.textContent=count+' servicios destacados';
+   const empty=document.querySelector('#home-empty');
+   if(empty)empty.hidden=count!==0;
+   const reset=document.querySelector('#reset-home-search');
+   if(reset)reset.hidden=!query&&!selected;
+ }
+ quick?.addEventListener('input',filterHome);
+ homeFilters.forEach((button)=>button.addEventListener('click',()=>{
+   homeFilters.forEach(el=>el.setAttribute('aria-pressed',String(el===button)));
+   filterHome();
+ }));
+ document.querySelector('#reset-home-search')?.addEventListener('click',()=>{
+   if(quick)quick.value='';
+   homeFilters.forEach(el=>el.setAttribute('aria-pressed',String(el.dataset.homeFilter==='')));
+   filterHome();quick?.focus();
+ });
+ document.addEventListener('keydown',(event)=>{
+   if(event.key==='/'&&!event.altKey&&!event.ctrlKey&&!event.metaKey){
+     const tag=document.activeElement?.tagName;
+     if(tag!=='INPUT'&&tag!=='TEXTAREA'&&tag!=='SELECT'&&quick){
+       event.preventDefault();quick.focus();
+     }
+   } else if(event.key==='Escape'&&document.activeElement===quick){
+     if(quick)quick.value='';filterHome();quick?.blur();
+   }
+ });
+ if(document.querySelector('#directory-sort'))filterDirectory();
+ if(quick)filterHome();
  const query=new URLSearchParams(location.search);
  const selected=query.get('s');
  if(selected&&document.querySelector('#directory-search')){

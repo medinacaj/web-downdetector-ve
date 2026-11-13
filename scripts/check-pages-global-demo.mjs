@@ -54,8 +54,22 @@ if(!homepage.includes('Nube e infraestructura')||!homepage.includes('Videojuegos
   throw Error('Global homepage sections absent');
 if((homepage.match(/class="demo-chart"/g)||[]).length!==60)throw Error('Expected 60 clearly labelled illustrative charts on index');
 if((directory.match(/class="demo-chart"/g)||[]).length!==211)throw Error('Every catalogue card requires illustrative demo chart');
-if((homepage.match(/Ejemplo visual · datos simulados/g)||[]).length!==60)throw Error('Illustrative chart disclosure missing');
-if((directory.match(/Ejemplo visual · datos simulados/g)||[]).length!==211)throw Error('Catalogue chart disclosure missing');
+if(homepage.includes('Ejemplo visual · datos simulados')||directory.includes('Ejemplo visual · datos simulados'))
+  throw Error('Redundant repeated chart disclaimer must not occupy card space');
+if((homepage.match(/class="card-cta"/g)||[]).length!==60 ||
+   (directory.match(/class="card-cta"/g)||[]).length!==211)
+  throw Error('Each card needs a concise way into its detail');
+if(!homepage.includes('VISTA PREVIA PÚBLICA')||!directory.includes('VISTA PREVIA PÚBLICA'))
+  throw Error('Global synthetic preview disclosure required');
+if(!homepage.includes('id="theme-toggle"')||!homepage.includes('data-home-filter=')||
+   !homepage.includes('id="home-search-count"')||!homepage.includes('id="home-empty"'))
+  throw Error('Home filter and visual mode controls missing');
+if(!directory.includes('id="directory-sort"')||!directory.includes('id="favorites-only"'))
+  throw Error('Directory interactive sorting/favorites missing');
+if(directory.indexOf('class="card-link"')>directory.indexOf('class="card-actions"'))
+  throw Error('Actions must be after full-width service title and chart');
+if(!homepage.includes('--accent:#1275a9')||!homepage.includes('--accent:#c14a79'))
+  throw Error('Category contrast palette missing');
 if((directory.match(/class="report-quick"/g)||[]).length!==211)throw Error('Expected one compact red report icon per card');
 if((homepage.match(/class="card-actions"/g)||[]).length!==60)throw Error('Expected isolated toolbar on each index card');
 if((directory.match(/class="card-actions"/g)||[]).length!==211)throw Error('Expected isolated toolbar on each directory card');
