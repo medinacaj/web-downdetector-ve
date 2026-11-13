@@ -4,6 +4,11 @@ on:
     paths:
       - 'src/app/page.tsx'
       - 'src/components/home/**'
+      - 'src/components/service/TopIssuesBreakdown.tsx'
+      - 'src/app/servicios/[[]slug[]]/page.tsx'
+      - 'src/lib/queries/service-detail.ts'
+      - 'src/lib/queries/issue-breakdown-series.ts'
+      - 'tests/issue-breakdown-series.test.ts'
       - 'src/lib/queries/home.ts'
       - 'src/lib/queries/home-trends.ts'
       - 'src/lib/favorites.ts'
