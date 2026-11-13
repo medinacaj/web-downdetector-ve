@@ -252,6 +252,20 @@ with sync_playwright() as playwright:
         img.evaluate("(el) => el.decode()")
         assert img.evaluate("(el) => el.complete && el.naturalWidth > 0"), "Broken asset: " + slug
         assert tile.locator(".monogram").get_attribute("hidden") is not None
+    # Newly sourced Venezuelan identifiers must load from local files, not
+    # third-party URLs or default monograms.
+    for slug in ("seniat", "mercantil", "sistema-patria"):
+        tile = page.locator("#directory-cards .card[data-slug='" + slug + "']")
+        assert tile.count() == 1, slug
+        img = tile.locator("img.logo")
+        assert img.count() == 1, "Missing reviewed asset: " + slug
+        assert img.get_attribute("src").endswith("/brands/" + slug + ".svg")
+        img.scroll_into_view_if_needed()
+        img.evaluate("(el) => { el.loading = 'eager'; }")
+        img.evaluate("(el) => el.decode()")
+        assert img.evaluate("(el) => el.complete && el.naturalWidth > 0"), slug
+        assert tile.locator(".monogram").get_attribute("hidden") is not None
+
     # Community-sourced iconography must load locally and hide the fallback.
     for slug in ("pedidosya", "yango"):
         tile = page.locator("#directory-cards .card[data-slug='" + slug + "']")
