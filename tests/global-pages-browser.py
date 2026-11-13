@@ -25,20 +25,29 @@ with sync_playwright() as playwright:
     assert page.get_by_text("VISTA PREVIA PÚBLICA").count() == 0
     assert page.locator(".banner").count() == 0
 
-    # A visitor unfamiliar with PulsoVE must understand its purpose, what
-    # this demo can/cannot do and the path to explore services immediately.
-    hero_intro = page.locator(".wrap.hero")
+    # Purpose must be evident immediately, without a long guide and counters.
+    hero_intro = page.locator("main .wrap.hero").first
     assert hero_intro.get_by_role("heading", name="¿Tu internet, banco o aplicación está fallando?").count() == 1
-    assert hero_intro.get_by_text("Encuentra servicios de Venezuela y del mundo", exact=False).count() == 1
-    assert hero_intro.get_by_text("Estás viendo una demostración:", exact=False).count() == 0
-    assert page.get_by_text("Gráficos ilustrativos, no indicadores de disponibilidad actual", exact=False).count() == 1
+    assert hero_intro.get_by_text("Busca servicios, consulta su información", exact=False).count() == 1
     assert hero_intro.get_by_role("link", name="Explorar servicios").get_attribute("href") == "/web-downdetector-ve/servicios/"
-    assert hero_intro.get_by_role("link", name="Cómo se usa").get_attribute("href") == "#como-funciona"
-    steps = hero_intro.locator("#como-funciona ol.intro-steps > li")
+    assert hero_intro.locator(".intro-guide, .stats, .intro-steps").count() == 0
+    assert hero_intro.evaluate("(el) => Math.round(el.getBoundingClientRect().height)") <= 235
+    assert page.locator("main .home-tools-bar #quicksearch").count() == 1
+    assert page.locator("main .home-tools-bar [data-home-filter]").count() == 5
+
+    # Keep help and attribution on every page, not in the masthead.
+    foot = page.locator("footer#ayuda")
+    assert foot.get_by_role("heading", name="Ayuda · Cómo usar PulsoVE").count() == 1
+    steps = foot.locator("ol.footer-steps > li")
     assert steps.count() == 3
-    for heading in ("1 · Busca", "2 · Revisa", "3 · Reporta"):
-        assert steps.get_by_text(heading, exact=True).count() == 1
-    assert hero_intro.get_by_text("Todo lo que usas, en un solo lugar.").count() == 0
+    for title in ("Busca", "Revisa", "Reporta"):
+        assert steps.get_by_text(title, exact=True).count() == 1
+    assert foot.get_by_role("link", name="Logos y créditos").get_attribute("href") == "/web-downdetector-ve/creditos-marcas/"
+    assert foot.get_by_text("Los gráficos ilustrativos no muestran disponibilidad actual", exact=False).count() == 1
+    assert topbar.get_by_role("link", name="Servicios", exact=True).count() == 1
+    assert topbar.get_by_text("Logos y créditos").count() == 0
+    assert page.get_by_text("211 servicios", exact=False).count() == 0
+    assert page.get_by_text("60 servicios destacados", exact=False).count() == 0
 
     for name in ("Cloudflare", "Gmail", "Outlook", "Fortnite"):
         assert page.get_by_role("link", name="Ver ficha de " + name).count() == 1, name
@@ -99,7 +108,7 @@ with sync_playwright() as playwright:
     page.get_by_role("button", name="Nube", exact=True).click()
     assert page.get_by_role("button", name="Nube", exact=True).get_attribute("aria-pressed") == "true"
     assert page.locator("main .card:visible").count() >= 6
-    assert page.locator("#home-search-count").inner_text().endswith("servicios destacados")
+    assert page.locator("#home-search-count").inner_text().endswith("resultados")
     page.get_by_role("button", name="Todos", exact=True).click()
     assert page.locator("main .card:visible").count() == 60
     page.locator("#quicksearch").fill("zzzzsinresultados")
@@ -142,7 +151,7 @@ with sync_playwright() as playwright:
         top_height = topbar.evaluate("(el) => Math.round(el.getBoundingClientRect().height)")
         assert top_height <= 56, ("Header must not wrap into a second row", width, top_height)
         controls = topbar.locator(".navlinks a")
-        assert controls.count() == 3
+        assert controls.count() == 2
         theme_box = topbar.locator("#theme-toggle").bounding_box()
         assert theme_box is not None
         assert theme_box["x"] + theme_box["width"] <= width + 1, ("Theme icon off screen", width)
@@ -156,7 +165,7 @@ with sync_playwright() as playwright:
         for step in steps.all():
             left = step.bounding_box()
             assert left is not None
-            assert left["x"] >= -2 and left["x"] + left["width"] <= width + 2, ("Intro step out of view", width, left)
+            assert left["x"] >= -2 and left["x"] + left["width"] <= width + 2, ("Footer help step out of view", width, left)
         measurements = page.locator("#nube .card").evaluate_all("""(cards) => cards.map(card => {
           const rect = (selector) => {
             const el = selector === '.card' ? card : card.querySelector(selector);
