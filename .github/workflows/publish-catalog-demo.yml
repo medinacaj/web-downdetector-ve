@@ -1,0 +1,56 @@
+name: Publicar catálogo demostrativo PulsoVE
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/build-pages-global-demo.mjs'
+      - 'scripts/check-pages-global-demo.mjs'
+      - 'src/lib/catalog/service-profiles.ts'
+      - 'src/lib/db/seed-data/**'
+      - 'src/lib/queries/home-trends.ts'
+      - 'src/lib/brand-logos.ts'
+      - 'public/brands/**'
+      - '.github/workflows/publish-catalog-demo.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: pulsove-public-preview
+  cancel-in-progress: false
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - name: Instalar versiones bloqueadas
+        run: npm ci --no-audit --no-fund
+      - name: Generar Pages desde catálogo aprobado
+        run: npx tsx scripts/build-pages-global-demo.mjs
+      - name: Verificar 211 fichas, privacidad y ausencia de backend
+        run: node scripts/check-pages-global-demo.mjs
+      - name: Publicar solo artefactos estáticos en gh-pages
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin gh-pages
+          git worktree add --detach /tmp/pulsove-demo-pages origin/gh-pages
+          find /tmp/pulsove-demo-pages -mindepth 1 -maxdepth 1 ! -name .git -exec rm -rf -- {} +
+          cp -a pages-global-demo/. /tmp/pulsove-demo-pages/
+          cd /tmp/pulsove-demo-pages
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          if git diff --cached --quiet; then
+            echo 'La vista pública ya está actualizada.'
+          else
+            git commit -m "deploy(pages): actualizar fichas verificadas a ${GITHUB_SHA}"
+            git push origin HEAD:gh-pages
+          fi

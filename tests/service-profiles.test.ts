@@ -1,0 +1,40 @@
+import { describe, expect, it } from 'vitest';
+import { getServiceProfile } from '../src/lib/catalog/service-profiles';
+import { servicesSeed } from '../src/lib/db/seed-data/services';
+import { categoriesSeed } from '../src/lib/db/seed-data/categories';
+
+describe('service editorial profile', () => {
+  it('resolves providers and useful tags for requested global platforms', () => {
+    const cases = [
+      ['cloudflare', 'Cloudflare, Inc.'],
+      ['gmail', 'Google'],
+      ['outlook', 'Microsoft'],
+      ['fortnite', 'Epic Games'],
+    ];
+    for (const [slug, provider] of cases) {
+      const entry = servicesSeed.find((service) => service.slug === slug);
+      expect(entry).toBeDefined();
+      const profile = getServiceProfile({ slug, categoryName: 'Plataformas', description: entry!.description });
+      expect(profile.provider).toBe(provider);
+      expect(profile.tags.length).toBeGreaterThan(1);
+      expect(profile.description.length).toBeGreaterThan(10);
+    }
+  });
+  it('uses a transparent fallback rather than guessing unknown providers', () => {
+    const p = getServiceProfile({ slug: 'unknown-service', categoryName: 'Servicios', description: null });
+    expect(p.provider).toBeNull();
+    expect(p.type).toBe('Servicios');
+    expect(p.tags).toEqual(['Servicios']);
+    expect(p.description).toMatch(/pendiente de verificar/);
+  });
+  it('can produce a profile for every catalogue item without losing category', () => {
+    const categories = new Map(categoriesSeed.map(({ slug, name }) => [slug, name]));
+    for (const service of servicesSeed) {
+      const categoryName = categories.get(service.categorySlug);
+      expect(categoryName).toBeTruthy();
+      const p = getServiceProfile({ slug: service.slug, categoryName: categoryName!, description: service.description });
+      expect(p.type).toBe(categoryName);
+      expect(p.tags).toContain(categoryName);
+    }
+  });
+});
