@@ -9,6 +9,9 @@ const directory = html('servicios/index.html');
 const credits = html('creditos-marcas/index.html');
 const info = html('build-info.txt');
 if(!info.includes('catalogue=211')) throw Error('Unexpected catalogue size in public output');
+const EXPECTED_LOGOS = 164;
+const actualLogos = Number(info.match(/^logos=(\d+)$/m)?.[1]);
+if(actualLogos !== EXPECTED_LOGOS) throw Error('Logo inventory mismatch: '+actualLogos);
 for(const file of [homepage,directory]){
   if(!file.includes('Cloudflare')||!file.includes('Gmail')||!file.includes('Outlook')||!file.includes('Fortnite'))
     throw Error('Required global services absent');
@@ -89,9 +92,17 @@ if(homepage.includes('padding-right:75px')||homepage.includes('padding-right:88p
 if(!homepage.includes('.card-actions{display:flex')||!homepage.includes('.report-quick,.report-quick:hover{background:#c62934;color:#fff'))
   throw Error('Report icon must be compact, red, and isolated beneath content');
 if(!directory.includes('id="directory-cards"'))throw Error('Interactive directory missing');
-if(!credits.includes('Banesco'))throw Error('Brand credits missing');
+if(!credits.includes('Banesco')||!credits.includes('Dashboard Icons')||!credits.includes('Simple Icons')||!credits.includes('GTA Online'))
+  throw Error('Per-brand source/rights credits missing');
+const PRIORITY = ['aliexpress','ebay','minecraft','amazon','tumblr','youtube-music','overwatch-2','pokemon-go','gta-online','brawl-stars','among-us'];
+for (const slug of PRIORITY) {
+  const segment=directory.match(new RegExp('<li class="card"[^>]+data-slug="'+slug+'"[\\s\\S]*?<\\/li>'))?.[0];
+  if(!segment||!segment.includes('/brands/'+slug+'.svg')) throw Error('Requested brand absent from directory: '+slug);
+  const profile=html(join('servicios',slug,'index.html'));
+  if(!profile.includes('/brands/'+slug+'.svg'))throw Error('Requested brand absent from profile: '+slug);
+}
 const files = readdirSync(join(root,'brands'));
-if(files.length!==50)throw Error('Missing assets: '+files.length);
+if(files.length!==EXPECTED_LOGOS)throw Error('Missing or unexpected local brand assets: '+files.length);
 for(const file of files) {
   const full=join(root,'brands',file);
   const data=readFileSync(full);
@@ -100,7 +111,7 @@ for(const file of files) {
     if(data.subarray(0,8).toString('hex')!=='89504e470d0a1a0a')throw Error('PNG invalid: '+file);
   }else if(file.endsWith('.svg')){
     const svg=data.toString();
-    if(!svg.startsWith('<svg ')||/<script|<foreignObject|<image|onload=|href=/i.test(svg))
+    if(!svg.startsWith('<svg ')||/<script\\b|<foreignObject\\b|<image\\b|<iframe\\b|\\bon[a-z]+\\s*=|\\b(?:href|xlink:href)\\s*=|@import|url\\(\\s*['\"]?\\s*https?:/i.test(svg))
       throw Error('Unsafe SVG: '+file);
   }else throw Error('Unexpected logo format '+file);
 }

@@ -178,6 +178,21 @@ with sync_playwright() as playwright:
     response = page.goto(ROOT + "servicios/", wait_until="networkidle")
     assert response and response.status == 200
     assert page.locator("#directory-cards .card").count() == 211
+    # Every specifically reported missing brand must render a real local icon.
+    priority_logos = ["aliexpress", "ebay", "minecraft", "amazon", "tumblr",
+                      "youtube-music", "overwatch-2", "pokemon-go", "gta-online",
+                      "brawl-stars", "among-us"]
+    for slug in priority_logos:
+        tile = page.locator("#directory-cards .card[data-slug='" + slug + "']")
+        assert tile.count() == 1, slug
+        img = tile.locator("img.logo")
+        assert img.count() == 1, "No image mapped: " + slug
+        assert img.get_attribute("src").endswith("/brands/" + slug + ".svg"), slug
+        img.scroll_into_view_if_needed()
+        img.evaluate("(el) => { el.loading = 'eager'; }")
+        img.evaluate("(el) => el.decode()")
+        assert img.evaluate("(el) => el.complete && el.naturalWidth > 0"), "Broken asset: " + slug
+        assert tile.locator(".monogram").get_attribute("hidden") is not None
     assert page.locator("#directory-cards button[data-report]").count() == 211
     assert page.locator("#directory-cards .demo-label").count() == 0
     assert page.locator("#directory-cards .notice").count() == 0

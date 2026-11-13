@@ -1,3 +1,6 @@
+import { servicesSeed } from '@/lib/db/seed-data/services';
+import { logoForService } from '@/lib/brand-logos';
+import { brandLogoSource, isAdditionalLogo } from '@/lib/brand-logo-sources';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 
@@ -60,6 +63,11 @@ const SOURCES = [
   { name: "Asana", url: 'https://github.com/simple-icons/simple-icons/blob/develop/icons/asana.svg', provider: 'Simple Icons' },
 ] as const;
 
+const ADDITIONAL_SOURCES = servicesSeed.filter((service) => isAdditionalLogo(service.slug)).map((service) => {
+  const source = brandLogoSource(service.slug, logoForService(service.slug) ?? '');
+  return { name: service.name, url: source.url, provider: source.provider };
+});
+
 export default function CreditsPage() {
   return (
     <main className="mx-auto max-w-3xl px-4 py-12 sm:px-6">
@@ -73,7 +81,7 @@ export default function CreditsPage() {
         visitantes con proveedores externos de imágenes.
       </p>
       <ul className="mt-8 divide-y divide-border rounded-xl border border-border bg-surface px-5">
-        {SOURCES.map((item) => (
+        {[...SOURCES, ...ADDITIONAL_SOURCES].map((item) => (
           <li key={item.name} className="flex flex-wrap items-center justify-between gap-3 py-4">
             <span className="font-medium">{item.name}</span>
             <span className="text-sm">
@@ -95,7 +103,7 @@ export default function CreditsPage() {
         ))}
       </ul>
       <p className="mt-6 text-sm text-ink-muted">
-        Si un logo falta o no está verificado, se utiliza un identificador tipográfico.
+        Los iconos originales y sus variantes pertenecen a sus titulares; la procedencia no implica patrocinio. Si un logo falta o no está verificado, se utiliza un identificador tipográfico.
         Para solicitar una actualización o retirar un archivo, consulta el repositorio del proyecto.
       </p>
       <Link href="/" className="mt-8 inline-block text-sm font-medium text-brand-600 underline underline-offset-4">

@@ -46,7 +46,7 @@ export function BrandMark({
             sizes="(max-width: 640px) 160px, 220px"
             unoptimized
             onError={() => setBroken(true)}
-            className="h-full max-h-[76px] w-full object-contain"
+            className="h-full max-h-[72px] w-full object-contain object-center"
           />
         </div>
       </div>

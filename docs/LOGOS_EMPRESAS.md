@@ -18,7 +18,7 @@ Las imágenes descargadas se sirven desde `public/brands/` sin consultas de los 
 
 Para Banesco: imagen adaptada solo de formato y resolución mediante rasterización de la marca sin alterar su diseño; atribución a **Banesco**, fuente Wikimedia Commons y licencia [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0/). El archivo derivado se publica con los términos de dicha licencia en la medida aplicable; esto **no** incluye el código de la aplicación ni concede derechos sobre la marca.
 
-**Pendientes:** Mercantil, SENIAT y Sistema Patria conservan el identificador tipográfico cuando no se verificó un archivo e importación local. Los logos de otras marcas del directorio de 71 servicios aún no están incorporados; no cargar favicon genérico, logotipo de empresa distinta ni recursos obtenidos sin procedencia.
+**Pendientes:** Mercantil, SENIAT y Sistema Patria conservan el identificador tipográfico cuando no se verificó un archivo e importación local. Los logos de otras marcas del catálogo aún no están incorporados; no cargar favicon genérico, logotipo de empresa distinta ni recursos obtenidos sin procedencia.
 
 **Control editorial:** las marcas pueden actualizar su identidad sin previo aviso; revisar archivos y condiciones de uso antes de sustituciones. Si el titular solicita retirar su logo, retirar el archivo y su entrada de la lista; el componente utiliza el monograma seguro como reserva. No recoger datos privados ni añadir herramientas de analítica al cargar imágenes.
 
@@ -33,6 +33,30 @@ Las plataformas para las que no existe un recurso de uso verificable, como Outlo
 
 ## Incorporación adicional de 21 marcas · noviembre 2026
 
-Se añadieron íconos locales de Signal, WeChat, Bluesky, Figma, Apple Music, Crunchyroll, Dota 2, Uber, Railway, Render, Fastly, MongoDB, SoundCloud, Deezer, Airbnb, Wise, Etsy, LINE, Mastodon, Trello y Asana. Se copiaron los SVG de rutas simples verificados en [Simple Icons](https://github.com/simple-icons/simple-icons), se comprobaron contra scripts, imágenes activas y referencias externas, y se añadieron a la lista permitida. En total hay **50** archivos de marca autohospedados.
+Se añadieron íconos locales de Signal, WeChat, Bluesky, Figma, Apple Music, Crunchyroll, Dota 2, Uber, Railway, Render, Fastly, MongoDB, SoundCloud, Deezer, Airbnb, Wise, Etsy, LINE, Mastodon, Trello y Asana. Se copiaron los SVG de rutas simples verificados en [Simple Icons](https://github.com/simple-icons/simple-icons), se comprobaron contra scripts, imágenes activas y referencias externas, y se añadieron a la lista permitida. En esa ampliación histórica se alcanzaron **50** archivos de marca autohospedados (antes de la siguiente incorporación).
 
 Los gráficos distribuidos por Simple Icons usan licencia CC0 para la representación, pero **las marcas comerciales conservan sus derechos**. [La página de créditos](/creditos-marcas) contiene enlaces individuales. Las tarjetas muestran exclusivamente el logo disponible y un monograma solo si falla o no existe.
+
+
+## Incorporación y auditoría de logos · 13 de noviembre de 2026
+
+**Cobertura actual:** 164 recursos locales revisados / 211 servicios (**77,7 %**), frente a 50 / 211 antes de esta actualización. Se añadieron **114** iconos, SVG en la mayoría de los casos. La integridad de rutas, sanitización y compatibilidad de renderizado se comprueban en CI. La ausencia de un logo no se disfraza con una representación fabricada: se conserva el monograma accesible.
+
+**Once casos prioritarios comunicados por el propietario:**
+
+| Servicio | Procedencia del archivo local | Nota editorial |
+| --- | --- | --- |
+| AliExpress, eBay, Tumblr, YouTube Music | [Simple Icons](https://github.com/simple-icons/simple-icons) | Gráficos vectoriales CC0 de la biblioteca; las marcas siguen protegidas |
+| Amazon, Minecraft, Overwatch 2 | [Dashboard Icons](https://github.com/homarr-labs/dashboard-icons) | Iconos de la biblioteca, licencia de repositorio Apache-2.0; marcas de sus titulares |
+| Pokémon GO | [Material Design Icons](https://github.com/Templarian/MaterialDesign/blob/master/svg/pokemon-go.svg) | Icono identificativo del juego (no es necesariamente su wordmark corporativo) |
+| GTA Online | [Repositorio de ejemplo GTA](https://github.com/devemdobro/projeto-gta/blob/HEAD/src/imagens/logo-gta-online.svg) | Recurso del juego usado en un proyecto comunitario; derechos de la marca conservados |
+| Brawl Stars | [Iconografía SVG](https://github.com/fakhrul62/free-awesome/blob/HEAD/freeawesome/line/504182-Brawl-stars.svg) | Símbolo identificativo en trazo, no logo oficial garantizado |
+| Among Us | [Tabler Icons](https://github.com/tabler/tabler-icons/blob/main/icons/outline/brand-among-us.svg) | Icono de marca de la biblioteca MIT |
+
+**Otros recursos:** principalmente [Dashboard Icons](https://github.com/homarr-labs/dashboard-icons) y [Simple Icons](https://github.com/simple-icons/simple-icons); para recursos específicos también [CoreUI Icons](https://github.com/coreui/coreui-icons), [Lawnicons](https://github.com/LawnchairLauncher/lawnicons), [Papirus](https://github.com/PapirusDevelopmentTeam/papirus-icon-theme), [Arcticons](https://github.com/deathrashed/iconography), [SVG Repo](https://www.svgrepo.com/) y otros repositorios de iconografía mencionados en la [página de créditos](../src/app/creditos-marcas/page.tsx). Cada SVG nuevo incluye procedencia enlazada desde la página pública `/creditos-marcas/` mediante `brand-logo-sources.ts`. No se descargan imágenes desde el navegador del visitante.
+
+**Licencias:** la licencia de un proyecto de iconos no equivale a autorización de uso de la marca comercial. Algunas representaciones comunitarias tienen licencias específicas, incluso GPL; conservar avisos, atribución, procedencia y condiciones de redistribución. Para dudas sobre un recurso, retirar su entrada del allowlist y usar el monograma hasta aclararlo. Se mantienen los términos particulares de Banesco (CC BY-SA 3.0).
+
+**Sin archivo aprobado (47 servicios):** Inter, NetUno, Fibex, VNET, Thundernet, Simple TV, Supercable, Airtek, G-Network, Mercantil, BBVA Provincial, BNC, Banco Digital de los Trabajadores, Bancamiga, Banco del Tesoro, Bancaribe, Banplus, Cashea, Ubii, Zinli, Reserve, Creska, Mony, Wally, Sistema Patria, Hidroven, SENIAT, SAIME, BCV, Call of Duty: Mobile, Yummy, PedidosYa, Zupper, Farmatodo, Yummy Rides, Ridery, Yango, 1xBet, Lotto Activo, La Granjita, Triple Táchira, Kino Táchira, Call of Duty: Warzone, EA app, AOL Mail, Mobile Legends, EA Sports FC. Estos no deben recibir logotipos de empresas distintas, variantes no verificadas o supuestos iconos oficiales creados por IA.
+
+**Normalización visual:** contenedor autocentrado y de contraste estable, `object-fit: contain` y medidas consistentes en portada, directorio y fichas. Las imágenes fallidas se reemplazan por un monograma, sin llamadas a terceros ni bloqueo de la página.

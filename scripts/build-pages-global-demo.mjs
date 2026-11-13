@@ -11,6 +11,7 @@ import { issueTypesSeed } from '../src/lib/db/seed-data/issue-types.ts';
 import { statesSeed } from '../src/lib/db/seed-data/states.ts';
 import { HOME_SERVICE_SLUGS, WORLDWIDE_SPOTLIGHT } from '../src/lib/queries/home-trends.ts';
 import { HOME_BRAND_LOGOS, logoForService } from '../src/lib/brand-logos.ts';
+import { brandLogoSource } from '../src/lib/brand-logo-sources.ts';
 import { MICROSOFT_FEEDS } from '../src/lib/official-status/microsoft-rss.ts';
 import { getServiceProfile } from '../src/lib/catalog/service-profiles.ts';
 
@@ -74,6 +75,8 @@ const CSS=[
 ".breadcrumbs{color:#486267}.profile-note{color:#587278!important}.chart-controls label{color:#3e6267}.chart-summary{color:#456c6b}.chart-summary strong{color:#0b7b72}.chart-readout{color:#186f6b}.chart-observation{background:#e7f1ed;border:0;border-radius:0;color:#275955}.chart-observation strong{color:#13685d}.chart-key{color:#4d6868}.profile-chart svg{color:#178376}\nbody[data-theme=\"dark\"] .breadcrumbs{color:#b2ccca}\nbody[data-theme=\"dark\"] .profile-note{color:#9cc3bc!important}\nbody[data-theme=\"dark\"] .chart-controls label,body[data-theme=\"dark\"] .chart-summary{color:#bad3cd}\nbody[data-theme=\"dark\"] .chart-summary strong,body[data-theme=\"dark\"] .chart-readout{color:#89dfcf}\nbody[data-theme=\"dark\"] .chart-observation{background:#243e3e;color:#c9e5da}\nbody[data-theme=\"dark\"] .chart-observation strong{color:#9fe4d1}\nbody[data-theme=\"dark\"] .profile-chart svg{color:#76e9d7}"
 ,
 "\n/* Visual correction: round the surfaces, not with a colored border-strip. */\n.card{border:0;border-top:0;border-radius:13px;box-shadow:0 3px 12px rgba(19,39,44,.11);overflow:hidden;transition:background .18s ease,box-shadow .18s ease,transform .18s ease}\n.card:hover,.card:focus-within{border:0;border-top:0;border-radius:13px;box-shadow:0 8px 23px rgba(19,39,44,.17);transform:translateY(-2px)}\n.wrap.hero,body[data-theme=\"light\"] .wrap.hero{border:0;border-radius:16px;box-shadow:0 8px 26px rgba(15,35,40,.12)}\n.profile-hero,.profile-panel{border:0;border-radius:13px;box-shadow:0 3px 14px rgba(14,34,39,.08)}\n.profile-chart{border-radius:11px}\n.profile-incident{border-radius:8px}\n.report-dialog{border-radius:13px}\nbody[data-theme=\"dark\"] .card{border:0;border-top:0;box-shadow:0 4px 15px rgba(0,0,0,.23)}\nbody[data-theme=\"dark\"] .card:hover,body[data-theme=\"dark\"] .card:focus-within{box-shadow:0 9px 25px rgba(0,0,0,.3)}\nbody[data-theme=\"dark\"] .profile-hero,body[data-theme=\"dark\"] .profile-panel{border:0;box-shadow:0 4px 14px rgba(0,0,0,.19)}\n@media(prefers-reduced-motion:reduce){.card:hover,.card:focus-within{transform:none}}\n"
+,
+".card .logo-area{background:#fff;border-radius:9px;margin:4px 5px 0;box-sizing:border-box;padding:6px 8px;height:76px}.card .logo{display:block;width:100%;max-width:170px;height:64px;max-height:100%;object-fit:contain;object-position:center}.profile-logo .logo{max-width:100%;height:80px;object-fit:contain;object-position:center} @media(max-width:375px){.card .logo-area{height:68px;padding:5px 6px}.card .logo{height:58px}}"
 ].join('\n');
 
 function monogram(name){const parts=name.trim().split(/\s+/);return parts.length>1?parts.slice(0,2).map((s)=>s[0]).join('').toUpperCase():name.slice(0,2).toUpperCase();}
@@ -251,8 +254,12 @@ function serviceDetailHtml(s){
   return layout('Ficha de '+s.name,body,'Ficha demostrativa de '+s.name+': empresa, usos y gráfico interactivo de ejemplo sin datos operativos.');
 }
 
-const credits=Object.entries(HOME_BRAND_LOGOS).map(([slug,path])=>'<li><strong>'+escape(bySlug.get(slug)?.name||slug)+
- '</strong> · archivo local '+escape(path)+' · Fuente de iconografía: '+(path.endsWith('.svg')?'Simple Icons (CC0 sobre el gráfico; marcas registradas reservadas)':'Wikimedia Commons (consultar derechos y licencia en la ficha original)')+'</li>').join('');
+const credits=Object.entries(HOME_BRAND_LOGOS).map(([slug,path])=>{
+ const source=brandLogoSource(slug,path);
+ return '<li><strong>'+escape(bySlug.get(slug)?.name||slug)+'</strong> · archivo local '+escape(path)+
+  ' · Procedencia: <a href="'+escape(source.url)+'" target="_blank" rel="noopener noreferrer">'+escape(source.provider)+'</a>'+
+  (source.licenseUrl?' · <a href="'+escape(source.licenseUrl)+'" target="_blank" rel="noopener noreferrer">Licencia de la iconografía</a>':'')+'</li>';
+}).join('');
 const creditBody='<div class="wrap credits"><h1>Créditos y uso editorial de marcas</h1><p>Los gráficos identifican productos y servicios de sus titulares. PulsoVE no pertenece a ellos ni cuenta con su aval. Marcas protegidas, aunque la licencia de una representación gráfica permita su redistribución.</p>'+
 '<ul>'+credits+'</ul><p>La atribución individual y el historial de archivos originales se documentan en <code>docs/LOGOS_EMPRESAS.md</code> del repositorio. El archivo Banesco requiere la atribución de licencia CC BY-SA 3.0.</p>'+
 '<a href="'+BASE+'/">Volver al catálogo</a></div>';
@@ -546,7 +553,7 @@ await Promise.all([
  writeFile(join(OUTPUT,'servicios','index.html'),directoryHtml),
  writeFile(join(OUTPUT,'creditos-marcas','index.html'),creditsHtml),
  writeFile(join(OUTPUT,'.nojekyll'),''),
- writeFile(join(OUTPUT,'build-info.txt'),'mode=synthetic-public-demo\ncatalogue='+catalog.length+'\nsource-commit='+(process.env.GITHUB_SHA||'local')+'\n')
+ writeFile(join(OUTPUT,'build-info.txt'),'mode=synthetic-public-demo\ncatalogue='+catalog.length+'\nlogos='+Object.keys(HOME_BRAND_LOGOS).length+'\nsource-commit='+(process.env.GITHUB_SHA||'local')+'\n')
 ]);
 await Promise.all(catalog.map(async (service)=>{
   const folder=join(OUTPUT,'servicios',service.slug);
