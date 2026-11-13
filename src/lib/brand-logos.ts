@@ -20,11 +20,13 @@ export const HOME_BRAND_LOGOS: Readonly<Record<string, string>> = Object.freeze(
   'bbva-provincial': '/brands/bbva-provincial.svg',
   'binance': '/brands/binance.svg',
   'bluesky': '/brands/bluesky.svg',
+  'bnc': '/brands/bnc.svg',
   'bolt': '/brands/bolt.svg',
   'box': '/brands/box.svg',
   'brawl-stars': '/brands/brawl-stars.svg',
   'cantv': '/brands/cantv.png',
   'canva': '/brands/canva.svg',
+  'cashea': '/brands/cashea.svg',
   'cash-app': '/brands/cash-app.svg',
   'character-ai': '/brands/character-ai.svg',
   'chatgpt': '/brands/chatgpt.svg',
@@ -130,6 +132,7 @@ export const HOME_BRAND_LOGOS: Readonly<Record<string, string>> = Object.freeze(
   'redis-cloud': '/brands/redis-cloud.svg',
   'render': '/brands/render.svg',
   'revolut': '/brands/revolut.svg',
+  'ridery': '/brands/ridery.svg',
   'riot-games': '/brands/riot-games.svg',
   'roblox': '/brands/roblox.svg',
   'rocket-league': '/brands/rocket-league.svg',
@@ -171,8 +174,10 @@ export const HOME_BRAND_LOGOS: Readonly<Record<string, string>> = Object.freeze(
   'yango': '/brands/yango.svg',
   'youtube-music': '/brands/youtube-music.svg',
   'youtube': '/brands/youtube.svg',
+  'zinli': '/brands/zinli.svg',
   'zoho-mail': '/brands/zoho-mail.svg',
   'zoom': '/brands/zoom.svg',
+  'zupper': '/brands/zupper.svg',
 });
 
 export function logoForService(slug: string): string | null {

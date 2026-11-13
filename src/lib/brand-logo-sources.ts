@@ -19,6 +19,11 @@ const DASHBOARD_ALIASES: Record<string, string> = {
   "yahoo-mail": "yahoo"
 };
 const CUSTOM_SOURCES: Record<string, LogoProvenance> = {
+  'cashea': {provider: 'Lawnicons (ilustración comunitaria)', url: 'https://github.com/LawnchairLauncher/lawnicons/blob/develop/svgs/cashea.svg', licenseUrl: 'https://github.com/LawnchairLauncher/lawnicons/blob/develop/LICENSE'},
+  'bnc': {provider: 'Arcticons (ilustración comunitaria)', url: 'https://github.com/deathrashed/iconography/blob/main/iconify/arcticons/bnc.svg', licenseUrl: 'https://github.com/deathrashed/iconography/blob/main/LICENSE'},
+  'ridery': {provider: 'Arcticons (ilustración comunitaria)', url: 'https://github.com/deathrashed/iconography/blob/main/iconify/arcticons/ridery.svg', licenseUrl: 'https://github.com/deathrashed/iconography/blob/main/LICENSE'},
+  'zinli': {provider: 'Arcticons (ilustración comunitaria)', url: 'https://github.com/deathrashed/iconography/blob/main/iconify/arcticons/zinli.svg', licenseUrl: 'https://github.com/deathrashed/iconography/blob/main/LICENSE'},
+  'zupper': {provider: 'Arcticons (ilustración comunitaria)', url: 'https://github.com/deathrashed/iconography/blob/main/iconify/arcticons/zupper.svg', licenseUrl: 'https://github.com/deathrashed/iconography/blob/main/LICENSE'},
   'aol-mail': {provider: 'Arcticons (ilustración comunitaria)', url: 'https://github.com/deathrashed/iconography/blob/main/iconify/arcticons/aol.svg', licenseUrl: 'https://github.com/deathrashed/iconography/blob/main/LICENSE'},
   'bbva-provincial': {provider: 'Lawnicons (marca matriz BBVA, ilustración comunitaria)', url: 'https://github.com/LawnchairLauncher/lawnicons/blob/develop/svgs/bbva.svg', licenseUrl: 'https://github.com/LawnchairLauncher/lawnicons/blob/develop/LICENSE'},
   'mobile-legends': {provider: 'Arcticons (ilustración comunitaria)', url: 'https://github.com/deathrashed/iconography/blob/main/iconify/arcticons/mobile-legends-bang-bang.svg', licenseUrl: 'https://github.com/deathrashed/iconography/blob/main/LICENSE'},
