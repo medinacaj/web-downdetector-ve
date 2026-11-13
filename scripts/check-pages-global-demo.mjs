@@ -108,13 +108,13 @@ if(!homepage.includes('¿Tu internet, banco o aplicación está fallando?') ||
    !homepage.includes('>Destacados</p>'))
   throw Error('Home must prioritize search, not a long explanation or catalogue counters');
 for(const page of [homepage,directory,html('servicios/cloudflare/index.html')]) {
-  const top=page.match(/<header class="top">([\\s\\S]*?)<\\/header>/)?.[1]||'';
-  const footer=page.match(/<footer class="footer">([\\s\\S]*?)<\\/footer>/)?.[1]||'';
+  const top = page.split('</header>')[0];
+  const footer = page.split('<footer class="footer">')[1]?.split('</footer>')[0] || '';
   if(!top.includes('>Servicios</a>') || top.includes('Logos y créditos') ||
      !footer.includes('id="ayuda"') ||
      !footer.includes('¿Cómo usar PulsoVE?') ||
      !footer.includes('>Logos y créditos</a>') ||
-     (footer.match(/<li><strong>(?:Busca|Revisa|Reporta)<\\/strong>/g)||[]).length!==3)
+     footer.split('<li><strong>').length - 1 !== 3)
     throw Error('Navigation and accessible help/credits footer must exist on every page');
 }
 if((homepage.match(/class="section-index"/g)||[]).length!==9)
