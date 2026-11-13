@@ -135,14 +135,14 @@ const homeSections=WORLDWIDE_SPOTLIGHT.map((section)=>({
  id:section.id,title:section.title,description:section.description,
  items:section.slugs.map((slug)=>bySlug.get(slug)).filter(Boolean)
 }));
-if(homeSections.some((s)=>s.items.length!==6))throw Error('All five global spotlight groups need 6 items');
+if(homeSections.length!==8||homeSections.some((s)=>s.items.length!==6))throw Error('All eight global spotlight groups need 6 items');
 
 const hero='<div class="wrap hero"><div class="eyebrow">Monitorea las plataformas que usas</div>'+
 '<h1>Servicios de Venezuela y las plataformas más conocidas del mundo</h1>'+
 '<p>Encuentra Cloudflare, Outlook, Gmail, Fortnite, juegos, redes, nube, bancos y muchas más. Esta vista muestra el catálogo; los estados reales de disponibilidad requieren la aplicación conectada.</p>'+
 '<div class="stats"><div class="stat"><strong>'+catalog.length+'</strong><small>Servicios del catálogo</small></div>'+
 '<div class="stat"><strong>'+categoriesSeed.length+'</strong><small>Categorías</small></div>'+
-'<div class="stat"><strong>30</strong><small>Plataformas internacionales destacadas</small></div></div>'+
+'<div class="stat"><strong>'+homeSections.length*6+'</strong><small>Plataformas internacionales destacadas</small></div></div>'+
 '<div class="filters"><input id="quicksearch" type="search" class="input" placeholder="Buscar Gmail, Cloudflare, Fortnite…" aria-label="Buscar entre tarjetas visibles">'+
 '<a class="chip" href="'+BASE+'/servicios/">Abrir directorio de '+catalog.length+' servicios</a></div>'+
 '<div class="filters">'+homeSections.map((s)=>'<a class="chip" href="#'+escape(s.id)+'">'+escape(s.title)+'</a>').join('')+'</div></div>';
