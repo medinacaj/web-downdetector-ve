@@ -100,13 +100,13 @@ jobs:
         run: node scripts/check-pages-global-demo.mjs
       - name: Verify static GitHub Pages directory in browser
         run: |
-          mkdir -p /tmp/pulsove-public/web-downdetector-ve
-          cp -a pages-global-demo/. /tmp/pulsove-public/web-downdetector-ve/
+          mkdir -p /tmp/pulsove-public/web-pulso-ve
+          cp -a pages-global-demo/. /tmp/pulsove-public/web-pulso-ve/
           python -m http.server 3434 --directory /tmp/pulsove-public >/tmp/pulsove-preview.log 2>&1 &
           server_pid=$!
           trap 'kill "$server_pid" || true' EXIT
           for attempt in $(seq 1 40); do
-            if curl -fsS http://127.0.0.1:3434/web-downdetector-ve/ >/dev/null; then break; fi
+            if curl -fsS http://127.0.0.1:3434/web-pulso-ve/ >/dev/null; then break; fi
             sleep 1
           done
           python tests/global-pages-browser.py
