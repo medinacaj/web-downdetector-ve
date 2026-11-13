@@ -424,7 +424,8 @@ function demoChartInteraction(){
    const idx=atPointer(event);if(idx!==hovered){hovered=idx;render();}
  });
  svg.addEventListener('pointerleave',()=>{hovered=-1;render();});
- svg.addEventListener('click',(event)=>picked(atPointer(event)));
+ // Select on pointerdown: SVG child nodes are redrawn on hover, which can suppress the later click event.
+ svg.addEventListener('pointerdown',(event)=>{if(event.pointerType==='mouse'&&event.button!==0)return;picked(atPointer(event));});
  svg.addEventListener('keydown',(event)=>{
    if(event.key==='ArrowRight'||event.key==='ArrowLeft'){
      event.preventDefault();
