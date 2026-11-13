@@ -1,0 +1,46 @@
+name: Verify live public PulsoVE quick-report demo
+on:
+  push:
+    branches: ['verify/quick-report-pages-public-20261112']
+permissions:
+  contents: read
+jobs:
+  verify-public:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify public URLs and exact source version
+        run: |
+          set -euo pipefail
+          base='https://medinacaj.github.io/web-downdetector-ve'
+          for attempt in $(seq 1 10); do
+            if curl --location --fail --silent --show-error --max-time 15 "$base/build-info.txt" -o /tmp/pulsove-build.txt; then break; fi
+            sleep 5
+          done
+          grep -q 'catalogue=142' /tmp/pulsove-build.txt
+          grep -q 'source-commit=8f8720efa25538433e6a7b0d9e3e591eac6d8bb4' /tmp/pulsove-build.txt
+          curl --location --fail --silent --show-error "$base/" -o /tmp/pulsove-home.html
+          grep -q 'monogram\[hidden\]' /tmp/pulsove-home.html
+          grep -q 'data-report=' /tmp/pulsove-home.html
+          grep -q 'no envía ni almacena reportes' /tmp/pulsove-home.html
+          curl --location --fail --silent --show-error "$base/servicios/" -o /tmp/pulsove-services.html
+          grep -q '142 servicios' /tmp/pulsove-services.html
+          curl --location --fail --silent --show-error "$base/brands/cloudflare.svg" -o /tmp/cloudflare.svg
+          grep -q '<svg ' /tmp/cloudflare.svg
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Prepare browser verification
+        run: |
+          command -v google-chrome || command -v google-chrome-stable || command -v chromium
+          python -m pip install --disable-pip-version-check playwright==1.56.0
+      - name: Exercise live logo and quick-report UI in Chrome
+        run: python tests/quick-report-public-pages.py
+      - name: Save live screenshots
+        uses: actions/upload-artifact@v4
+        with:
+          name: pulsove-public-quick-report-visuals
+          path: artifacts/pulsove-public-logo-only-*.png
+          if-no-files-found: error
+          retention-days: 7
