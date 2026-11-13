@@ -31,7 +31,9 @@
  *   `slug` forma parte de la URL pública (/servicios/<slug>): no cambiarlo sin
  *   redirección permanente.
  */
-export const servicesSeed = [
+import { expandRequestedServices } from './catalog-requested';
+
+export const originalServicesSeed = [
   // ── Telecomunicaciones ──────────────────────────────────────────────────
   {
     slug: 'cantv',
@@ -631,3 +633,10 @@ export const servicesSeed = [
   { slug: "character-ai", name: "Character.AI", categorySlug: "inteligencia-artificial", description: "Servicio de conversaciones con personajes de IA." },
   { slug: "poe", name: "Poe", categorySlug: "inteligencia-artificial", description: "Plataforma de acceso a asistentes de inteligencia artificial." },
 ] as const;
+
+/** Preserve original slugs and all existing records when appending new services. */
+export const servicesSeed = [
+  ...originalServicesSeed,
+  ...expandRequestedServices(originalServicesSeed),
+] as const;
+
