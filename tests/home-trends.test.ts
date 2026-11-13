@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { HOUR_MS, pickFeaturedServices, sparklinePolyline, toHourlySeries } from '@/lib/queries/home-trends';
+import { HOUR_MS, pickFeaturedServices, reportSurgeScore, sparklinePolyline, toHourlySeries } from '@/lib/queries/home-trends';
 
 describe('home service activity tiles', () => {
   const now = new Date('2026-11-12T16:30:00.000Z');
@@ -33,6 +33,29 @@ describe('home service activity tiles', () => {
     const coordinates = sparklinePolyline(Array(25).fill(1));
     expect(coordinates).not.toMatch(/NaN|Infinity/);
     expect(coordinates?.split(' ')).toHaveLength(25);
+  });
+
+  it('requires a meaningful burst of distinct reports before promoting a service', () => {
+    expect(reportSurgeScore({ recent30m: 1, previous2h: 0, uniqueReporters30m: 1 })).toBe(0);
+    expect(reportSurgeScore({ recent30m: 9, previous2h: 1, uniqueReporters30m: 1 })).toBe(0);
+    expect(reportSurgeScore({ recent30m: 9, previous2h: 1, uniqueReporters30m: 2 })).toBe(0);
+    expect(reportSurgeScore({ recent30m: 9, previous2h: 1, uniqueReporters30m: 3 })).toBeGreaterThan(0);
+    expect(reportSurgeScore({ recent30m: 12, previous2h: 44, uniqueReporters30m: 12 })).toBe(0);
+    expect(reportSurgeScore({ recent30m: 12, previous2h: 10, uniqueReporters30m: 10 })).toBeGreaterThan(0);
+    expect(reportSurgeScore({ recent30m: Number.NaN, previous2h: 0, uniqueReporters30m: 10 })).toBe(0);
+  });
+
+  it('brings a sudden surge ahead of a high-traffic service with a steady baseline', () => {
+    const input = [
+      { slug: 'large', name: 'Servicio grande', reportsLast24h: 500, surgeScore: 0 },
+      { slug: 'sudden', name: 'Servicio reciente', reportsLast24h: 12, surgeScore: 5 },
+      { slug: 'other', name: 'Otro', reportsLast24h: 20, surgeScore: 0 },
+    ];
+    expect(pickFeaturedServices(input).map(({ slug }) => slug))
+      .toEqual(['sudden', 'large', 'other']);
+    // Once the recent burst ends, the service returns to normal volume order.
+    expect(pickFeaturedServices(input.map((service) => ({ ...service, surgeScore: 0 })))
+      .map(({ slug }) => slug)).toEqual(['large', 'other', 'sudden']);
   });
 
   it('prioritizes real activity before curated order, then falls back to Venezuelan services', () => {
