@@ -19,6 +19,19 @@ const DASHBOARD_ALIASES: Record<string, string> = {
   "yahoo-mail": "yahoo"
 };
 const CUSTOM_SOURCES: Record<string, LogoProvenance> = {
+  'sistema-patria': {
+    provider: 'Lawnicons (icono comunitario de vePatria, no logotipo oficial del portal)',
+    url: 'https://github.com/LawnchairLauncher/lawnicons/blob/develop/svgs/vepatria.svg',
+    licenseUrl: 'https://github.com/LawnchairLauncher/lawnicons/blob/develop/LICENSE',
+  },
+  'mercantil': {
+    provider: 'Crom Studio (vector editorial de Mercantil Banco, Venezuela)',
+    url: 'https://github.com/Crom-Studio-C-A/Crom-Studio/blob/main/imagenes/logos/banco-mercantil.svg',
+  },
+  'seniat': {
+    provider: 'Vector editorial de SENIAT (repositorio comunitario)',
+    url: 'https://github.com/danielac32/dart_dashboard_backend_ont_v1/blob/2545bcf666a4c818ede714062ea5f07b9abc17ef/Pagina%20web/seniat.svg',
+  },
   'call-of-duty-warzone': {provider: 'Icons Plus (ilustración de videojuego no oficial)', url: 'https://github.com/chouhan-rahul/icons_plus/blob/main/assets/images/logos/video-games/call-of-duty-warzone.svg', licenseUrl: 'https://github.com/chouhan-rahul/icons_plus/blob/main/LICENSE'},
   'cashea': {provider: 'Lawnicons (ilustración comunitaria)', url: 'https://github.com/LawnchairLauncher/lawnicons/blob/develop/svgs/cashea.svg', licenseUrl: 'https://github.com/LawnchairLauncher/lawnicons/blob/develop/LICENSE'},
   'bnc': {provider: 'Arcticons (ilustración comunitaria)', url: 'https://github.com/deathrashed/iconography/blob/main/iconify/arcticons/bnc.svg', licenseUrl: 'https://github.com/deathrashed/iconography/blob/main/LICENSE'},

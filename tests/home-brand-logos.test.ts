@@ -15,9 +15,9 @@ describe('homepage editorial brand assets', () => {
   });
 
   it('supports fallback for missing/unverified brands and unsafe slug names', () => {
-    expect(logoForService('sistema-patria')).toBeNull();
-    expect(logoForService('mercantil')).toBeNull();
-    expect(logoForService('seniat')).toBeNull();
+    expect(logoForService('sistema-patria')).toBe('/brands/sistema-patria.svg');
+    expect(logoForService('mercantil')).toBe('/brands/mercantil.svg');
+    expect(logoForService('seniat')).toBe('/brands/seniat.svg');
     expect(logoForService('__proto__')).toBeNull();
     expect(logoForService('https://attacker.invalid/logo.svg')).toBeNull();
   });

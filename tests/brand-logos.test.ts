@@ -118,8 +118,21 @@ describe('Local brand logo inventory', () => {
     }
   });
 
+  it('includes source-attributed local images for SENIAT, Mercantil and Sistema Patria', () => {
+    for (const slug of ['seniat', 'mercantil', 'sistema-patria']) {
+      const path = logoForService(slug);
+      expect(path).toBe('/brands/' + slug + '.svg');
+      expect(isAdditionalLogo(slug)).toBe(true);
+      const source = brandLogoSource(slug, path!);
+      expect(source.provider.length).toBeGreaterThan(10);
+      expect(source.url).toMatch(/^https:\/\/github\.com\//);
+    }
+    const patria = brandLogoSource('sistema-patria', '/brands/sistema-patria.svg');
+    expect(patria.provider).toContain('vePatria');
+    expect(patria.licenseUrl).toContain('LawnchairLauncher/lawnicons');
+  });
+
   it('keeps an honest fallback for missing/unchecked brands', () => {
-    expect(logoForService('seniat')).toBeNull();
     expect(logoForService('no-existe')).toBeNull();
   });
 });
