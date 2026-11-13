@@ -118,7 +118,7 @@ if(!homepage.includes('¿Tu internet, banco o aplicación está fallando?') ||
    homepage.includes('PULSOVE · FALLAS DE SERVICIOS Y APLICACIONES') ||
    homepage.includes('class="intro-guide"') ||
    homepage.includes('class="stats"') ||
-   homepage.includes('Ver los 211 servicios') ||
+   /Ver los \\d+ servicios/i.test(homepage) ||
    !homepage.includes('>Destacados</p>'))
   throw Error('Home must prioritize search, not a long explanation or catalogue counters');
 for(const page of [homepage,directory,html('servicios/cloudflare/index.html')]) {
