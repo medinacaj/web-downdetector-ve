@@ -342,7 +342,7 @@ with sync_playwright() as playwright:
     page.goto(ROOT + "servicios/cloudflare/", wait_until="networkidle")
     assert page.get_by_role("heading", name="Cloudflare", exact=True).count() == 1
     assert "Cloudflare, Inc." in page.locator(".profile-panel").first.inner_text()
-    assert "Sin datos reales suficientes" in page.locator(".profile-panel").nth(1).inner_text()
+    assert "Estado actual no consultado" in page.locator(".profile-panel").nth(1).inner_text()
     assert page.locator(".profile-tags span").count() >= 3
     assert remote == [], "Demo must not request third-party hosts"
     print("PASS: 211 services; logos exclusive with fallback, 211 quick-report modal actions, simulated form without backend, responsive cards and no external requests")
