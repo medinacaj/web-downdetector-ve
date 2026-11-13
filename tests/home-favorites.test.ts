@@ -1,9 +1,10 @@
 import { describe, expect, it } from 'vitest';
-import { FAVORITES_KEY, parseFavoriteSlugs, toggleFavorite } from '@/lib/favorites';
+import { FAVORITES_CHANGE_EVENT, FAVORITES_KEY, parseFavoriteSlugs, toggleFavorite } from '@/lib/favorites';
 
 describe('local service favorites', () => {
   it('uses a scoped storage key, not a user account or a backend', () => {
     expect(FAVORITES_KEY).toBe('pulsove:favorites:v1');
+    expect(FAVORITES_CHANGE_EVENT).toBe('pulsove:favorites:change');
   });
 
   it('defaults to an empty list and tolerates private browsing corruption', () => {
