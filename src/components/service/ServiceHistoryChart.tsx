@@ -1,6 +1,7 @@
 'use client';
 
 import { useId, useState } from 'react';
+import Link from 'next/link';
 import {
   Area, Bar, Brush, CartesianGrid, ComposedChart, Line, ReferenceLine,
   ResponsiveContainer, Tooltip, XAxis, YAxis,
@@ -210,6 +211,9 @@ export function ServiceHistoryChart({
         Intervalos de 1 hora (24 h) o ventanas consecutivas de 24 horas (7, 30 y 90 días), en hora de Caracas.
         La última ventana puede estar incompleta. Las líneas verticales ámbar identifican fechas con incidentes registrados.
         Esta vista muestra conteos de reportes, no disponibilidad técnica.
+        {' '}<Link href="/metodologia#deteccion" className="font-semibold text-brand-600 underline underline-offset-2 hover:text-brand-700">
+          Conoce cómo interpretamos estos reportes.
+        </Link>
       </p>
     </section>
   );
