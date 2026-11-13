@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { logoForService } from '@/lib/brand-logos';
 
 const BRAND_TONES: Record<string, { background: string; foreground: string }> = {
@@ -19,7 +19,7 @@ function monogram(name: string) {
 }
 
 /**
- * Logos are inert, locally-served PNGs with provenance recorded in docs.
+ * Logos are locally-served PNG/SVG assets with provenance recorded in docs.
  * Never hotlink a logo host from a user's browser. A broken asset falls back
  * to a descriptive monogram instead of showing the broken-image glyph.
  */
@@ -32,6 +32,11 @@ export function BrandMark({
 }) {
   const [broken, setBroken] = useState(false);
   const logo = logoForService(slug);
+
+  // A reused card must retry the new service's asset after a prior image failed.
+  useEffect(() => {
+    setBroken(false);
+  }, [logo]);
   const tone = BRAND_TONES[categorySlug] ?? DEFAULT_TONE;
 
   if (logo && !broken) {
