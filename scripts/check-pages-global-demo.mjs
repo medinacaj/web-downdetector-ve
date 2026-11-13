@@ -111,7 +111,7 @@ for(const file of files) {
     if(data.subarray(0,8).toString('hex')!=='89504e470d0a1a0a')throw Error('PNG invalid: '+file);
   }else if(file.endsWith('.svg')){
     const svg=data.toString();
-    if(!/^<svg\s/.test(svg)||/<script\\b|<foreignObject\\b|<image\\b|<iframe\\b|\\bon[a-z]+\\s*=|\\b(?:href|xlink:href)\\s*=|@import|url\\(\\s*['\"]?\\s*https?:/i.test(svg))
+    if(!/^<svg\s/.test(svg)||/<script\b|<foreignObject\b|<image\b|<iframe\b|\bon[a-z]+\s*=|\b(?:href|xlink:href)\s*=|@import|url\(\s*['"]?\s*https?:/i.test(svg))
       throw Error('Unsafe SVG: '+file);
   }else throw Error('Unexpected logo format '+file);
 }
