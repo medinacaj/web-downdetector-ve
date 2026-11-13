@@ -152,6 +152,11 @@ with sync_playwright() as playwright:
     assert "Anotación ficticia" in page.locator("#demo-observation-text").inner_text()
     page.locator("#demo-range").select_option("90d")
     assert page.locator("#demo-point option").count() == 90
+    before_hover = page.locator("#demo-chart-readout").inner_text()
+    page.locator("#detail-chart").hover(position={"x": 20, "y": 70})
+    assert page.locator("#demo-chart-readout").inner_text() != before_hover
+    page.locator("#detail-chart").click(position={"x": 20, "y": 70})
+    assert page.locator("#demo-point").input_value() == "0"
     page.locator("#demo-mode").select_option("area")
     assert page.locator("#detail-chart path[fill='#2ab8a3']").count() == 1
     page.locator("#detail-chart").focus()
