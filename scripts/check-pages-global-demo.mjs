@@ -101,14 +101,28 @@ if(!homepage.includes('.wrap.hero,body[data-theme="light"] .wrap.hero{border:0;b
   throw Error('Hero should be rounded with subtle depth and no colored frame');
 if(!homepage.includes('¿Tu internet, banco o aplicación está fallando?') ||
    homepage.includes('Estás viendo una demostración:') ||
-   !homepage.includes('En tres pasos') ||
-   !homepage.includes('Gráficos ilustrativos, no indicadores de disponibilidad actual') ||
-   !homepage.includes('href="#como-funciona"') ||
-   !homepage.includes('class="intro-primary" href="/web-downdetector-ve/servicios/"'))
-  throw Error('Static homepage must explain the purpose while keeping a compact data disclaimer');
-if((homepage.match(/class="intro-steps"/g)||[]).length!==1 ||
-   (homepage.match(/<li><strong>[123] · /g)||[]).length!==3)
-  throw Error('First-time visitors need a single, accessible three-step guide');
+   !homepage.includes('class="intro-primary" href="/web-downdetector-ve/servicios/"') ||
+   !homepage.includes('class="home-tools-bar"') ||
+   homepage.includes('class="stats"') ||
+   homepage.includes('class="intro-guide"'))
+  throw Error('Homepage should have a compact introduction and a separate search toolbar');
+for (const page of [homepage, directory]) {
+  if(!page.includes('id="ayuda"') ||
+     !page.includes('id="footer-help-title"') ||
+     (page.match(/class="footer-steps"/g)||[]).length!==1 ||
+     (page.match(/<li><strong>(Busca|Revisa|Reporta)<\/strong>/g)||[]).length!==3 ||
+     !page.includes('class="footer-links"') ||
+     !page.includes('>Logos y créditos</a>') ||
+     !page.includes('Los gráficos ilustrativos no muestran disponibilidad actual'))
+    throw Error('Help and image credits must be in the shared site footer');
+  const header = page.slice(page.indexOf('<header'), page.indexOf('</header>')+9);
+  if(header.includes('211 servicios') || header.includes('Logos y créditos'))
+    throw Error('Header should contain only logo, navigation and theme switch');
+}
+if(homepage.includes('Ver los 211 servicios') ||
+   homepage.includes('60 servicios destacados') ||
+   directory.includes('Directorio de 211 plataformas'))
+  throw Error('Decorative catalog totals should not clutter the landing experience');
 if((homepage.match(/class="section-index"/g)||[]).length!==9)
   throw Error('Numbered editorial sections missing');
 if(homepage.includes('linear-gradient('))
