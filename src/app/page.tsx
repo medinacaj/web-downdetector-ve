@@ -6,6 +6,9 @@ import { HomeAutoRefresh } from '@/components/home/HomeAutoRefresh';
 import { OfficialMicrosoftStatus } from '@/components/home/OfficialMicrosoftStatus';
 import { ROUTE, isRouteAvailable } from '@/lib/nav';
 
+// Citizen activity is time-sensitive and must not be served from a stale static page.
+export const dynamic = 'force-dynamic';
+
 function formatUpdatedAt(date: Date) {
   return new Intl.DateTimeFormat('es-VE', {
     timeZone: 'America/Caracas',
