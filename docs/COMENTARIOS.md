@@ -10,7 +10,7 @@ Una respuesta HTTP 201 significa únicamente **recibido, pendiente de revisión*
 
 ## Prevención de abuso
 
-- Límite de 3 envíos por identificador de dispositivo por hora y 60 por prefijo de red confiable por hora. Se usa el mismo mecanismo Redis compartido de los reportes; el modo en memoria solo es apropiado para una instancia.
+- Límite de 3 envíos por identificador de dispositivo por hora y 60 por prefijo de red confiable por hora. Si no se dispone de IP confiable, se usa además un cupo **compartido de 30 envíos por hora** para evitar eludir límites rotando identificadores. Se usa el mismo mecanismo Redis compartido de los reportes; el modo en memoria solo es apropiado para una instancia.
 - No se almacenan IP completas ni nombres/correos del autor; se conservan únicamente hashes HMAC y fecha para controlar abuso. `ANONYMIZATION_SALT` es imprescindible en producción.
 - Los mensajes enviados dos veces al mismo servicio en los dos minutos siguientes se rechazan.
 - Todas las publicaciones entran en estado `pending` de PostgreSQL; `approved` y `rejected` se registran explícitamente.
