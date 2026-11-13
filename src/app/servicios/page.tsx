@@ -45,7 +45,7 @@ export default async function ServicesDirectoryPage({
         <p className="font-mono text-sm text-ink-muted tabular-nums">{total} servicios</p>
       </div>
 
-      <form className="mt-6 grid gap-3 sm:grid-cols-[2fr_1fr_1fr_1fr_auto]" action="/servicios">
+      <form className="mt-6 grid min-w-0 gap-3 sm:grid-cols-2 lg:grid-cols-[minmax(0,2fr)_repeat(3,minmax(0,1fr))_auto]" action="/servicios">
         <label className="sr-only" htmlFor="q">
           Buscar
         </label>
@@ -55,7 +55,7 @@ export default async function ServicesDirectoryPage({
           type="search"
           defaultValue={params.q}
           placeholder="Buscar un servicio…"
-          className="rounded-md border border-border bg-surface px-3 py-2 text-sm focus:border-pulse-500"
+          className="w-full min-w-0 rounded-md border border-border bg-surface px-3 py-2 text-sm focus:border-pulse-500"
         />
 
         <label className="sr-only" htmlFor="category">
@@ -65,7 +65,7 @@ export default async function ServicesDirectoryPage({
           id="category"
           name="category"
           defaultValue={params.category ?? ''}
-          className="rounded-md border border-border bg-surface px-3 py-2 text-sm focus:border-pulse-500"
+          className="w-full min-w-0 rounded-md border border-border bg-surface px-3 py-2 text-sm focus:border-pulse-500"
         >
           <option value="">Toda categoría</option>
           {categoryList.map((c) => (
@@ -82,7 +82,7 @@ export default async function ServicesDirectoryPage({
           id="status"
           name="status"
           defaultValue={validStatus ?? ''}
-          className="rounded-md border border-border bg-surface px-3 py-2 text-sm focus:border-pulse-500"
+          className="w-full min-w-0 rounded-md border border-border bg-surface px-3 py-2 text-sm focus:border-pulse-500"
         >
           <option value="">Todo estado</option>
           {STATUS_OPTIONS.map((o) => (
@@ -99,7 +99,7 @@ export default async function ServicesDirectoryPage({
           id="sort"
           name="sort"
           defaultValue={validSort ?? 'alphabetical'}
-          className="rounded-md border border-border bg-surface px-3 py-2 text-sm focus:border-pulse-500"
+          className="w-full min-w-0 rounded-md border border-border bg-surface px-3 py-2 text-sm focus:border-pulse-500"
         >
           {SORT_OPTIONS.map((o) => (
             <option key={o.value} value={o.value}>

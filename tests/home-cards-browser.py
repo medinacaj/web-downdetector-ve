@@ -299,5 +299,64 @@ with sync_playwright() as playwright:
         assert page.evaluate("document.documentElement.scrollWidth <= window.innerWidth + 2"), ("real detail overflow", width)
 
 
+    # Directory favorites use the same browser-local storage as home cards.
+    # All directory entries can now be starred, including those not featured.
+    directory = page.goto("http://127.0.0.1:3000/servicios", wait_until="networkidle", timeout=60000)
+    assert directory and directory.status == 200
+    only = page.locator("[data-favorites-only]")
+    assert only.count() == 1
+    assert only.get_attribute("aria-pressed") == "false"
+    page.evaluate("""() => {
+      localStorage.setItem('pulsove:favorites:v1', '[]');
+      window.dispatchEvent(new Event('pulsove:favorites:change'));
+    }""")
+    assert "(0)" in only.inner_text()
+    only.click()
+    assert page.get_by_text("No hay favoritos en estos resultados").count() == 1
+    page.get_by_role("button", name="Mostrar todos").click()
+    assert only.get_attribute("aria-pressed") == "false"
+
+    star = page.get_by_role("button", name="Añadir CANTV a favoritos")
+    assert star.count() == 1
+    star.click()
+    assert "(1)" in only.inner_text()
+    only.click()
+    assert only.get_attribute("aria-pressed") == "true"
+    assert page.locator("[data-directory-grid] > li").count() == 1
+    assert "Mostrando 1 de" in page.locator("[data-directory-results]").inner_text()
+
+    # The blank footer of a directory tile is also a native detail link,
+    # but clicking its star must never navigate.
+    tile = page.locator("[data-directory-grid] > li").first
+    footer = tile.locator(".directory-favorite-action")
+    area = footer.bounding_box()
+    assert area is not None
+    page.mouse.click(area["x"] + 8, area["y"] + area["height"] / 2)
+    page.wait_for_url("**/servicios/cantv", timeout=30000)
+    assert page.get_by_role("heading", name="Acerca de la empresa y el servicio").count() == 1
+
+    page.goto("http://127.0.0.1:3000/servicios", wait_until="networkidle", timeout=60000)
+    page.get_by_role("button", name="Lista", exact=True).click()
+    assert page.locator("[data-directory-list] > li").count() >= 200
+    only = page.locator("[data-favorites-only]")
+    only.click()
+    assert page.locator("[data-directory-list] > li").count() == 1
+    page.get_by_role("button", name="Quitar CANTV de favoritos").click()
+    assert page.get_by_text("No hay favoritos en estos resultados").count() == 1
+    assert "(0)" in only.inner_text()
+    page.get_by_role("button", name="Mostrar todos").click()
+    assert page.locator("[data-directory-list] > li").count() >= 200
+    for width in (320, 390, 768, 1280):
+        page.set_viewport_size({"width": width, "height": 844})
+        overflow = page.evaluate("document.documentElement.scrollWidth - innerWidth")
+        if overflow > 2:
+            offending = page.evaluate("""() => [...document.querySelectorAll('body *')]
+              .filter(el => el.getBoundingClientRect().right > innerWidth + 2)
+              .slice(0, 8).map(el => ({tag: el.tagName, className: String(el.className).slice(0, 120),
+                right: Math.round(el.getBoundingClientRect().right)}))""")
+            raise AssertionError(("directory horizontal overflow", width, overflow, offending))
+    page.set_viewport_size({"width": 390, "height": 844})
+    page.screenshot(path="artifacts/pulsove-directory-390.png", full_page=False, animations="disabled")
+
     print("Mobile cards responsive; quick report links to real protected service form; optional fields collapsed; favorites persist.")
     browser.close()
