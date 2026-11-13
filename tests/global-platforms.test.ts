@@ -10,7 +10,7 @@ const categorySlugs = new Set<string>(categoriesSeed.map((category) => category.
 
 describe('worldwide platform catalogue', () => {
   it('includes more than 140 services across at least 12 categories', () => {
-    expect(servicesSeed.length).toBeGreaterThanOrEqual(140);
+    expect(servicesSeed.length).toBeGreaterThanOrEqual(211);
     expect(categoriesSeed.length).toBeGreaterThanOrEqual(12);
     expect(new Set(servicesSeed.map((service) => service.slug)).size).toBe(servicesSeed.length);
   });
@@ -23,6 +23,8 @@ describe('worldwide platform catalogue', () => {
       'roblox', 'steam', 'valorant', 'epic-games-store', 'minecraft',
       'chatgpt', 'google-gemini', 'claude', 'discord', 'reddit',
       'amazon', 'shopify', 'paypal', 'stripe',
+      'signal', 'wechat', 'apple-music', 'crunchyroll', 'dota-2', 'overwatch-2',
+      'figma', 'railway', 'render', 'fastly', 'wise', 'uber', 'airbnb',
     ]) {
       expect(slugs.has(slug), `Missing international service: ${slug}`).toBe(true);
     }
@@ -40,15 +42,15 @@ describe('worldwide platform catalogue', () => {
   });
 
   it('five homepage global sections cover 30 unique services without inventing records', () => {
-    expect(WORLDWIDE_SPOTLIGHT).toHaveLength(5);
+    expect(WORLDWIDE_SPOTLIGHT).toHaveLength(8);
     const allSlugs = WORLDWIDE_SPOTLIGHT.flatMap((section) => section.slugs);
-    expect(allSlugs).toHaveLength(30);
+    expect(allSlugs).toHaveLength(48);
     expect(new Set(allSlugs).size).toBe(allSlugs.length);
     expect(allSlugs.every((slug) => slugs.has(slug))).toBe(true);
 
     const selected = selectWorldwideSpotlights(servicesSeed);
-    expect(selected).toHaveLength(5);
-    expect(selected.flatMap((section) => section.services)).toHaveLength(30);
+    expect(selected).toHaveLength(8);
+    expect(selected.flatMap((section) => section.services)).toHaveLength(48);
     expect(selectWorldwideSpotlights([])).toEqual([]);
     expect(selectWorldwideSpotlights(servicesSeed.filter((service) => service.slug === 'fortnite'))[0]?.services[0]?.slug).toBe('fortnite');
   });
