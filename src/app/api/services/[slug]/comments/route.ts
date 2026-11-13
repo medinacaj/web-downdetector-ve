@@ -62,10 +62,12 @@ async function handlePOST(request: Request, context: Context) {
       retryAt: new Date(rate.resetAt).toISOString(),
     });
   }
-  if (ip !== '0.0.0.0') {
-    const network = await checkRateLimit('comment:network:' + ipPrefixHash, LIMIT_PER_NETWORK, WINDOW_SECONDS);
-    if (!network.allowed) return apiError('rate_limited', 'Se alcanzó el límite temporal de comentarios desde esta red.');
-  }
+  // When ingress does not supply a trusted IP, share a conservative
+  // anonymous bucket rather than let spoofed device IDs bypass all limits.
+  const networkKey = ip === '0.0.0.0' ? 'comment:network:unverified' : 'comment:network:' + ipPrefixHash;
+  const networkLimit = ip === '0.0.0.0' ? 30 : LIMIT_PER_NETWORK;
+  const network = await checkRateLimit(networkKey, networkLimit, WINDOW_SECONDS);
+  if (!network.allowed) return apiError('rate_limited', 'Se alcanzó el límite temporal de comentarios desde esta red.');
 
   const recent = await db.select({ id: serviceComments.id })
     .from(serviceComments)
