@@ -34,9 +34,21 @@ with sync_playwright() as playwright:
     assert page.locator("#nube .card .name").first.is_visible()
     assert page.locator("#nube .card .card-cta").first.is_visible()
     assert page.locator("#nube .card .card-actions").first.is_visible()
-    colors = page.locator("#nube .card").first.evaluate("(el) => getComputedStyle(el).getPropertyValue('--accent').trim()")
-    games_color = page.locator("#juegos .card").first.evaluate("(el) => getComputedStyle(el).getPropertyValue('--accent').trim()")
-    assert colors != games_color, "Distinct category colors for varied visual hierarchy"
+    colors = page.locator("#nube .card").first.evaluate("(el) => getComputedStyle(el).getPropertyValue('--plot').trim()")
+    games_color = page.locator("#juegos .card").first.evaluate("(el) => getComputedStyle(el).getPropertyValue('--plot').trim()")
+    assert colors != games_color, "Chart traces identify categories without decorative borders"
+    assert page.locator("main .section-index").count() == 9, "Every homepage group needs its editorial number"
+    for card in page.locator("#nube .card").all():
+        appearance = card.evaluate("""(el) => {
+          const s = getComputedStyle(el);
+          return { border: s.borderTopWidth, radius: s.borderTopLeftRadius, shadow: s.boxShadow }
+        }""")
+        assert appearance["border"] == "0px", ("Card border must be removed", appearance)
+        assert appearance["radius"] == "0px", ("Card rounded corners must be removed", appearance)
+        assert appearance["shadow"] == "none", ("Card drop-shadow must be removed", appearance)
+    hero = page.locator(".wrap.hero").first
+    assert hero.evaluate("(el) => getComputedStyle(el).borderTopLeftRadius") == "0px"
+    assert hero.evaluate("(el) => getComputedStyle(el).boxShadow") == "none"
 
     # Quick filters, search reset, keyboard search and display mode are real controls.
     page.get_by_role("button", name="Nube", exact=True).click()
@@ -130,7 +142,7 @@ with sync_playwright() as playwright:
     assert report.count() == 1, "Every card needs a quick report action"
     assert report.inner_text() == "!", "Report must be a compact icon, not a large text button"
     assert report.evaluate("(el) => Math.round(el.getBoundingClientRect().width)") <= 40
-    assert report.evaluate("(el) => getComputedStyle(el).backgroundColor") == "rgb(220, 38, 38)"
+    assert report.evaluate("(el) => getComputedStyle(el).backgroundColor") == "rgb(198, 41, 52)"
     star = cloudflare_card.locator("button[data-fav='cloudflare']")
     assert report.evaluate("(el) => el.getBoundingClientRect().right") < star.evaluate("(el) => el.getBoundingClientRect().left")
 

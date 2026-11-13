@@ -68,8 +68,15 @@ if(!directory.includes('id="directory-sort"')||!directory.includes('id="favorite
   throw Error('Directory interactive sorting/favorites missing');
 if(directory.indexOf('class="card-link"')>directory.indexOf('class="card-actions"'))
   throw Error('Actions must be after full-width service title and chart');
-if(!homepage.includes('--accent:#1275a9')||!homepage.includes('--accent:#c14a79'))
-  throw Error('Category contrast palette missing');
+if(!homepage.includes('--plot:#146e97')||!homepage.includes('--plot:#b95177'))
+  throw Error('Charts must retain distinct category colors');
+if(!homepage.includes('.card,.card:hover,.card:focus-within{border:0;border-radius:0;box-shadow:none') ||
+   !homepage.includes('.wrap.hero,body[data-theme="light"] .wrap.hero{background:#152c33;color:#fff;border:0;border-radius:0;box-shadow:none'))
+  throw Error('Editorial style must have borderless, shadowless service tiles and a flat masthead');
+if((homepage.match(/class="section-index"/g)||[]).length!==9)
+  throw Error('Numbered editorial sections missing');
+if(homepage.includes('linear-gradient('))
+  throw Error('Illustrative preview must not reintroduce generic gradient card styling');
 if((directory.match(/class="report-quick"/g)||[]).length!==211)throw Error('Expected one compact red report icon per card');
 if((homepage.match(/class="card-actions"/g)||[]).length!==60)throw Error('Expected isolated toolbar on each index card');
 if((directory.match(/class="card-actions"/g)||[]).length!==211)throw Error('Expected isolated toolbar on each directory card');
@@ -77,7 +84,8 @@ if(!homepage.includes('.card-header{display:flex')||!homepage.includes('.demo-ch
   throw Error('Uniform, full-width card layout CSS missing');
 if(homepage.includes('padding-right:75px')||homepage.includes('padding-right:88px'))
   throw Error('Whole-card right padding would shrink charts behind action icons');
-if(!homepage.includes('.card-actions{display:flex')||!homepage.includes('.report-quick{border:1px solid #b91c1c;background:#dc2626'))throw Error('Report icon must be compact, red, and inside its toolbar');
+if(!homepage.includes('.card-actions{display:flex')||!homepage.includes('.report-quick,.report-quick:hover{background:#c62934;color:#fff'))
+  throw Error('Report icon must be compact, red, and isolated beneath content');
 if(!directory.includes('id="directory-cards"'))throw Error('Interactive directory missing');
 if(!credits.includes('Banesco'))throw Error('Brand credits missing');
 const files = readdirSync(join(root,'brands'));
