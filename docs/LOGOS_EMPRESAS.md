@@ -2,6 +2,8 @@
 
 **Uso:** identificación editorial del servicio supervisado, no identidad gráfica de PulsoVE. Los logotipos y marcas pertenecen a sus respectivos titulares; **no existe patrocinio, afiliación ni aval** por aparecer en el catálogo. La disponibilidad del servicio se calcula mediante la metodología de PulsoVE, no mediante el logotipo.
 
+**Cobertura del catálogo ampliado (13/11/2026):** 579 fichas, 179 logos locales revisados y 400 fichas que utilizan monograma tipográfico hasta disponer de un recurso con procedencia y condiciones de uso verificadas. La incorporación a la lista no autoriza a copiar automáticamente la marca desde una web externa ni a inventar recursos. La tarea de normalización de logos permanece abierta.
+
 Las imágenes descargadas se sirven desde `public/brands/` sin consultas de los visitantes a proveedores externos. Las imágenes obtenidas en Wikimedia se rasterizan localmente a PNG y se dimensionan con Sharp para reducir carga y evitar SVG activo de terceros. Los dos iconos de Simple Icons se sirven como SVG locales de rutas puras, sin scripts ni enlaces externos. El código solo presenta imágenes incluidas explícitamente en la lista `HOME_BRAND_LOGOS`.
 
 | Servicio | Archivo local | Procedencia (fuente del recurso) | Condición indicada por la fuente |
