@@ -217,6 +217,18 @@ with sync_playwright() as playwright:
         assert img.evaluate("(el) => el.complete && el.naturalWidth > 0"), "Broken SVG for " + slug
         assert tile.locator(".monogram").get_attribute("hidden") is not None
 
+    # Five locally relevant services must have decoded SVGs with monogram hidden.
+    for slug in ("cashea", "bnc", "ridery", "zinli", "zupper"):
+        tile = page.locator("#directory-cards .card[data-slug='" + slug + "']")
+        img = tile.locator("img.logo")
+        assert img.count() == 1, "Missing approved community icon: " + slug
+        assert img.get_attribute("src").endswith("/brands/" + slug + ".svg")
+        img.scroll_into_view_if_needed()
+        img.evaluate("(el) => { el.loading = 'eager'; }")
+        img.evaluate("(el) => el.decode()")
+        assert img.evaluate("(el) => el.complete && el.naturalWidth > 0"), slug
+        assert tile.locator(".monogram").get_attribute("hidden") is not None
+
     assert page.locator("#directory-cards button[data-report]").count() == 211
     assert page.locator("#directory-cards .demo-label").count() == 0
     assert page.locator("#directory-cards .notice").count() == 0
