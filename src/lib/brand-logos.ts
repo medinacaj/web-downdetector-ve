@@ -25,6 +25,7 @@ export const HOME_BRAND_LOGOS: Readonly<Record<string, string>> = Object.freeze(
   'box': '/brands/box.svg',
   'brawl-stars': '/brands/brawl-stars.svg',
   'cantv': '/brands/cantv.png',
+  'call-of-duty-warzone': '/brands/call-of-duty-warzone.svg',
   'canva': '/brands/canva.svg',
   'cashea': '/brands/cashea.svg',
   'cash-app': '/brands/cash-app.svg',

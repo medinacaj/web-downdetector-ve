@@ -229,6 +229,17 @@ with sync_playwright() as playwright:
         assert img.evaluate("(el) => el.complete && el.naturalWidth > 0"), slug
         assert tile.locator(".monogram").get_attribute("hidden") is not None
 
+    # The additional Warzone illustration must decode in the static preview.
+    warzone = page.locator("#directory-cards .card[data-slug='call-of-duty-warzone']")
+    warzone_logo = warzone.locator("img.logo")
+    assert warzone_logo.count() == 1
+    assert warzone_logo.get_attribute("src").endswith("/brands/call-of-duty-warzone.svg")
+    warzone_logo.scroll_into_view_if_needed()
+    warzone_logo.evaluate("(el) => { el.loading = 'eager'; }")
+    warzone_logo.evaluate("(el) => el.decode()")
+    assert warzone_logo.evaluate("(el) => el.complete && el.naturalWidth > 0")
+    assert warzone.locator(".monogram").get_attribute("hidden") is not None
+
     assert page.locator("#directory-cards button[data-report]").count() == 211
     assert page.locator("#directory-cards .demo-label").count() == 0
     assert page.locator("#directory-cards .notice").count() == 0
