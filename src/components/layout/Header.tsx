@@ -4,7 +4,7 @@ import { ROUTE, isRouteAvailable } from '@/lib/nav';
 
 // Solo las páginas que existen (ver src/lib/nav.ts): un enlace a una página
 // planificada sería un 404 en todas las páginas del sitio.
-const NAV_LINKS = [ROUTE.services, ROUTE.map, ROUTE.incidents, ROUTE.statistics, ROUTE.methodology].filter(
+const NAV_LINKS = [ROUTE.services, ROUTE.map, ROUTE.incidents, ROUTE.statistics].filter(
   isRouteAvailable,
 );
 
