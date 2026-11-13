@@ -5,6 +5,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useView } from './ViewToggle';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { FavoriteButton } from '@/components/home/FavoriteButton';
+import { BrandMark } from '@/components/home/BrandMark';
 import { FAVORITES_CHANGE_EVENT, FAVORITES_KEY, parseFavoriteSlugs } from '@/lib/favorites';
 import type { DirectoryService } from '@/lib/queries/directory';
 
@@ -79,21 +80,29 @@ export function ServiceGrid({ services }: { services: DirectoryService[] }) {
               <Link
                 href={`/servicios/${encodeURIComponent(s.slug)}`}
                 aria-label={`Ver estado y reportes de ${s.name}`}
-                className="directory-service-link flex min-w-0 flex-1 items-center justify-between gap-3 px-4 py-3"
+                className="directory-service-link flex min-w-0 flex-1 flex-col gap-2 px-3 py-3 sm:flex-row sm:items-center sm:justify-between"
               >
-                <div className="min-w-0">
-                  <p className="truncate font-medium">{s.name}</p>
-                  <p className="text-xs text-ink-muted">{s.categoryName}</p>
-                  {s.surgeScore > 0 && <p className="mt-1 text-xs font-medium text-brand-600">↗ Reportes en aumento</p>}
+                <div className="flex min-w-0 items-center gap-3">
+                  <div data-directory-brand className="h-10 w-12 shrink-0 rounded-lg bg-white p-1 shadow-sm">
+                    <BrandMark slug={s.slug} name={s.name} categorySlug={s.categorySlug} />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="truncate font-semibold">{s.name}</p>
+                    <p className="truncate text-xs text-ink-muted">{s.categoryName}</p>
+                    {s.surgeScore > 0 && <p className="mt-1 text-xs font-medium text-brand-600">↗ Reportes en aumento</p>}
+                  </div>
                 </div>
-                <div className="flex shrink-0 flex-wrap items-center justify-end gap-2 sm:gap-4">
-                  <span className="font-mono text-xs text-ink-muted tabular-nums">
-                    {s.reportsLast24h} rep. (24h)
-                  </span>
+                <div className="flex min-w-0 flex-wrap items-center gap-2 pl-[60px] sm:shrink-0 sm:justify-end sm:gap-3 sm:pl-0">
+                  <span className="font-mono text-xs text-ink-muted tabular-nums">{s.reportsLast24h} rep. (24h)</span>
                   <StatusBadge status={s.status} size="sm" />
                 </div>
               </Link>
-              <div className="directory-favorite-action relative z-20 shrink-0 px-2">
+              <div className="directory-favorite-action relative z-20 flex shrink-0 items-center gap-1 pr-2">
+                <Link href={`/servicios/${encodeURIComponent(s.slug)}#reportar`}
+                  aria-label={`Reportar falla de ${s.name}`} title={`Reportar falla de ${s.name}`}
+                  className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-red-600 text-white shadow-sm transition-colors hover:bg-red-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-500">
+                  <span aria-hidden="true" className="text-xl font-black leading-none">!</span>
+                </Link>
                 <FavoriteButton slug={s.slug} name={s.name} inline />
               </div>
             </li>
@@ -108,20 +117,28 @@ export function ServiceGrid({ services }: { services: DirectoryService[] }) {
                 aria-label={`Ver estado y reportes de ${s.name}`}
                 className="directory-service-link flex min-w-0 flex-1 flex-col gap-3 px-4 pb-2 pt-4"
               >
-                <div className="flex min-w-0 items-start justify-between gap-2">
-                  <div className="min-w-0">
-                    <p className="font-semibold">{s.name}</p>
-                    <p className="text-xs text-ink-muted">{s.categoryName}</p>
-                  {s.surgeScore > 0 && <p className="mt-1 text-xs font-medium text-brand-600">↗ Reportes en aumento</p>}
+                <div className="flex min-w-0 items-center gap-3">
+                  <div data-directory-brand className="h-16 w-[72px] shrink-0 rounded-lg bg-white p-1 shadow-sm">
+                    <BrandMark slug={s.slug} name={s.name} categorySlug={s.categorySlug} />
                   </div>
-                  <StatusBadge status={s.status} size="sm" />
+                  <div className="min-w-0 flex-1">
+                    <p className="line-clamp-2 font-semibold leading-snug">{s.name}</p>
+                    <p className="mt-1 truncate text-xs text-ink-muted">{s.categoryName}</p>
+                    {s.surgeScore > 0 && <p className="mt-1 text-xs font-medium text-brand-600">↗ Reportes en aumento</p>}
+                  </div>
                 </div>
                 {s.description && <p className="line-clamp-2 text-sm text-ink-muted">{s.description}</p>}
-                <p className="mt-auto font-mono text-xs text-ink-muted tabular-nums">
-                  {s.reportsLast24h} reportes (24h)
-                </p>
+                <div className="mt-auto flex min-w-0 flex-wrap items-center justify-between gap-2">
+                  <p className="font-mono text-xs text-ink-muted tabular-nums">{s.reportsLast24h} reportes (24h)</p>
+                  <StatusBadge status={s.status} size="sm" />
+                </div>
               </Link>
-              <div className="directory-favorite-action relative z-20 flex justify-end px-3 pb-2">
+              <div className="directory-favorite-action relative z-20 flex items-center justify-end gap-2 px-3 pb-2">
+                <Link href={`/servicios/${encodeURIComponent(s.slug)}#reportar`}
+                  aria-label={`Reportar falla de ${s.name}`} title={`Reportar falla de ${s.name}`}
+                  className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-red-600 text-white shadow-sm transition-colors hover:bg-red-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-500">
+                  <span aria-hidden="true" className="text-xl font-black leading-none">!</span>
+                </Link>
                 <FavoriteButton slug={s.slug} name={s.name} inline />
               </div>
             </li>
