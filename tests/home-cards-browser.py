@@ -360,6 +360,18 @@ with sync_playwright() as playwright:
 
     # Interactive, truthful service detail uses actual PostgreSQL buckets.
     assert page.get_by_role("heading", name="Acerca de la empresa y el servicio").count() == 1
+    top_issues = page.locator("section[aria-labelledby='top-issues-title']")
+    assert top_issues.get_by_role("heading", name="Problemas más reportados").count() == 1
+    assert top_issues.get_by_text("no fueron marcados como sospechosos", exact=False).count() == 1
+    for period in ("24 horas", "7 días", "30 días"):
+        button = top_issues.get_by_role("button", name=period)
+        assert button.count() == 1
+        button.click()
+        assert button.get_attribute("aria-pressed") == "true", period
+        assert top_issues.get_by_role("status").count() == 1, "No fabricated ranks on empty seed"
+        assert top_issues.locator("ol[aria-label='Tres tipos de falla más reportados'] li").count() == 0
+    top_issues.get_by_role("button", name="24 horas").click()
+
     history = page.locator("section[aria-labelledby='history-chart-title']")
     assert history.count() == 1
     assert history.get_by_role("button", name="90d").count() == 1

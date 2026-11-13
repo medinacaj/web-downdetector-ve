@@ -7,6 +7,7 @@ import { StatusBadge } from '@/components/ui/StatusBadge';
 import { ReportForm } from '@/components/service/ReportForm';
 import { BrandMark } from '@/components/home/BrandMark';
 import { ServiceHistoryChart } from '@/components/service/ServiceHistoryChart';
+import { TopIssuesBreakdown } from '@/components/service/TopIssuesBreakdown';
 import { ServiceComments } from '@/components/service/ServiceComments';
 import { getServiceProfile } from '@/lib/catalog/service-profiles';
 
@@ -154,28 +155,8 @@ export default async function ServiceDetailPage({ params }: { params: Promise<{ 
         </div>
       </section>
 
-      {/* Tipos de problema */}
-      {issueBreakdown.length > 0 && (
-        <section className="mt-10">
-          <h2 className="font-display text-lg font-semibold">Tipos de problema reportados</h2>
-          <ul className="mt-3 space-y-2">
-            {issueBreakdown.map((it) => {
-              const max = issueBreakdown[0].count || 1;
-              return (
-                <li key={it.name} className="flex items-center gap-3">
-                  <span className="w-36 shrink-0 truncate text-sm">{it.name}</span>
-                  <div className="h-2 flex-1 overflow-hidden rounded-full bg-border">
-                    <div className="h-full rounded-full bg-brand-500" style={{ width: `${(it.count / max) * 100}%` }} />
-                  </div>
-                  <span className="w-8 shrink-0 text-right font-mono text-xs text-ink-muted tabular-nums">
-                    {it.count}
-                  </span>
-                </li>
-              );
-            })}
-          </ul>
-        </section>
-      )}
+      {/* Ranking temporal a partir de reportes válidos, nunca porcentajes inventados. */}
+      <TopIssuesBreakdown rows={issueBreakdown} />
 
       {/* Actividad geográfica */}
       {affectedStates.length > 0 && (
