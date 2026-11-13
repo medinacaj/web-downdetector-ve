@@ -56,6 +56,15 @@ with sync_playwright() as playwright:
     grid = page.locator("section[aria-labelledby='home-services-title'] ul")
     cards = grid.locator(":scope > li")
     assert cards.count() == 12, "12 featured services must be shown"
+    assert page.get_by_text("El orden se actualiza cada minuto", exact=False).count() == 1
+    assert cards.locator("article[data-rapid-surge]").count() == 12
+    assert all(item in ("true", "false") for item in
+               cards.locator("article[data-rapid-surge]").evaluate_all(
+                   "(elements) => elements.map(el => el.dataset.rapidSurge)"))
+    # A burst is a discovery signal, not a confirmed operational outage.
+    for article in cards.locator("article[data-rapid-surge='true']").all():
+        assert article.get_by_text("Reportes en aumento", exact=False).count() == 1
+
 
     # The international catalogue is visible on the index, not just in seed files.
     global_section = page.locator("section[aria-labelledby='global-platforms-title']")
