@@ -9,9 +9,18 @@ const directory = html('servicios/index.html');
 const credits = html('creditos-marcas/index.html');
 const info = html('build-info.txt');
 if(!info.includes('catalogue=211')) throw Error('Unexpected catalogue size in public output');
-const EXPECTED_LOGOS = 167;
+// Compare the generated preview with the canonical explicit local allowlist.
+// Keep a regression floor, rather than pinning the inventory to an exact number
+// every time a verified service image is added.
+const source = readFileSync('src/lib/brand-logos.ts', 'utf8');
+const entries = [...source.matchAll(/^  '([a-z0-9-]+)': '(\/brands\/[a-z0-9-]+\.(?:svg|png))',?$/gm)];
+const slugs = new Set(entries.map((entry) => entry[1]));
+const paths = new Set(entries.map((entry) => entry[2]));
+if (entries.length < 167 || entries.length !== slugs.size || entries.length !== paths.size)
+  throw Error('Local logo registry invalid or unexpectedly reduced');
+const expectedLogos = entries.length;
 const actualLogos = Number(info.match(/^logos=(\d+)$/m)?.[1]);
-if(actualLogos !== EXPECTED_LOGOS) throw Error('Logo inventory mismatch: '+actualLogos);
+if(actualLogos !== expectedLogos) throw Error('Logo inventory mismatch: build='+actualLogos+', registry='+expectedLogos);
 for(const file of [homepage,directory]){
   if(!file.includes('Cloudflare')||!file.includes('Gmail')||!file.includes('Outlook')||!file.includes('Fortnite'))
     throw Error('Required global services absent');
@@ -102,7 +111,7 @@ for (const slug of PRIORITY) {
   if(!profile.includes('/brands/'+slug+'.svg'))throw Error('Requested brand absent from profile: '+slug);
 }
 const files = readdirSync(join(root,'brands'));
-if(files.length!==EXPECTED_LOGOS)throw Error('Missing or unexpected local brand assets: '+files.length);
+if(files.length!==expectedLogos)throw Error('Missing or unexpected local brand assets: '+files.length);
 for(const file of files) {
   const full=join(root,'brands',file);
   const data=readFileSync(full);
