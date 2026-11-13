@@ -4,6 +4,7 @@ on:
     branches: [main]
     paths:
       - 'scripts/build-pages-global-demo.mjs'
+      - 'scripts/methodology-static.mjs'
       - 'scripts/check-pages-global-demo.mjs'
       - 'src/lib/catalog/service-profiles.ts'
       - 'src/lib/db/seed-data/**'
