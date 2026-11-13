@@ -46,7 +46,7 @@ with sync_playwright() as playwright:
         assert page.evaluate("document.documentElement.scrollWidth <= window.innerWidth + 2"), f"Horizontal overflow: {width}"
         measurements = page.locator("#nube .card").evaluate_all("""(cards) => cards.map(card => {
           const rect = (selector) => {
-            const el = card.querySelector(selector);
+            const el = selector === '.card' ? card : card.querySelector(selector);
             const r = el.getBoundingClientRect();
             return { left: r.left, right: r.right, top: r.top, bottom: r.bottom, width: r.width, height: r.height };
           };
