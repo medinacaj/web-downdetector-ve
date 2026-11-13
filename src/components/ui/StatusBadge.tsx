@@ -58,7 +58,7 @@ const VISUALS: Record<ExtendedStatus, StatusVisual> = {
     colorClass: 'text-ink-muted',
     dotClass: 'bg-ink-muted',
     label: 'Monitoreo no disponible',
-    icon: 'question',
+    icon: null,
   },
 };
 
