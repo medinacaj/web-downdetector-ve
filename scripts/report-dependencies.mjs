@@ -34,13 +34,11 @@ if (!validLevels || data.error) {
     'La auditoría del repositorio no confirma por sí sola la versión desplegada en producción.',
   ].join('\n') + '\n';
   let detailed = '';
-  if (process.env.AUDIT_SCOPE !== 'all') {
-    try {
-      detailed = '\n' + formatProductionAudit(data);
-    } catch (error) {
-      console.error('No fue posible detallar los paquetes de producción:', error);
-      process.exitCode = 2;
-    }
+  try {
+    detailed = '\n' + formatProductionAudit(data, process.env.AUDIT_SCOPE === 'all' ? 'all' : 'production');
+  } catch (error) {
+    console.error('No fue posible detallar los paquetes auditados:', error);
+    process.exitCode = 2;
   }
   console.log(summary + detailed);
   if (process.env.GITHUB_STEP_SUMMARY) appendFileSync(process.env.GITHUB_STEP_SUMMARY, summary + detailed);
