@@ -404,6 +404,29 @@ with sync_playwright() as playwright:
         assert page.evaluate("document.documentElement.scrollWidth <= window.innerWidth + 2"), ("real detail overflow", width)
 
 
+    # Map: real region totals are zero in the clean test DB, not illustrative heat.
+    regional = page.goto("http://127.0.0.1:3000/mapa", wait_until="networkidle", timeout=60000)
+    assert regional and regional.status == 200
+    assert page.get_by_role("heading", name="Actividad por estado").count() == 1
+    assert page.locator(".regional-cartogram-cell").count() == 24
+    assert page.get_by_role("button", name="Zulia: 0 reportes en 24 horas").count() == 1
+    for label in ("7 días", "30 días", "24 horas"):
+        chosen = page.get_by_role("button", name=label, exact=True)
+        chosen.click()
+        assert chosen.get_attribute("aria-pressed") == "true"
+        assert page.get_by_text("No hay reportes válidos en este periodo").count() == 1
+    page.get_by_role("button", name="Zulia: 0 reportes en 24 horas").click()
+    assert page.get_by_role("button", name="Cerrar selección").count() == 1
+    page.locator("select[name='service']").select_option("cantv")
+    page.get_by_role("button", name="Aplicar filtro").click()
+    page.wait_for_url("**/mapa?service=cantv", timeout=30000)
+    assert page.get_by_text("Servicio: CANTV.", exact=False).count() == 1
+    for width in (320, 390, 768, 1280):
+        page.set_viewport_size({"width": width, "height": 844})
+        assert page.evaluate("document.documentElement.scrollWidth <= window.innerWidth + 2"), ("map horizontal overflow", width)
+    page.set_viewport_size({"width": 390, "height": 844})
+    page.screenshot(path="artifacts/pulsove-regional-map-390.png", full_page=False, animations="disabled")
+
     # Directory favorites use the same browser-local storage as home cards.
     # All directory entries can now be starred, including those not featured.
     directory = page.goto("http://127.0.0.1:3000/servicios", wait_until="networkidle", timeout=60000)
