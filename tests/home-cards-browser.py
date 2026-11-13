@@ -91,7 +91,10 @@ with sync_playwright() as playwright:
     assert quick.count() == 1
     assert quick.get_attribute("href") == "/servicios/cantv#reportar"
     quick.click()
-    assert page.url.endswith("/servicios/cantv#reportar")
+    page.wait_for_url("**/servicios/cantv*", timeout=30000)
+    print("QUICK REPORT TARGET:", page.url, flush=True)
+    assert page.url.split("#")[0].rstrip("/").endswith("/servicios/cantv")
+    assert page.url.split("#")[-1] == "reportar", "Deep link must focus the form section"
     report_section = page.locator("#reportar")
     assert report_section.is_visible()
     assert report_section.get_by_role("heading", name="Reportar una falla de CANTV").count() == 1
