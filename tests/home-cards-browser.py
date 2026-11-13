@@ -274,6 +274,22 @@ with sync_playwright() as playwright:
     assert optional.count() == 1 and not optional.get_attribute("open")
     assert optional.get_by_text("Añadir detalles (opcional)").count() == 1
     assert report_section.locator("button[type='submit']").is_disabled()
+    # Community messages are NOT outage reports. Every submission must
+    # remain pending until a moderator approves it explicitly.
+    community = page.locator("#comentarios")
+    assert community.get_by_role("heading", name="Comentarios de la comunidad").count() == 1
+    assert community.get_by_text("no aumentan el contador de reportes de fallas", exact=False).count() == 1
+    note_form = community.locator("form")
+    assert note_form.locator("textarea[maxlength='500']").count() == 1
+    submit_comment = note_form.get_by_role("button", name="Enviar comentario")
+    assert submit_comment.is_disabled()
+    note_form.locator("textarea").fill("Desde esta mañana tengo interrupciones intermitentes del servicio; vuelve al cabo de unos minutos.")
+    assert submit_comment.is_disabled(), "Privacy acknowledgement must be required"
+    note_form.locator("input[type=checkbox]").check()
+    submit_comment.click()
+    assert community.get_by_role("status").get_by_text("pendiente de revisión", exact=False).count() == 1
+    assert community.locator("ul[aria-label='Comentarios publicados'] li").count() == 0
+
     # Interactive, truthful service detail uses actual PostgreSQL buckets.
     assert page.get_by_role("heading", name="Acerca de la empresa y el servicio").count() == 1
     history = page.locator("section[aria-labelledby='history-chart-title']")
