@@ -16,7 +16,7 @@ function formatUpdatedAt(date: Date) {
 }
 
 const METHODOLOGY_STEPS = [
-  { title: 'Recopilación', text: 'Reportes ciudadanos anónimos y mediciones técnicas automáticas.' },
+  { title: 'Recopilación', text: 'Reportes ciudadanos anónimos y señales técnicas disponibles, cuando existan.' },
   { title: 'Comparación', text: 'Cada ventana se compara contra el comportamiento habitual de ese servicio, no contra un umbral fijo.' },
   { title: 'Validación', text: 'Diversidad de reportantes, persistencia y señales técnicas antes de confiar en una desviación.' },
   { title: 'Publicación del estado', text: 'Un estado prudente, nunca una afirmación categórica sin evidencia suficiente.' },
@@ -35,8 +35,8 @@ export default async function HomePage() {
               Consulta reportes de servicios en Venezuela y plataformas de todo el mundo
             </h1>
             <p className="mt-4 max-w-md text-ink-muted">
-              Reportes ciudadanos anónimos y mediciones técnicas, combinados con un motor
-              estadístico explicable. Independiente de cualquier proveedor.
+              Reportes ciudadanos y señales técnicas cuando están disponibles, interpretados
+              con un motor estadístico explicable. Independiente de cualquier proveedor.
             </p>
 
             <form action="/servicios" className="mt-7 flex max-w-md gap-2">
@@ -64,7 +64,7 @@ export default async function HomePage() {
               </Link>
               <span className="text-ink-muted">·</span>
               <span className="text-ink-muted">
-                Actualizado {formatUpdatedAt(data.generatedAt)}
+                Consulta: {formatUpdatedAt(data.generatedAt)}
               </span>
             </div>
           </div>
@@ -89,7 +89,7 @@ export default async function HomePage() {
                 <dd className="font-mono text-2xl font-medium tabular-nums">{data.totals.incidentsOpen}</dd>
               </div>
               <div>
-                <dt className="text-xs text-ink-muted">Servicios monitoreados</dt>
+                <dt className="text-xs text-ink-muted">Servicios en catálogo</dt>
                 <dd className="font-mono text-2xl font-medium tabular-nums">{data.totals.servicesCount}</dd>
               </div>
               <div>
@@ -100,7 +100,7 @@ export default async function HomePage() {
 
             {data.totals.incidentsOpen === 0 && (
               <p className="mt-5 border-t border-border pt-4 text-sm text-ink-muted">
-                Sin incidentes activos en este momento.
+                Sin incidentes activos registrados en PulsoVE. Esto no garantiza que los servicios estén funcionando.
               </p>
             )}
           </div>
