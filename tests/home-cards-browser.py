@@ -348,7 +348,13 @@ with sync_playwright() as playwright:
     assert page.locator("[data-directory-list] > li").count() >= 200
     for width in (320, 390, 768, 1280):
         page.set_viewport_size({"width": width, "height": 844})
-        assert page.evaluate("document.documentElement.scrollWidth <= innerWidth + 2"), ("directory horizontal overflow", width)
+        overflow = page.evaluate("document.documentElement.scrollWidth - innerWidth")
+        if overflow > 2:
+            offending = page.evaluate("""() => [...document.querySelectorAll('body *')]
+              .filter(el => el.getBoundingClientRect().right > innerWidth + 2)
+              .slice(0, 8).map(el => ({tag: el.tagName, className: String(el.className).slice(0, 120),
+                right: Math.round(el.getBoundingClientRect().right)}))""")
+            raise AssertionError(("directory horizontal overflow", width, overflow, offending))
     page.set_viewport_size({"width": 390, "height": 844})
     page.screenshot(path="artifacts/pulsove-directory-390.png", full_page=False, animations="disabled")
 
