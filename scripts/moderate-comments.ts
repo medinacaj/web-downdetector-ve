@@ -1,3 +1,4 @@
+import 'dotenv/config';
 /**
  * Server-side moderation. Requires DATABASE_URL with write privileges.
  * No public route, admin token in the browser or user-supplied IP is needed.
