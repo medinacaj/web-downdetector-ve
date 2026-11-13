@@ -46,11 +46,13 @@ export function ServiceHistoryChart({
   const [mode, setMode] = useState<ChartMode>('line');
   const [selected, setSelected] = useState(23);
   const [zoomEnabled, setZoomEnabled] = useState(false);
+  const [compareReference, setCompareReference] = useState(false);
   const points = history[period];
   const selectedIndex = Math.max(0, Math.min(points.length - 1, selected));
   const selectedPoint = points[selectedIndex];
   const total = points.reduce((sum, point) => sum + point.reports, 0);
   const maximum = Math.max(0, ...points.map((point) => point.reports));
+  const hasReference = points.some((point) => typeof point.typicalReports === 'number');
   const selectedObservations = observations.filter((item) => incidentInBucket(item.timestamp, selectedPoint));
   const annotatedPoints = points.filter((point) => observations.some((item) => incidentInBucket(item.timestamp, point)));
 
@@ -103,6 +105,21 @@ export function ServiceHistoryChart({
           <dd className="mt-1 font-mono text-xl font-semibold tabular-nums">{annotatedPoints.length}</dd></div>
       </dl>
 
+      <div className="mt-4 flex flex-wrap items-center gap-3">
+        <button type="button" aria-pressed={compareReference && hasReference}
+          disabled={!hasReference || total === 0}
+          title={!hasReference ? 'Aún no hay suficientes muestras históricas procesadas para estimar una referencia' : undefined}
+          onClick={() => setCompareReference((current) => !current)}
+          className="rounded-lg border border-border px-3 py-2 text-xs font-semibold text-ink transition-colors hover:bg-bg disabled:cursor-not-allowed disabled:opacity-50">
+          {compareReference && hasReference ? 'Ocultar referencia habitual' : 'Comparar con actividad habitual'}
+        </button>
+        <p className="max-w-xl text-xs leading-5 text-ink-muted">
+          {hasReference
+            ? 'Referencia estimada mediante medianas de ventanas históricas realmente procesadas.'
+            : 'Referencia histórica aún no disponible: el motor necesita suficientes ventanas procesadas.'}
+        </p>
+      </div>
+
       <div className="mt-5 flex flex-wrap items-center justify-between gap-2">
         <p className="text-xs text-ink-muted">Selecciona un punto para consultar el intervalo y sus incidentes.</p>
         <button type="button" aria-pressed={zoomEnabled} disabled={total === 0}
@@ -143,7 +160,10 @@ export function ServiceHistoryChart({
                 <Tooltip cursor={{ stroke: '#00a994', strokeDasharray: '4 4' }}
                   wrapperStyle={{ outline: 'none' }}
                   contentStyle={{ borderRadius: 12, borderColor: '#64748b', color: '#172033', backgroundColor: '#ffffff', fontSize: 12 }}
-                  formatter={(value) => [Number(value ?? 0).toLocaleString('es-VE'), 'Reportes']}
+                  formatter={(value, name) => [
+                    Number(value ?? 0).toLocaleString('es-VE', { maximumFractionDigits: 1 }),
+                    name === 'Referencia habitual' ? 'Referencia habitual' : 'Reportes',
+                  ]}
                   labelFormatter={(label) => {
                     const found = points.find((point) => point.label === String(label));
                     return found ? intervalLabel(found) : String(label);
@@ -151,6 +171,11 @@ export function ServiceHistoryChart({
                 />
                 {annotatedPoints.map((point) => <ReferenceLine key={point.startIso} x={point.label} stroke="#efad69" strokeDasharray="3 4" strokeOpacity={0.7}/>)}
                 <ReferenceLine x={selectedPoint.label} stroke="#158d81" strokeDasharray="2 3" strokeWidth={2}/>
+                {compareReference && hasReference && (
+                  <Line name="Referencia habitual" type="monotone" dataKey="typicalReports"
+                    stroke="#cb7c2d" strokeWidth={2} strokeDasharray="7 5" dot={false}
+                    activeDot={false} connectNulls={false} isAnimationActive={false} />
+                )}
                 {mode === 'bars' && <Bar dataKey="reports" fill="#16a995" maxBarSize={26} radius={[3, 3, 0, 0]} isAnimationActive={false}/>}
                 {mode === 'area' && <Area type="monotone" dataKey="reports" stroke="#008a79" fill={`url(#fill-${chartId})`} strokeWidth={2.5} isAnimationActive={false}/>}
                 {mode === 'line' && <Line type="monotone" dataKey="reports" stroke="#008a79" strokeWidth={2.5} dot={false} activeDot={{ r: 5 }} isAnimationActive={false}/>}
@@ -211,6 +236,7 @@ export function ServiceHistoryChart({
         Intervalos de 1 hora (24 h) o ventanas consecutivas de 24 horas (7, 30 y 90 días), en hora de Caracas.
         La última ventana puede estar incompleta. Las líneas verticales ámbar identifican fechas con incidentes registrados.
         Esta vista muestra conteos de reportes, no disponibilidad técnica.
+        La referencia habitual es una estimación basada en ventanas previas procesadas: no representa un SLA y omite intervalos sin historial suficiente.
         {' '}<Link href="/metodologia#deteccion" className="font-semibold text-brand-600 underline underline-offset-2 hover:text-brand-700">
           Conoce cómo interpretamos estos reportes.
         </Link>
