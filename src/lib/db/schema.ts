@@ -13,6 +13,7 @@ import {
   uniqueIndex,
   index,
   pgEnum,
+  check,
 } from 'drizzle-orm/pg-core';
 import { sql } from 'drizzle-orm';
 
@@ -168,6 +169,34 @@ export const reports = pgTable(
     serviceCreatedIdx: index('reports_service_created_idx').on(t.serviceId, t.createdAt),
     anonHashIdx: index('reports_anon_hash_idx').on(t.anonymousHash),
     ipPrefixIdx: index('reports_ip_prefix_idx').on(t.ipPrefixHash),
+  }),
+);
+
+// ---------------------------------------------------------------------------
+// Comentarios comunitarios — NO forman parte de los reportes ni de las
+// métricas operativas. Solo son públicos después de aprobación explícita.
+// ---------------------------------------------------------------------------
+export const serviceComments = pgTable(
+  'service_comments',
+  {
+    id: uuid('id').primaryKey().default(sql`gen_random_uuid()`),
+    serviceId: uuid('service_id')
+      .notNull()
+      .references(() => services.id, { onDelete: 'cascade' }),
+    body: varchar('body', { length: 500 }).notNull(),
+    moderationStatus: varchar('moderation_status', { length: 16 }).notNull().default('pending'),
+    anonymousHash: varchar('anonymous_hash', { length: 64 }).notNull(),
+    ipPrefixHash: varchar('ip_prefix_hash', { length: 64 }).notNull(),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+    moderatedAt: timestamp('moderated_at', { withTimezone: true }),
+  },
+  (t) => ({
+    serviceModerationIdx: index('service_comments_public_idx').on(
+      t.serviceId, t.moderationStatus, t.createdAt,
+    ),
+    pendingIdx: index('service_comments_pending_idx').on(t.moderationStatus, t.createdAt),
+    anonRecentIdx: index('service_comments_anon_idx').on(t.anonymousHash, t.createdAt),
+    moderationCheck: check('service_comments_moderation_check', sql`${t.moderationStatus} in ('pending', 'approved', 'rejected')`),
   }),
 );
 
