@@ -7,6 +7,8 @@ import { mkdir, writeFile, copyFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { servicesSeed } from '../src/lib/db/seed-data/services.ts';
 import { categoriesSeed } from '../src/lib/db/seed-data/categories.ts';
+import { issueTypesSeed } from '../src/lib/db/seed-data/issue-types.ts';
+import { statesSeed } from '../src/lib/db/seed-data/states.ts';
 import { HOME_SERVICE_SLUGS, WORLDWIDE_SPOTLIGHT } from '../src/lib/queries/home-trends.ts';
 import { HOME_BRAND_LOGOS, logoForService } from '../src/lib/brand-logos.ts';
 import { MICROSOFT_FEEDS } from '../src/lib/official-status/microsoft-rss.ts';
@@ -39,8 +41,16 @@ const CSS=[
 '.cards{margin:0;padding:0;list-style:none;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px}.card{position:relative;min-width:0;background:var(--card);color:var(--ink);border-radius:18px;box-shadow:0 5px 15px #0003;overflow:hidden}.card:hover{box-shadow:0 9px 25px #0005}',
 '.card-link{display:flex;flex-direction:column;min-height:240px;padding:14px 13px 12px;padding-right:40px}.name{font-size:clamp(13px,1.9vw,17px);font-weight:750;line-height:1.25;min-height:34px;overflow-wrap:anywhere}.category{font-size:10px;color:#64748b;margin-top:4px;line-height:1.3}',
 '.logo-area{flex:1;min-height:93px;display:flex;justify-content:center;align-items:center;padding:14px 0}.logo{display:block;max-width:100%;width:145px;height:75px;object-fit:contain}.monogram{border-radius:17px;background:#dceef3;color:#14546a;font-weight:800;letter-spacing:-1px;font-size:26px;width:70px;height:70px;display:grid;place-items:center}',
+'.logo[hidden],.monogram[hidden]{display:none!important}',
 '.signal{color:#64748b;font-size:10px;line-height:1.3;border-top:1px solid #e2e8f0;padding-top:8px}.dashed{height:17px;border-bottom:2px dashed #9caec1;margin:4px 0 8px}.notice{font-size:10px;color:#59677a}',
 '.star{position:absolute;right:8px;top:8px;z-index:3;background:#eef8ff;color:#028bd1;border:1px solid #d4ecfa;width:35px;height:35px;border-radius:50%;cursor:pointer;font-size:22px;line-height:1}.star[aria-pressed=true]{color:#005a98;background:#d0efff}',
+'.report-quick{display:flex;justify-content:center;align-items:center;width:calc(100% - 20px);margin:0 10px 10px;min-height:40px;background:#0d7378;border:0;border-radius:9px;color:#fff;font-weight:750;font-size:12px;cursor:pointer}.report-quick:hover{background:#07565c}',
+'.report-dialog{border:0;border-radius:17px;padding:22px;width:min(92vw,470px);max-height:85vh;overflow:auto;color:#172033;background:#fff;box-shadow:0 20px 70px #0008}.report-dialog::backdrop{background:#060f1dc9}',
+'.report-dialog h2{font-size:22px;margin:0 0 9px}.report-dialog p{font-size:13px;color:#475569}.report-dialog label{display:block;font-size:13px;font-weight:650;margin-top:13px}',
+'.report-dialog select{display:block;width:100%;min-height:44px;padding:8px;border:1px solid #94a3b8;border-radius:9px;background:#fff;color:#172033;margin-top:5px}',
+'.report-dialog .check{display:flex;align-items:flex-start;gap:9px;font-weight:450}.report-dialog .check input{margin-top:4px}.report-dialog .buttons{display:flex;gap:10px;margin-top:20px}',
+'.report-dialog .buttons button{flex:1;min-height:44px;padding:8px;border-radius:9px;border:1px solid #94a3b8;background:#fff;color:#172033;cursor:pointer}.report-dialog .buttons button[type=submit]{background:#08767a;color:#fff;border-color:#08767a}',
+'.report-dialog .report-feedback{color:#07565c;font-weight:650;margin-top:12px}',
 '.directory{padding-bottom:70px}.filterbar{display:flex;flex-wrap:wrap;gap:10px;margin:22px 0}.filterbar select{min-height:44px;border:0;border-radius:12px;padding:8px 12px;background:#fff;color:#172033;flex:1;max-width:330px}.result{color:#a7c1ce;font-size:13px}',
 '.footer{border-top:1px solid #233647;padding:34px 0 50px;color:#a8b9ce;font-size:12px;margin-top:20px}.credits{max-width:850px;padding:30px 0 70px}.credits a{color:#70e7d4;text-decoration:underline}',
 '.legal{border-radius:14px;border:1px solid #31516a;background:#102331;padding:16px;color:#cde2ed;font-size:13px}.noresults{padding:22px;background:#102331;border:1px solid #31516a;border-radius:12px}',
@@ -61,19 +71,39 @@ function card(s) {
     '<span class="name">'+escape(s.name)+'</span><span class="category">'+escape(s.categoryName)+'</span>'+
     '<span class="logo-area">'+logo+'</span>'+
     '<span class="signal"><span>Actividad: no disponible en la demo</span><span class="dashed" aria-hidden="true"></span>'+
-    '<span class="notice">Sin mediciones en esta versión</span></span></a></li>';
+    '<span class="notice">Sin mediciones en esta versión</span></span></a>'+
+    '<button type="button" class="report-quick" data-report="'+escape(s.slug)+'" aria-label="Reportar falla de '+escape(s.name)+'">Reportar falla</button></li>';
 }
 function header(){
  return '<header class="top"><div class="wrap nav"><a class="brand" href="'+BASE+'/">Pulso<span>VE</span></a>'+
    '<nav class="navlinks" aria-label="Navegación"><a href="'+BASE+'/">Inicio</a><a href="'+BASE+'/servicios/">142 servicios</a><a href="'+BASE+'/creditos-marcas/">Logos y créditos</a></nav></div></header>'+
    '<div class="banner" role="note"><div class="wrap"><strong>VISTA PREVIA PÚBLICA</strong> · Catálogo demostrativo, sin reportes reales ni medición de caídas. La app operativa requiere servidor y base de datos.</div></div>';
 }
+
+const DEMO_REPORT_ISSUES = Object.fromEntries(categoriesSeed.map((category) => [
+  category.slug, issueTypesSeed.filter((issue) =>
+    issue.categorySlug === category.slug || issue.categorySlug === null
+  ).map((issue) => ({slug: issue.slug, name: issue.name}))
+]));
+const REPORT_MODAL = '<dialog id="demo-report-dialog" class="report-dialog" aria-labelledby="demo-report-title">'+
+'<h2 id="demo-report-title">Reportar falla: <span id="demo-report-service"></span></h2>'+
+'<p><strong>Simulación:</strong> esta demo no envía ni almacena reportes. El formulario operativo requiere el servidor de PulsoVE.</p>'+
+'<form id="demo-report-form" method="dialog">'+
+'<label for="demo-issue">Tipo de falla<select id="demo-issue" name="issue" required></select></label>'+
+'<label for="demo-state">Estado de Venezuela<select id="demo-state" name="state" required><option value="">Seleccionar estado</option>'+
+statesSeed.map((state)=>'<option value="'+escape(state.code)+'">'+escape(state.name)+'</option>').join('')+'</select></label>'+
+'<label class="check"><input id="demo-consent" type="checkbox" required>Entiendo que esto es una prueba, sin envío ni almacenamiento de datos.</label>'+
+'<p class="report-feedback" id="demo-report-feedback" role="status" aria-live="polite"></p>'+
+'<div class="buttons"><button type="button" id="demo-report-close">Cancelar</button>'+
+'<button type="submit">Probar reporte (demo)</button></div></form></dialog>';
+
 function layout(title,body,description){
  return '<!DOCTYPE html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">'+
   '<meta name="robots" content="noindex,nofollow"><title>'+escape(title)+' — PulsoVE (demo)</title>'+
   '<meta name="description" content="'+escape(description)+'"><style>'+CSS+'</style></head><body>'+header()+
   '<main id="contenido">'+body+'</main><footer class="footer"><div class="wrap">PulsoVE · Vista previa técnica independiente. Sin datos productivos ni monitoreo en tiempo real. '+
-  '<a href="'+BASE+'/creditos-marcas/">Créditos y marcas</a>.</div></footer><script>'+clientEnhance.toString()+';clientEnhance();</script></body></html>';
+  '<a href="'+BASE+'/creditos-marcas/">Créditos y marcas</a>.</div></footer>'+REPORT_MODAL+
+  '<script>const PREVIEW_ISSUES='+JSON.stringify(DEMO_REPORT_ISSUES).replace(/</g,'\\u003c')+';'+clientEnhance.toString()+';clientEnhance();</script></body></html>';
 }
 function group(title,desc,items,id){
  return '<section class="group" id="'+escape(id)+'"><div class="section-title"><h2>'+escape(title)+'</h2>'+
@@ -160,6 +190,33 @@ function clientEnhance(){
  for(const selector of ['#directory-search','#category-filter','#favorites-only']){
    const field=document.querySelector(selector);field?.addEventListener('input',filterDirectory);field?.addEventListener('change',filterDirectory);
  }
+ const demoDialog=document.querySelector('#demo-report-dialog');
+ const reportForm=document.querySelector('#demo-report-form');
+ const reportIssue=document.querySelector('#demo-issue');
+ const reportResult=document.querySelector('#demo-report-feedback');
+ document.querySelectorAll('button[data-report]').forEach((button)=>button.addEventListener('click',()=>{
+   const item=button.closest('.card');
+   const name=item?.querySelector('.name')?.textContent||button.dataset.report;
+   const issueList=PREVIEW_ISSUES[item?.dataset.category]||[];
+   document.querySelector('#demo-report-service').textContent=name;
+   reportForm.reset();
+   reportResult.textContent='';
+   reportIssue.replaceChildren();
+   for(const issue of issueList){
+     const option=document.createElement('option');
+     option.value=issue.slug;
+     option.textContent=issue.name;
+     reportIssue.append(option);
+   }
+   if(!issueList.length){const fallback=document.createElement('option');fallback.value='otro';fallback.textContent='Otro';reportIssue.append(fallback);}
+   demoDialog.showModal();
+ }));
+ document.querySelector('#demo-report-close')?.addEventListener('click',()=>demoDialog.close());
+ reportForm?.addEventListener('submit',(event)=>{
+   event.preventDefault();
+   if(!reportForm.reportValidity())return;
+   reportResult.textContent='Simulación completada. No se envió ni guardó ningún reporte.';
+ });
  const quick=document.querySelector('#quicksearch');quick?.addEventListener('input',()=>{
    const text=quick.value.toLocaleLowerCase('es').trim();
    document.querySelectorAll('main .card').forEach((el)=>{el.hidden=!!text&&!(el.dataset.name.includes(text)||el.dataset.slug.includes(text))});
