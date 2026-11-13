@@ -101,3 +101,15 @@ Estas imágenes sirven como referencias editoriales de terceros, **no** como ava
 Se añadió un SVG local de [Icons Plus](https://github.com/chouhan-rahul/icons_plus/blob/main/assets/images/logos/video-games/call-of-duty-warzone.svg), biblioteca de iconografía bajo [licencia MIT](https://github.com/chouhan-rahul/icons_plus/blob/main/LICENSE), atribuido a Rahul Chouhan (2022). Es una **ilustración comunitaria del videojuego**, no su logotipo oficial ni una asociación o aval de Activision. Se publica sin recursos remotos y con alternativa tipográfica cuando el archivo falla. Las marcas son propiedad de sus titulares.
 
 La cobertura alcanza **176 de 211 servicios (83,4 %)**, quedando 35 monogramas sin recurso verificado.
+
+## SENIAT, Mercantil y Sistema Patria · noviembre de 2026
+
+Se añadieron tres archivos SVG locales, en `public/brands/`, sin scripts, imágenes embebidas ni solicitudes de recursos externos en el navegador. No se creó ninguna marca inventada.
+
+- **SENIAT:** vector reproducido en el [repositorio de diagramas venezolanos](https://github.com/danielac32/dart_dashboard_backend_ont_v1/blob/2545bcf666a4c818ede714062ea5f07b9abc17ef/Pagina%20web/seniat.svg). La representación corresponde al identificador tipográfico de la autoridad tributaria; la [ficha de Commons](https://commons.wikimedia.org/wiki/File:LogoSENIAT.png) describe su uso como logotipo, atribuido a SENIAT y catalogado como `PD-textlogo`. El archivo SVG proviene del repositorio comunitario, no del sitio oficial.
+- **Mercantil Banco (Venezuela):** recurso vectorial editorial desde [Crom Studio](https://github.com/Crom-Studio-C-A/Crom-Studio/blob/main/imagenes/logos/banco-mercantil.svg). Referencia de la marca en [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Banco_Mercantil.svg). No debe confundirse con la entidad bancaria brasileña del mismo nombre.
+- **Sistema Patria:** ilustración de la aplicación vinculada **vePatria**, de [Lawnicons](https://github.com/LawnchairLauncher/lawnicons/blob/develop/svgs/vepatria.svg), con licencia [Apache-2.0 de la biblioteca](https://github.com/LawnchairLauncher/lawnicons/blob/develop/LICENSE). Es un **icono comunitario de la aplicación**, no se presenta como el logo oficial del portal patria.org.ve.
+
+Las marcas pertenecen a sus titulares, sin afiliación ni aval de PulsoVE. Los archivos se cargan como recursos propios y conservan el monograma como alternativa si falla la imagen.
+
+**Cobertura actualizada: 179/211 servicios (84,8 %); 32 restantes con monograma.** El objetivo sigue siendo emplear representaciones auténticas y legales, sin sustituir símbolos de empresas distintas.
