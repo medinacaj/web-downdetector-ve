@@ -30,7 +30,7 @@ describe('Local brand logo inventory', () => {
         expect(bytes.subarray(0, 8).toString('hex')).toBe('89504e470d0a1a0a');
       } else {
         const svg = bytes.toString('utf8');
-        expect(svg.startsWith('<svg '), slug).toBe(true);
+        expect(svg, slug).toMatch(/^<svg\s/);
         expect(svg).toContain('</svg>');
         expect(svg, slug).not.toMatch(/<script\b|<foreignObject\b|<image\b|<iframe\b|\bon[a-z]+\s*=|\b(?:href|xlink:href)\s*=|@import|url\(\s*['"]?\s*https?:/i);
       }
