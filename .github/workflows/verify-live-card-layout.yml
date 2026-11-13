@@ -1,0 +1,45 @@
+name: Verify public PulsoVE card geometry after release
+on:
+  push:
+    branches: ['verify/public-layout-c197b5f-20261112']
+permissions:
+  contents: read
+jobs:
+  public-layout:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify live URLs, catalogue version and merge commit
+        run: |
+          set -euo pipefail
+          base='https://medinacaj.github.io/web-downdetector-ve'
+          for attempt in $(seq 1 12); do
+            curl -fsSL --max-time 20 "$base/build-info.txt" -o /tmp/pulsove-info || true
+            if grep -q 'source-commit=c197b5fd8491256c9473f1895a1ec5991087ed67' /tmp/pulsove-info; then break; fi
+            sleep 5
+          done
+          grep -q 'catalogue=211' /tmp/pulsove-info
+          grep -q 'source-commit=c197b5fd8491256c9473f1895a1ec5991087ed67' /tmp/pulsove-info
+          curl -fsSL --max-time 20 "$base/" -o /tmp/pulsove-index
+          grep -q 'grid-auto-rows:1fr' /tmp/pulsove-index
+          grep -q 'card-actions' /tmp/pulsove-index
+          grep -q 'Ejemplo visual · datos simulados' /tmp/pulsove-index
+          curl -fsSL --max-time 20 "$base/servicios/" -o /tmp/pulsove-directory
+          grep -q '211 servicios' /tmp/pulsove-directory
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install Playwright using runner Chrome
+        run: |
+          command -v google-chrome || command -v google-chrome-stable || command -v chromium
+          python -m pip install --disable-pip-version-check playwright==1.56.0
+      - name: Inspect published layout, search and preview modal in Chrome
+        run: python tests/verify-live-card-layout.py
+      - name: Preserve published screenshots across breakpoints
+        uses: actions/upload-artifact@v4
+        with:
+          name: pulsove-public-card-layout-320-390-768-1280
+          path: artifacts/pulsove-card-layout-*.png
+          if-no-files-found: error
+          retention-days: 7
