@@ -12,6 +12,7 @@ import { statesSeed } from '../src/lib/db/seed-data/states.ts';
 import { HOME_SERVICE_SLUGS, WORLDWIDE_SPOTLIGHT } from '../src/lib/queries/home-trends.ts';
 import { HOME_BRAND_LOGOS, logoForService } from '../src/lib/brand-logos.ts';
 import { MICROSOFT_FEEDS } from '../src/lib/official-status/microsoft-rss.ts';
+import { getServiceProfile } from '../src/lib/catalog/service-profiles.ts';
 
 const BASE='/web-downdetector-ve';
 const OUTPUT='pages-global-demo';
@@ -28,6 +29,8 @@ if(catalog.length!==211||new Set(catalog.map((s)=>s.slug)).size!==catalog.length
 for(const slug of ['cloudflare','gmail','outlook','fortnite'])if(!bySlug.has(slug))throw Error('Missing '+slug);
 
 const CSS=[
+'.service-detail{padding:26px 0 66px}.breadcrumbs{color:#a8b9ce;font-size:13px;margin:8px 0 22px}.breadcrumbs a{text-decoration:underline;text-underline-offset:3px}.profile-hero{display:grid;gap:18px;align-items:center;border:1px solid #31516a;border-radius:20px;background:#112331;padding:24px}.profile-hero h1{font-size:clamp(28px,4vw,45px);line-height:1.12;margin:4px 0 12px}.profile-hero p{color:#c1d3de;margin:0;max-width:750px}.profile-logo{width:116px;height:110px;border-radius:20px;background:#fff;color:#14546a;display:flex;align-items:center;justify-content:center;padding:14px}.profile-logo .logo{height:82px;width:100%;max-width:100%;object-fit:contain}.profile-logo .monogram{width:78px;height:78px}.profile-tags{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}.profile-tags span{display:inline-block;padding:6px 11px;border:1px solid #356077;border-radius:100px;color:#d7f5f0;background:#1a3745;font-size:12px}.profile-grid{display:grid;gap:14px;grid-template-columns:minmax(0,1fr);margin-top:20px}.profile-panel{border:1px solid #294458;border-radius:16px;background:#11202d;padding:20px;min-width:0}.profile-panel h2{margin:0 0 12px;font-size:21px}.profile-panel h3{font-size:14px;margin:0 0 6px;color:#a8cbd6}.profile-panel p{margin:0 0 13px;color:#b9ccd8;font-size:14px}.profile-value{font-weight:700;color:#fff;font-size:17px}.profile-note{font-size:12px!important;color:#97b5c5!important}.profile-chart{width:100%;margin:14px 0 8px;border:1px solid #31495f;border-radius:13px;background:#0e1c29;padding:18px}.profile-chart svg{display:block;width:100%;height:200px;color:#76e9d7}.profile-incident{padding:13px;border:1px dashed #536e7f;border-radius:10px;color:#c5dae6}.profile-back{display:inline-block;margin-top:22px;padding:12px 18px;border-radius:11px;background:#176d73;color:#fff;font-weight:700}.profile-back:hover{background:#0f888f}',
+'@media(min-width:760px){.profile-hero{grid-template-columns:130px minmax(0,1fr);padding:30px}.profile-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.profile-wide{grid-column:1/-1}}',
 ':root{color-scheme:light;--bg:#090d13;--card:#fff;--ink:#172033;--muted:#64748b;--cyan:#00c2a8}',
 '*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;font:15px/1.55 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;color:#e8edf5;background:var(--bg)}',
 'a{color:inherit;text-decoration:none}button,input,select{font:inherit}a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--cyan);outline-offset:3px}',
@@ -91,7 +94,7 @@ function card(s) {
     '<div class="card-actions" role="group" aria-label="Acciones de '+escape(s.name)+'">'+
     '<button type="button" class="report-quick" data-report="'+escape(s.slug)+'" aria-label="Reportar falla de '+escape(s.name)+'" title="Reportar falla de '+escape(s.name)+'"><span aria-hidden="true">!</span></button>'+
     '<button type="button" class="star" data-fav="'+escape(s.slug)+'" aria-pressed="false" aria-label="Añadir '+escape(s.name)+' a favoritos">☆</button></div>'+
-    '<a class="card-link" href="'+BASE+'/servicios/?s='+encodeURIComponent(s.slug)+'" aria-label="Ver ficha de '+escape(s.name)+'">'+
+    '<a class="card-link" href="'+BASE+'/servicios/'+encodeURIComponent(s.slug)+'/'+'" aria-label="Ver ficha de '+escape(s.name)+'">'+
     '<span class="card-header"><span class="name">'+escape(s.name)+'</span><span class="category">'+escape(s.categoryName)+'</span></span>'+
     '<span class="logo-area">'+logo+'</span>'+
     '<span class="signal"><span class="demo-label">Ejemplo visual · datos simulados</span>'+illustrativeSparkline(s.slug)+
@@ -170,6 +173,39 @@ const dirBody='<div class="wrap directory"><div class="hero"><div class="eyebrow
 '<ul class="cards" id="directory-cards">'+catalog.map(card).join('')+'</ul>'+
 '<p class="noresults" id="empty-result" hidden>No se encontraron servicios con estos filtros.</p></div>';
 const directoryHtml=layout('Directorio global de servicios',dirBody,'Directorio demostrativo de '+catalog.length+' plataformas, servicios cloud, correo y juegos.');
+
+
+/** Every catalogued service has a directly accessible, static, noindex profile. */
+function serviceDetailHtml(s){
+  const profile=getServiceProfile({slug:s.slug,categoryName:s.categoryName,description:s.description});
+  const mark=s.logo
+    ? '<img class="logo" src="'+BASE+escape(s.logo)+'" alt="Logo de '+escape(s.name)+'" onerror="this.hidden=true;this.nextElementSibling.hidden=false"><span class="monogram" hidden>'+escape(monogram(s.name))+'</span>'
+    : '<span class="monogram">'+escape(monogram(s.name))+'</span>';
+  const tags=profile.tags.map((tag)=>'<span>'+escape(tag)+'</span>').join('');
+  const body='<div class="wrap service-detail">'+
+    '<nav class="breadcrumbs" aria-label="Ruta de navegación"><a href="'+BASE+'/">Inicio</a> / <a href="'+BASE+'/servicios/">Servicios</a> / '+escape(s.name)+'</nav>'+
+    '<section class="profile-hero" aria-labelledby="profile-name">'+
+      '<div class="profile-logo">'+mark+'</div><div><p class="eyebrow">'+escape(profile.type)+'</p>'+
+      '<h1 id="profile-name">'+escape(s.name)+'</h1><p>'+escape(profile.description)+'</p>'+
+      '<div class="profile-tags" aria-label="Etiquetas de la plataforma">'+tags+'</div></div></section>'+
+    '<div class="profile-grid">'+
+      '<section class="profile-panel"><h2>Ficha de la plataforma</h2>'+
+        '<h3>Proveedor o fabricante</h3><p class="profile-value">'+escape(profile.provider||'Por verificar')+'</p>'+
+        '<h3>Tipo de servicio</h3><p class="profile-value">'+escape(profile.type)+'</p>'+
+        '<p class="profile-note">Información editorial orientativa. La identificación no supone afiliación con PulsoVE.</p></section>'+
+      '<section class="profile-panel"><h2>Estado y alcance</h2>'+
+        '<p class="profile-value">Sin datos reales suficientes</p>'+
+        '<p>Esta versión de GitHub Pages es una demostración estática. No consulta servidores de terceros ni recoge reportes ciudadanos.</p>'+
+        '<p class="profile-note">No es un indicador de funcionamiento, disponibilidad, incidentes ni tiempo en línea.</p></section>'+
+      '<section class="profile-panel profile-wide"><h2>Gráfica detallada de reportes</h2>'+
+        '<p>Diseño de ejemplo de la gráfica. <strong>Todos los puntos son ficticios y determinísticos</strong>, no representan reportes ni incidentes.</p>'+
+        '<div class="profile-chart">'+illustrativeSparkline(s.slug)+'</div>'+
+        '<p class="profile-note">Ejemplo visual · datos simulados. El histórico real de 24 horas, 7 días y 30 días requiere la aplicación conectada a PostgreSQL.</p></section>'+
+      '<section class="profile-panel profile-wide"><h2>Historial de incidentes</h2>'+
+        '<div class="profile-incident">No hay historial de incidentes verificable en esta demo. La ausencia de registros no significa que el servicio haya funcionado sin fallas.</div></section>'+
+    '</div><a class="profile-back" href="'+BASE+'/servicios/">Volver a los 211 servicios</a></div>';
+  return layout('Ficha de '+s.name,body,'Ficha demostrativa de '+s.name+': proveedor, categoría y visualización de ejemplo sin datos operativos.');
+}
 
 const credits=Object.entries(HOME_BRAND_LOGOS).map(([slug,path])=>'<li><strong>'+escape(bySlug.get(slug)?.name||slug)+
  '</strong> · archivo local '+escape(path)+' · Fuente de iconografía: '+(path.endsWith('.svg')?'Simple Icons (CC0 sobre el gráfico; marcas registradas reservadas)':'Wikimedia Commons (consultar derechos y licencia en la ficha original)')+'</li>').join('');
@@ -265,6 +301,11 @@ await Promise.all([
  writeFile(join(OUTPUT,'.nojekyll'),''),
  writeFile(join(OUTPUT,'build-info.txt'),'mode=synthetic-public-demo\ncatalogue='+catalog.length+'\nsource-commit='+(process.env.GITHUB_SHA||'local')+'\n')
 ]);
+await Promise.all(catalog.map(async (service)=>{
+  const folder=join(OUTPUT,'servicios',service.slug);
+  await mkdir(folder,{recursive:true});
+  await writeFile(join(folder,'index.html'),serviceDetailHtml(service));
+}));
 for(const path of Object.values(HOME_BRAND_LOGOS)){
   const filename=path.slice(1);
   await mkdir(join(OUTPUT,'brands'),{recursive:true});

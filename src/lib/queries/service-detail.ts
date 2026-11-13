@@ -3,6 +3,7 @@ import { db } from '@/lib/db/client';
 import { issueTypes, reports, incidents, states } from '@/lib/db/schema';
 import { getServiceBySlug } from './services';
 import { getServiceStatusDetail } from './status';
+import { getServiceHistory } from './service-history';
 
 /** Tipos de problema de la categoría del servicio + los transversales (category_id null). */
 export async function getIssueTypesForCategory(categoryId: string) {
@@ -17,9 +18,10 @@ export async function getServiceDetailData(slug: string) {
   const service = await getServiceBySlug(slug);
   if (!service || !service.active) return null;
 
-  const [statusDetail, issueTypeOptions, issueBreakdown, recentIncidents] = await Promise.all([
+  const [statusDetail, issueTypeOptions, issueBreakdown, recentIncidents, history] = await Promise.all([
     getServiceStatusDetail(service.id),
     getIssueTypesForCategory(service.category.id),
+    getServiceHistory(service.id),
     db
       .select({ name: issueTypes.name, count: sql<number>`count(${reports.id})::int` })
       .from(reports)
@@ -57,5 +59,5 @@ export async function getServiceDetailData(slug: string) {
 
   const allStates = await db.select({ code: states.code, name: states.name }).from(states).orderBy(states.name);
 
-  return { service, statusDetail, issueTypeOptions, issueBreakdown, recentIncidents, affectedStates, allStates };
+  return { service, statusDetail, issueTypeOptions, issueBreakdown, recentIncidents, affectedStates, allStates, history };
 }

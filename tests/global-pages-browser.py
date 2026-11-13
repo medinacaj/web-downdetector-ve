@@ -129,6 +129,27 @@ with sync_playwright() as playwright:
     page.locator("#directory-search").fill("")
     page.locator("#category-filter").select_option("videojuegos")
     assert page.locator("#directory-cards .card:visible").count() >= 20
+    # Every service card should open a full independent profile, not filter the directory.
+    page.locator("#directory-search").fill("")
+    page.locator("#category-filter").select_option("")
+    page.locator("#directory-cards .card[data-slug='outlook'] .card-link").click()
+    assert page.url.endswith("/web-downdetector-ve/servicios/outlook/")
+    assert page.get_by_role("heading", name="Outlook", exact=True).count() == 1
+    assert "Microsoft" in page.locator(".profile-panel").first.inner_text()
+    assert page.get_by_text("Historial de incidentes").count() == 1
+    assert page.locator(".profile-chart svg").count() == 1
+    assert "datos simulados" in page.locator(".profile-panel.profile-wide").first.inner_text()
+    for width in (320, 390, 768, 1280):
+        page.set_viewport_size({"width": width, "height": 844})
+        assert page.evaluate("document.documentElement.scrollWidth <= window.innerWidth + 2"), ("detail overflow", width)
+    page.get_by_role("link", name="Volver a los 211 servicios").click()
+    assert page.url.endswith("/web-downdetector-ve/servicios/")
+    assert page.locator("#directory-cards .card").count() == 211
+    page.goto(ROOT + "servicios/cloudflare/", wait_until="networkidle")
+    assert page.get_by_role("heading", name="Cloudflare", exact=True).count() == 1
+    assert "Cloudflare, Inc." in page.locator(".profile-panel").first.inner_text()
+    assert "Sin datos reales suficientes" in page.locator(".profile-panel").nth(1).inner_text()
+    assert page.locator(".profile-tags span").count() >= 3
     assert remote == [], "Demo must not request third-party hosts"
     print("PASS: 211 services; logos exclusive with fallback, 211 quick-report modal actions, simulated form without backend, responsive cards and no external requests")
     browser.close()

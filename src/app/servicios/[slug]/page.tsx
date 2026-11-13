@@ -1,8 +1,12 @@
 import type { Metadata } from 'next';
+import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { getServiceDetailData } from '@/lib/queries/service-detail';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { ReportForm } from '@/components/service/ReportForm';
+import { BrandMark } from '@/components/home/BrandMark';
+import { ServiceHistoryChart } from '@/components/service/ServiceHistoryChart';
+import { getServiceProfile } from '@/lib/catalog/service-profiles';
 
 function formatDateTime(date: Date | null) {
   if (!date) return null;
@@ -33,7 +37,7 @@ export async function generateMetadata({
   return {
     title: `Estado de ${data.service.name} en Venezuela`,
     alternates: { canonical: `/servicios/${encodeURIComponent(data.service.slug)}` },
-    description: `Consulta reportes ciudadanos, incidentes y estado actual de ${data.service.name} (${data.service.category.name}) en Venezuela.`,
+    description: `${data.service.name}: ${data.service.description || data.service.category.name}. Consulta reportes e incidentes registrados, sin confundirlos con disponibilidad confirmada.`,
   };
 }
 
@@ -42,63 +46,59 @@ export default async function ServiceDetailPage({ params }: { params: Promise<{ 
   const data = await getServiceDetailData(slug);
   if (!data) notFound();
 
-  const { service, statusDetail, issueTypeOptions, issueBreakdown, recentIncidents, affectedStates, allStates } = data;
+  const { service, statusDetail, issueTypeOptions, issueBreakdown, recentIncidents, affectedStates, allStates, history } = data;
+  const profile = getServiceProfile({slug: service.slug, categoryName: service.category.name, description: service.description});
 
   return (
-    <div className="mx-auto max-w-4xl px-4 py-10 sm:px-6">
-      {/* Cabecera */}
-      <div className="border-b border-border pb-6">
-        <p className="text-sm text-ink-muted">{service.category.name}</p>
-        <div className="mt-1 flex flex-wrap items-center justify-between gap-3">
-          <h1 className="font-display text-2xl font-semibold tracking-tight sm:text-3xl">{service.name}</h1>
-          <StatusBadge status={statusDetail.status} />
+    <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
+      {/* Ficha editorial y estado, independientes de las mediciones. */}
+      <nav aria-label="Ruta de navegación" className="mb-5 text-sm text-ink-muted">
+        <Link href="/servicios" className="underline underline-offset-2 hover:text-ink">Todos los servicios</Link>
+        <span aria-hidden="true" className="px-2">/</span>{service.name}
+      </nav>
+      <header className="rounded-xl border border-border bg-surface p-5 sm:p-7">
+        <div className="flex flex-wrap items-start gap-5 sm:flex-nowrap">
+          <div className="h-24 w-28 shrink-0 rounded-xl border border-border bg-white p-2">
+            <BrandMark slug={service.slug} name={service.name} categorySlug={service.category.slug} />
+          </div>
+          <div className="min-w-0 flex-1">
+            <p className="text-xs font-semibold uppercase tracking-wide text-ink-muted">{profile.type}</p>
+            <div className="mt-1 flex flex-wrap items-center gap-3">
+              <h1 className="font-display text-2xl font-semibold tracking-tight sm:text-3xl">{service.name}</h1>
+              <StatusBadge status={statusDetail.status} />
+            </div>
+            <p className="mt-3 max-w-3xl text-sm leading-relaxed text-ink-muted">{profile.description}</p>
+            <div className="mt-4 flex flex-wrap gap-2" aria-label="Etiquetas">
+              {profile.tags.map((tag) => <span key={tag} className="rounded-full border border-border bg-bg px-3 py-1 text-xs text-ink-muted">{tag}</span>)}
+            </div>
+          </div>
+          <a href="#reportar" className="shrink-0 rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-700 focus-visible:outline-red-500">
+            ! Reportar falla
+          </a>
         </div>
 
-        {service.description && <p className="mt-2 max-w-xl text-sm text-ink-muted">{service.description}</p>}
-
-        <dl className="mt-4 flex flex-wrap gap-x-8 gap-y-2 text-sm">
-          {statusDetail.confidence !== null && (
-            <div>
-              <dt className="inline text-ink-muted">Confianza: </dt>
-              <dd className="inline font-mono tabular-nums">{Math.round(statusDetail.confidence)}/100</dd>
-            </div>
-          )}
-          {statusDetail.lastUpdated && (
-            <div>
-              <dt className="inline text-ink-muted">Actualizado: </dt>
-              <dd className="inline">{formatDateTime(statusDetail.lastUpdated)}</dd>
-            </div>
-          )}
-          {statusDetail.officiallyConfirmed && (
-            <div className="font-medium text-status-incident">Confirmado por el proveedor</div>
-          )}
+        <dl className="mt-6 grid gap-3 border-t border-border pt-5 text-sm sm:grid-cols-2 lg:grid-cols-4">
+          <div><dt className="text-xs text-ink-muted">Empresa / proveedor</dt>
+            <dd className="mt-1 font-semibold">{profile.provider ?? 'Por verificar'}</dd></div>
+          <div><dt className="text-xs text-ink-muted">Tipo de plataforma</dt>
+            <dd className="mt-1 font-semibold">{profile.type}</dd></div>
+          <div><dt className="text-xs text-ink-muted">Confianza del estado</dt>
+            <dd className="mt-1 font-semibold">{statusDetail.confidence === null ? 'Sin datos suficientes' : Math.round(statusDetail.confidence) + '/100'}</dd></div>
+          <div><dt className="text-xs text-ink-muted">Última señal procesada</dt>
+            <dd className="mt-1 font-semibold">{formatDateTime(statusDetail.lastUpdated) ?? 'Sin registros'}</dd></div>
         </dl>
-
-        {service.officialUrl && (
-          <a
-            href={service.officialUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="mt-2 inline-block text-sm text-brand-600 underline-offset-2 hover:underline"
-          >
-            Sitio oficial ↗
-          </a>
-        )}
-
-        {service.isDemo && (
-          <p className="mt-3 inline-block rounded border border-border px-2 py-0.5 text-xs text-ink-muted">
-            Datos demostrativos
-          </p>
-        )}
-
-        {/* Apuestas y loterías: la revisión legal profesional está pendiente (CLAUDE.md,
-            docs/CATALOGO-SERVICIOS.md). Se aclara que PulsoVE no promueve ni valida. */}
+        {statusDetail.officiallyConfirmed && <p className="mt-4 text-sm font-semibold text-status-incident">Incidente confirmado por el proveedor.</p>}
+        {service.officialUrl && <a href={service.officialUrl} target="_blank" rel="noopener noreferrer" className="mt-4 inline-block text-sm text-brand-600 underline-offset-2 hover:underline">Visitar sitio oficial verificado</a>}
+        {service.isDemo && <p className="mt-4 rounded-md border border-border px-3 py-2 text-xs text-ink-muted">Servicio del catálogo demostrativo: no confirma que PulsoVE disponga de mediciones técnicas de este proveedor.</p>}
         {service.category.slug === 'apuestas-y-loterias' && (
-          <p className="mt-3 max-w-xl rounded border border-border bg-surface px-3 py-2 text-xs text-ink-muted">
-            PulsoVE solo informa la disponibilidad técnica de este servicio. Incluirlo aquí no es una promoción ni
-            confirma que esté autorizado.
+          <p className="mt-3 rounded border border-border bg-bg px-3 py-2 text-xs text-ink-muted">
+            PulsoVE solo informa de disponibilidad técnica. Su inclusión no promueve ni confirma autorización del servicio.
           </p>
         )}
+      </header>
+
+      <div className="mt-6">
+        <ServiceHistoryChart serviceName={service.name} history={history} />
       </div>
 
       {/* Reportar */}
