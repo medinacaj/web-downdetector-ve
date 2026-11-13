@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { combineWeightedSignals, reliabilityFactor } from '../src/lib/engine/anomaly';
+import { combineWeightedSignals, officialSignalEligible, reliabilityFactor } from '../src/lib/engine/anomaly';
 
 describe('combineWeightedSignals', () => {
   it('con todas las señales disponibles, aplica los pesos tal cual (sección 9.4)', () => {
@@ -49,5 +49,31 @@ describe('reliabilityFactor (confianza según tamaño de muestra de la línea ba
   it('nunca excede 1.0 ni baja de 0', () => {
     expect(reliabilityFactor(1000)).toBeLessThanOrEqual(1.0);
     expect(reliabilityFactor(0)).toBeGreaterThanOrEqual(0);
+  });
+});
+
+describe('evidencia oficial: nunca inferir verificación de un borrador', () => {
+  const windowStart = new Date('2026-11-13T19:00:00.000Z');
+  const today = new Date('2026-11-13T17:00:00.000Z');
+
+  it('rechaza un comunicado sin verificar aunque sea reciente', () => {
+    expect(officialSignalEligible(today, null, windowStart)).toBe(false);
+  });
+
+  it('rechaza una verificación posterior al intervalo analizado', () => {
+    expect(officialSignalEligible(today, new Date('2026-11-13T19:01:00Z'), windowStart)).toBe(false);
+  });
+
+  it('rechaza publicaciones futuras y anteriores a 24 horas', () => {
+    expect(officialSignalEligible(new Date('2026-11-13T19:01:00Z'), today, windowStart)).toBe(false);
+    expect(officialSignalEligible(new Date('2026-11-12T18:59:59Z'), today, windowStart)).toBe(false);
+  });
+
+  it('acepta solo una actualización verificada y publicada en la ventana válida', () => {
+    expect(officialSignalEligible(today, new Date('2026-11-13T18:30:00Z'), windowStart)).toBe(true);
+  });
+
+  it('rechaza fechas inválidas sin elevar el puntaje', () => {
+    expect(officialSignalEligible(new Date('invalid'), today, windowStart)).toBe(false);
   });
 });
