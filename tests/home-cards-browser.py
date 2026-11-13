@@ -341,6 +341,10 @@ with sync_playwright() as playwright:
     assert comment_link.get_attribute("href") == "#comentarios"
     community = page.locator("#comentarios")
     assert community.get_by_role("heading", name="Comentarios de la comunidad").count() == 1
+    # Removal is a server-only operator action, never an unauthenticated
+    # API method that lets visitors erase comments belonging to others.
+    denied_remove = page.request.delete("http://127.0.0.1:3000/api/services/cantv/comments")
+    assert denied_remove.status == 405, ("Anonymous comment deletion must not be exposed", denied_remove.status)
     assert community.get_by_text("no aumentan el contador de reportes de fallas", exact=False).count() == 1
     note_form = community.locator("form")
     assert note_form.locator("textarea[maxlength='500']").count() == 1
