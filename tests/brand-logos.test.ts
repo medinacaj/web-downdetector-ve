@@ -99,6 +99,16 @@ describe('Local brand logo inventory', () => {
     }
   });
 
+  it('tracks the non-official Warzone gaming illustration with its MIT source', () => {
+    const path = logoForService('call-of-duty-warzone');
+    expect(path).toBe('/brands/call-of-duty-warzone.svg');
+    const credit = brandLogoSource('call-of-duty-warzone', path!);
+    expect(credit.provider).toContain('Icons Plus');
+    expect(credit.url).toContain('/call-of-duty-warzone.svg');
+    expect(credit.licenseUrl).toContain('/LICENSE');
+    expect(isAdditionalLogo('call-of-duty-warzone')).toBe(true);
+  });
+
   it('keeps an honest fallback for missing/unchecked brands', () => {
     expect(logoForService('seniat')).toBeNull();
     expect(logoForService('no-existe')).toBeNull();
