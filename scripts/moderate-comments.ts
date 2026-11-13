@@ -1,19 +1,23 @@
 import 'dotenv/config';
 /**
- * Server-side moderation. Requires DATABASE_URL with write privileges.
- * No public route, admin token in the browser or user-supplied IP is needed.
+ * Server-only moderation. Requires a verified operator with DATABASE_URL.
+ * No public deletion endpoint or client-side administrator credentials.
  *
- * npm run comments:moderate -- list
+ * npm run comments:moderate -- list [pending|approved|rejected]
  * npm run comments:moderate -- approve <UUID>
  * npm run comments:moderate -- reject <UUID>
+ * npm run comments:moderate -- remove <UUID> --confirm
+ * npm run comments:moderate -- prune [--confirm]
  */
 import { and, asc, eq } from 'drizzle-orm';
 import { db } from '../src/lib/db/client';
 import { auditLogs, serviceComments, services } from '../src/lib/db/schema';
+import { parseCommentModerationCommand } from '../src/lib/comments/moderation-policy';
+import { pruneStaleServiceComments, removeServiceComment } from '../src/lib/comments/moderation-operations';
 
 async function main() {
-  const [command, id] = process.argv.slice(2);
-  if (command === 'list' && !id) {
+  const command = parseCommentModerationCommand(process.argv.slice(2));
+  if (command.action === 'list') {
     const rows = await db.select({
       id: serviceComments.id,
       service: services.name,
@@ -22,27 +26,39 @@ async function main() {
     })
       .from(serviceComments)
       .innerJoin(services, eq(services.id, serviceComments.serviceId))
-      .where(eq(serviceComments.moderationStatus, 'pending'))
+      .where(eq(serviceComments.moderationStatus, command.status))
       .orderBy(asc(serviceComments.createdAt))
       .limit(30);
-    for (const row of rows) {
-      process.stdout.write(JSON.stringify(row) + '\n');
-    }
-    process.stdout.write('Pendientes mostrados: ' + rows.length + '\n');
+    for (const row of rows) process.stdout.write(JSON.stringify(row) + '\n');
+    process.stdout.write(command.status + ' mostrados: ' + rows.length + '\n');
     return;
   }
 
-  if ((command !== 'approve' && command !== 'reject') ||
-      !id || !/^[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}$/i.test(id)) {
-    throw new Error('Uso: comments:moderate -- list | approve <UUID> | reject <UUID>');
+  if (command.action === 'remove') {
+    const removed = await removeServiceComment(command.id);
+    if (!removed) throw new Error('Comentario no encontrado.');
+    process.stdout.write('Comentario ' + command.id + ': retirado y auditado\n');
+    return;
   }
 
-  const status = command === 'approve' ? 'approved' : 'rejected';
+  if (command.action === 'prune') {
+    const result = await pruneStaleServiceComments({ confirm: command.confirm });
+    process.stdout.write(JSON.stringify(result) + '\n');
+    if (result.dryRun) {
+      process.stdout.write('Simulación: no se ha eliminado nada. Revisa los resultados y usa --confirm.\n');
+    }
+    if (result.matched >= result.batchLimit) {
+      process.stdout.write('Puede haber más comentarios antiguos; ejecuta nuevamente tras revisar.\n');
+    }
+    return;
+  }
+
+  const status = command.action === 'approve' ? 'approved' : 'rejected';
   const updated = await db.transaction(async (tx) => {
     const rows = await tx.update(serviceComments)
       .set({ moderationStatus: status, moderatedAt: new Date() })
       .where(and(
-        eq(serviceComments.id, id),
+        eq(serviceComments.id, command.id),
         eq(serviceComments.moderationStatus, 'pending'),
       ))
       .returning({ id: serviceComments.id });
@@ -50,13 +66,13 @@ async function main() {
     await tx.insert(auditLogs).values({
       action: 'comment_' + status,
       entity: 'service_comment',
-      entityId: id,
+      entityId: command.id,
       after: { moderationStatus: status },
     });
     return true;
   });
   if (!updated) throw new Error('Comentario no encontrado o ya moderado.');
-  process.stdout.write('Comentario ' + id + ': ' + status + '\n');
+  process.stdout.write('Comentario ' + command.id + ': ' + status + '\n');
 }
 
 main().catch((error) => {

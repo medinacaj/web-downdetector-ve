@@ -23,11 +23,27 @@ No existe una ruta pública para aprobar comentarios ni un administrador con cre
 ```bash
 npm run db:migrate:deploy
 npm run comments:moderate -- list
+npm run comments:moderate -- list approved
+npm run comments:moderate -- list rejected
 npm run comments:moderate -- approve <UUID>
 npm run comments:moderate -- reject <UUID>
+npm run comments:moderate -- remove <UUID> --confirm
+npm run comments:moderate -- prune
+npm run comments:moderate -- prune --confirm
 ```
 
 Las aprobaciones y rechazos se registran en `audit_logs`. El comando solo modifica filas pendientes y admite un UUID exacto. Revisar el texto antes de aprobar, particularmente por posibles datos personales o declaraciones sobre terceros. No ejecutar el comando desde navegadores públicos. Si no hay personal disponible para moderar, no promover la publicación de los mensajes: permanecerán pendientes.
+
+### Retiro de publicaciones y retención de pendientes
+
+Si un visitante solicita el retiro de un comentario o un moderador detecta contenido inapropiado, el operador debe identificar el UUID correcto con `list approved` y ejecutar **`remove <UUID> --confirm`**. El texto, el hash anónimo y el hash de red se eliminan de la tabla; el log de auditoría guarda únicamente el ID, servicio, estado previo y el hecho de la eliminación, **nunca el contenido del mensaje ni sus identificadores pseudónimos**. La operación es irreversible. No existe un endpoint público de borrado ni un sistema de cuentas para verificar automáticamente la autoría: una petición debe tramitarse y comprobarse manualmente por el equipo responsable.
+
+Política de limpieza que se puede ejecutar desde el servidor:
+- Los comentarios `pending` con más de **30 días** y `rejected` con más de **7 días** son candidatos a eliminación.
+- Los comentarios `approved` **no se eliminan automáticamente**; pueden retirarse individualmente mediante `remove`.
+- `prune` sin bandera **solo muestra** el total de candidatos, sin borrar datos. `prune --confirm` elimina hasta **100** comentarios antiguos por ejecución y registra cada eliminación en `audit_logs`, sin conservar texto ni hashes.
+- La limpieza **no se ejecuta sola**: un operador debe programarla y revisarla en un entorno con acceso seguro a la base de datos. Repetir la ejecución si se alcanzó el límite de 100.
+- No hay portal de solicitudes ni identidad verificada de autores; antes de abrir la función públicamente, definir un canal real de contacto para solicitudes de retiro y un procedimiento de comprobación de cada petición.
 
 ## Despliegue
 
@@ -35,4 +51,4 @@ La migración `drizzle/0002_service_comments.sql` se aplica **antes** de despleg
 
 ## Limitaciones
 
-Versión inicial: no incluye respuestas, votos, avatares ni notificaciones. No existe borrado autoservicio ni flujo público de apelación; deberán añadirse antes de ampliar la exposición de contenido. El control antiabuso puede ser eludido por actores sofisticados; la moderación previa sigue siendo obligatoria.
+Versión inicial: no incluye respuestas, votos, avatares ni notificaciones. No existe borrado autoservicio ni flujo público de apelación: el retiro ahora es posible mediante comando auditado del operador; antes de ampliar la exposición debe existir un canal de solicitudes atendido por responsables. El control antiabuso puede ser eludido por actores sofisticados; la moderación previa sigue siendo obligatoria.
