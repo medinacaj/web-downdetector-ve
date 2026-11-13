@@ -32,7 +32,7 @@ with sync_playwright() as playwright:
     assert page.locator("main .card .notice").count() == 0, "No repeated disclaimer beneath each chart"
     assert page.locator(".banner").count() == 1, "One global static-preview disclosure"
     assert page.locator("#nube .card .name").first.is_visible()
-    assert page.locator("#nube .card .card-cta").first.is_visible()
+    assert page.locator("main .card .card-cta").count() == 0, "No redundant Ver detalles CTA"
     assert page.locator("#nube .card .card-actions").first.is_visible()
     # The removed decoration is the colored line, not radius or shadow.
     borderless = page.locator("#nube .card").first
@@ -51,6 +51,13 @@ with sync_playwright() as playwright:
         assert appearance["border"] == "0px", ("No colored top border", appearance)
         assert appearance["radius"] == "13px", ("Restore softly rounded cards", appearance)
         assert appearance["shadow"] != "none", ("Restore restrained depth", appearance)
+        link = card.locator(":scope > a.card-link")
+        assert link.count() == 1
+        assert link.evaluate("(el) => getComputedStyle(el, '::after').position") == "absolute"
+        assert link.evaluate("(el) => getComputedStyle(el, '::after').cursor") == "pointer"
+        assert card.locator(":scope > .card-actions").evaluate("(el) => getComputedStyle(el).pointerEvents") == "none"
+        for button in card.locator(":scope > .card-actions button").all():
+            assert button.evaluate("(el) => getComputedStyle(el).pointerEvents") == "auto"
     hero = page.locator(".wrap.hero").first
     assert hero.evaluate("(el) => getComputedStyle(el).borderTopWidth") == "0px"
     assert hero.evaluate("(el) => getComputedStyle(el).borderTopLeftRadius") == "16px"
@@ -258,7 +265,14 @@ with sync_playwright() as playwright:
     # Every service card should open a full independent profile, not filter the directory.
     page.locator("#directory-search").fill("")
     page.locator("#category-filter").select_option("")
-    page.locator("#directory-cards .card[data-slug='outlook'] .card-link").click()
+    outlook = page.locator("#directory-cards .card[data-slug='outlook']")
+    outlook.scroll_into_view_if_needed()
+    # Footer's empty left side must be an active detail link, not dead space.
+    # Its dedicated report/favorite buttons must remain independent.
+    footer_box = outlook.locator(":scope > .card-actions").bounding_box()
+    assert footer_box is not None
+    page.mouse.click(footer_box["x"] + 8, footer_box["y"] + footer_box["height"] / 2)
+    page.wait_for_url("**/web-downdetector-ve/servicios/outlook/", timeout=30000)
     assert page.url.endswith("/web-downdetector-ve/servicios/outlook/")
     assert page.get_by_role("heading", name="Outlook", exact=True).count() == 1
     assert "Microsoft" in page.locator(".profile-panel").first.inner_text()
