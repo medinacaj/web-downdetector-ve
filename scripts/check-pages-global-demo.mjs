@@ -29,7 +29,11 @@ const profiles = readdirSync(join(root,'servicios'),{withFileTypes:true}).filter
 if(profiles.length!==211)throw Error('Expected 211 individually generated service pages, got '+profiles.length);
 for(const entry of profiles){
   const detail=html(join('servicios',entry.name,'index.html'));
-  if(!detail.includes('Ficha de la plataforma')||!detail.includes('Proveedor o fabricante')||!detail.includes('Tipo de servicio')||
+  if(!detail.includes('Acerca de la empresa y el servicio')||!detail.includes('Principales usos y productos')||
+     !detail.includes('id="demo-range"')||!detail.includes('id="demo-mode"')||
+     !detail.includes('id="detail-chart"')||!detail.includes('id="demo-point"')||
+     !detail.includes('demoChartInteraction()')||
+     !detail.includes('Ficha de la plataforma')||!detail.includes('Proveedor o fabricante')||!detail.includes('Tipo de servicio')||
      !detail.includes('Historial de incidentes')||!detail.includes('Gráfica detallada de reportes')||
      !detail.includes('datos simulados')||!detail.includes('noindex,nofollow'))
     throw Error('Service page lacks essential disclosure or details: '+entry.name);
@@ -43,6 +47,8 @@ for(const entry of profiles){
 for(const slug of ['cloudflare','gmail','outlook','fortnite']){
   const page=html(join('servicios',slug,'index.html'));
   if(!page.includes('id="profile-name"')||!page.includes('class="profile-tags"')) throw Error('Missing branded profile for '+slug);
+  if(!page.includes('Consultar la fuente')||!page.includes('https://')||!page.includes('Sin datos reales suficientes'))
+    throw Error('Curated company information missing for '+slug);
 }
 if(!homepage.includes('Nube e infraestructura')||!homepage.includes('Videojuegos y plataformas de juego'))
   throw Error('Global homepage sections absent');

@@ -133,6 +133,26 @@ with sync_playwright() as playwright:
     assert optional.count() == 1 and not optional.get_attribute("open")
     assert optional.get_by_text("Añadir detalles (opcional)").count() == 1
     assert report_section.locator("button[type='submit']").is_disabled()
+    # Interactive, truthful service detail uses actual PostgreSQL buckets.
+    assert page.get_by_role("heading", name="Acerca de la empresa y el servicio").count() == 1
+    history = page.locator("section[aria-labelledby='history-chart-title']")
+    assert history.count() == 1
+    assert history.get_by_role("button", name="90d").count() == 1
+    assert history.get_by_role("button", name="Barras").count() == 1
+    assert history.get_by_role("button", name="Área").count() == 1
+    assert history.get_by_text("Sin reportes registrados en este periodo").count() == 1
+    history.get_by_role("button", name="90d").click()
+    assert history.get_by_role("button", name="90d").get_attribute("aria-pressed") == "true"
+    assert history.locator("select option").count() == 90
+    history.get_by_role("button", name="Barras").click()
+    assert history.get_by_role("button", name="Barras").get_attribute("aria-pressed") == "true"
+    history.get_by_role("button", name="7d").click()
+    assert history.locator("select option").count() == 7
+    assert history.get_by_text("Sin observaciones de incidentes registrados").count() == 1
+    for width in (320, 390, 768, 1280):
+        page.set_viewport_size({"width": width, "height": 844})
+        assert page.evaluate("document.documentElement.scrollWidth <= window.innerWidth + 2"), ("real detail overflow", width)
+
 
     print("Mobile cards responsive; quick report links to real protected service form; optional fields collapsed; favorites persist.")
     browser.close()

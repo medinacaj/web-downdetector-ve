@@ -1,9 +1,10 @@
-import { and, desc, eq, isNull, or, sql } from 'drizzle-orm';
+import { and, desc, eq, gte, isNull, or, sql } from 'drizzle-orm';
 import { db } from '@/lib/db/client';
 import { issueTypes, reports, incidents, states } from '@/lib/db/schema';
 import { getServiceBySlug } from './services';
 import { getServiceStatusDetail } from './status';
 import { getServiceHistory } from './service-history';
+import { historyLowerBound } from './service-history-series';
 
 /** Tipos de problema de la categoría del servicio + los transversales (category_id null). */
 export async function getIssueTypesForCategory(categoryId: string) {
@@ -18,7 +19,7 @@ export async function getServiceDetailData(slug: string) {
   const service = await getServiceBySlug(slug);
   if (!service || !service.active) return null;
 
-  const [statusDetail, issueTypeOptions, history, issueBreakdown, recentIncidents] = await Promise.all([
+  const [statusDetail, issueTypeOptions, history, issueBreakdown, recentIncidents, timelineIncidents] = await Promise.all([
     getServiceStatusDetail(service.id),
     getIssueTypesForCategory(service.category.id),
     getServiceHistory(service.id),
@@ -46,6 +47,19 @@ export async function getServiceDetailData(slug: string) {
       .where(eq(incidents.serviceId, service.id))
       .orderBy(desc(incidents.startedAt))
       .limit(10),
+    db
+      .select({
+        id: incidents.id,
+        status: incidents.status,
+        startedAt: incidents.startedAt,
+        summary: incidents.summary,
+        severity: incidents.severity,
+        officiallyConfirmed: incidents.officiallyConfirmed,
+      })
+      .from(incidents)
+      .where(and(eq(incidents.serviceId, service.id), gte(incidents.startedAt, historyLowerBound(new Date()))))
+      .orderBy(desc(incidents.startedAt))
+      .limit(100),
   ]);
 
   const affectedStates = await db
@@ -59,5 +73,5 @@ export async function getServiceDetailData(slug: string) {
 
   const allStates = await db.select({ code: states.code, name: states.name }).from(states).orderBy(states.name);
 
-  return { service, statusDetail, issueTypeOptions, issueBreakdown, recentIncidents, affectedStates, allStates, history };
+  return { service, statusDetail, issueTypeOptions, issueBreakdown, recentIncidents, timelineIncidents, affectedStates, allStates, history };
 }

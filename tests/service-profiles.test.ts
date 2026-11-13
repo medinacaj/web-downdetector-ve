@@ -18,6 +18,9 @@ describe('service editorial profile', () => {
       expect(profile.provider).toBe(provider);
       expect(profile.tags.length).toBeGreaterThan(1);
       expect(profile.description.length).toBeGreaterThan(10);
+      expect(profile.companyOverview.length).toBeGreaterThan(140);
+      expect(profile.mainUses.length).toBeGreaterThan(2);
+      expect(profile.sourceUrl).toMatch(/^https:\/\//);
     }
   });
   it('uses a transparent fallback rather than guessing unknown providers', () => {
@@ -25,6 +28,9 @@ describe('service editorial profile', () => {
     expect(p.provider).toBeNull();
     expect(p.type).toBe('Servicios');
     expect(p.tags).toEqual(['Servicios']);
+    expect(p.sourceUrl).toBeNull();
+    expect(p.companyOverview).toMatch(/pendiente de verificación/);
+    expect(p.mainUses).toHaveLength(1);
     expect(p.description).toMatch(/pendiente de verificar/);
   });
   it('can produce a profile for every catalogue item without losing category', () => {
@@ -35,6 +41,8 @@ describe('service editorial profile', () => {
       const p = getServiceProfile({ slug: service.slug, categoryName: categoryName!, description: service.description });
       expect(p.type).toBe(categoryName);
       expect(p.tags).toContain(categoryName);
+      expect(p.companyOverview.length).toBeGreaterThan(60);
+      expect(p.monitoringContext.length).toBeGreaterThan(60);
     }
   });
 });
