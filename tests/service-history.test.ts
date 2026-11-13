@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
-  historyLowerBound, incidentInBucket, toServiceHistory,
+  historyIndexFromLabel, historyLowerBound, incidentInBucket, toServiceHistory,
 } from '../src/lib/queries/service-history-series';
 
 describe('service chart history in real hour buckets', () => {
@@ -49,6 +49,16 @@ describe('service chart history in real hour buckets', () => {
       }
     }
     expect(historyLowerBound(now)).toEqual(at(90 * 24 - 1));
+  });
+
+  it('selects real absolute buckets by label even after the visible range moves', () => {
+    const h = toServiceHistory([], now);
+    const points = h['90d'];
+    const viewportStart = 60; // Brush can render only a subset of all buckets.
+    expect(historyIndexFromLabel(points, points[viewportStart].label)).toBe(viewportStart);
+    expect(historyIndexFromLabel(points, points[89].label)).toBe(89);
+    expect(historyIndexFromLabel(points, 'invalid-label')).toBe(-1);
+    expect(historyIndexFromLabel(points, undefined)).toBe(-1);
   });
 
   it('assigns actual incident timestamps to precisely one interval', () => {
