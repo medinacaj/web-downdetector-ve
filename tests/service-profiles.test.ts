@@ -72,6 +72,27 @@ describe('service editorial profile', () => {
     }
   });
 
+  it('includes verified company context for Inter and Mercantil without inventing uptime', () => {
+    const cases = [
+      ['inter', 'blog.inter.com.ve'],
+      ['mercantil', 'mercantilbanco.com'],
+    ];
+    for (const [slug, domain] of cases) {
+      const item = servicesSeed.find((service) => service.slug === slug);
+      expect(item, slug).toBeDefined();
+      const profile = getServiceProfile({
+        slug,
+        categoryName: 'Servicios en Venezuela',
+        description: item!.description,
+      });
+      expect(profile.provider, slug).toBeTruthy();
+      expect(profile.companyOverview.length, slug).toBeGreaterThan(220);
+      expect(profile.mainUses, slug).toHaveLength(4);
+      expect(profile.sourceUrl, slug).toContain(domain);
+      expect(profile.companyOverview, slug).not.toMatch(/pendiente de verificación/i);
+    }
+  });
+
   it('uses a transparent fallback rather than guessing unknown providers', () => {
     const p = getServiceProfile({ slug: 'unknown-service', categoryName: 'Servicios', description: null });
     expect(p.provider).toBeNull();
