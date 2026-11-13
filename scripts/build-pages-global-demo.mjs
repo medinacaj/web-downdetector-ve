@@ -125,7 +125,7 @@ function card(s) {
 }
 function header(){
  return '<header class="top"><div class="wrap nav"><a class="brand" href="'+BASE+'/">Pulso<span>VE</span></a>'+
-   '<nav class="navlinks" aria-label="Navegación"><a href="'+BASE+'/">Inicio</a><a href="'+BASE+'/servicios/">'+catalog.length+' servicios</a><a href="'+BASE+'/creditos-marcas/">Logos y créditos</a></nav>'+
+   '<nav class="navlinks" aria-label="Navegación"><a href="'+BASE+'/">Inicio</a><a href="'+BASE+'/servicios/">Servicios</a></nav>'+
    '<button type="button" id="theme-toggle" class="theme-toggle" aria-label="Cambiar a modo oscuro" title="Cambiar a modo oscuro" aria-pressed="false"><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79Z"/></svg></button></div></header>';
 }
 
@@ -150,8 +150,15 @@ function layout(title,body,description){
  return '<!DOCTYPE html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">'+
   '<meta name="robots" content="noindex,nofollow"><title>'+escape(title)+' — PulsoVE</title>'+
   '<meta name="description" content="'+escape(description)+'"><style>'+CSS+'</style></head><body>'+header()+
-  '<main id="contenido">'+body+'</main><footer class="footer"><div class="wrap">PulsoVE · Gráficos ilustrativos, no indicadores de disponibilidad actual. '+
-  '<a href="'+BASE+'/creditos-marcas/">Créditos y marcas</a>.</div></footer>'+REPORT_MODAL+
+  '<main id="contenido">'+body+'</main><footer class="footer" id="ayuda"><div class="wrap footer-content">'+
+  '<section class="footer-help" aria-labelledby="footer-help-title"><h2 id="footer-help-title">Ayuda · Cómo usar PulsoVE</h2>'+
+  '<ol class="footer-steps"><li><strong>Busca</strong><span>Elige tu internet, banco, juego o aplicación.</span></li>'+
+  '<li><strong>Revisa</strong><span>Abre su ficha y consulta la información y gráficos disponibles.</span></li>'+
+  '<li><strong>Reporta</strong><span>Accede al formulario mediante el botón rojo de cada servicio.</span></li></ol>'+
+  '</section><nav class="footer-links" aria-label="Enlaces de ayuda"><a href="'+BASE+'/servicios/">Servicios</a>'+
+  '<a href="'+BASE+'/creditos-marcas/">Logos y créditos</a></nav>'+
+  '<p class="footer-note">PulsoVE · Los gráficos ilustrativos no muestran disponibilidad actual. El formulario de esta versión no envía reportes.</p>'+
+  '</div></footer>'+REPORT_MODAL+
   '<script>const PREVIEW_ISSUES='+JSON.stringify(DEMO_REPORT_ISSUES).replace(/</g,'\\u003c')+';'+clientEnhance.toString()+';clientEnhance();'+demoChartInteraction.toString()+';demoChartInteraction();</script></body></html>';
 }
 function group(title,desc,items,id){
