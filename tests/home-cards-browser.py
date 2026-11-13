@@ -286,8 +286,13 @@ with sync_playwright() as playwright:
     note_form.locator("textarea").fill("Desde esta mañana tengo interrupciones intermitentes del servicio; vuelve al cabo de unos minutos.")
     assert submit_comment.is_disabled(), "Privacy acknowledgement must be required"
     note_form.locator("input[type=checkbox]").check()
-    submit_comment.click()
-    assert community.get_by_role("status").get_by_text("pendiente de revisión", exact=False).count() == 1
+    with page.expect_response(lambda response: response.request.method == "POST" and
+                              response.url.endswith("/api/services/cantv/comments"), timeout=20000) as pending_response:
+        submit_comment.click()
+    response = pending_response.value
+    assert response.status == 201, ("Comment submission", response.status, response.text())
+    community.get_by_role("status").wait_for(state="visible", timeout=15000)
+    assert "pendiente de revisión" in community.get_by_role("status").inner_text().lower()
     assert community.locator("ul[aria-label='Comentarios publicados'] li").count() == 0
 
     # Interactive, truthful service detail uses actual PostgreSQL buckets.
