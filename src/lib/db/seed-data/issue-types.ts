@@ -86,4 +86,18 @@ export const issueTypesSeed = [
   { slug: "checkout-fallido", name: "Pago o checkout fallido", categorySlug: "comercio-global" },
   // Transversal (sin categoría fija)
   { slug: 'otro', name: 'Otro', categorySlug: null },
+
+  // Reporte ciudadano genérico por categorías ampliadas.
+  { slug: 'reservas-no-disponibles', name: 'No se puede reservar o consultar', categorySlug: 'viajes-y-turismo' },
+  { slug: 'check-in-fallido', name: 'Problema de acceso o check-in', categorySlug: 'viajes-y-turismo' },
+  { slug: 'farmacia-no-carga', name: 'Portal o aplicación sin acceso', categorySlug: 'salud-y-farmacias' },
+  { slug: 'compra-farmacia-fallida', name: 'Problemas con pedidos o compras', categorySlug: 'salud-y-farmacias' },
+  { slug: 'rastreo-envio-no-disponible', name: 'Seguimiento de envíos no disponible', categorySlug: 'logistica-y-envios' },
+  { slug: 'registro-envio-fallido', name: 'Problema con solicitud o gestión de envíos', categorySlug: 'logistica-y-envios' },
+  { slug: 'conexion-vpn-fallida', name: 'Conexión segura no disponible', categorySlug: 'seguridad-y-privacidad' },
+  { slug: 'autenticacion-seguridad-fallida', name: 'No se puede autenticar o acceder', categorySlug: 'seguridad-y-privacidad' },
+  { slug: 'curso-no-disponible', name: 'No se puede acceder al contenido', categorySlug: 'educacion-y-contenidos' },
+  { slug: 'aula-virtual-fallida', name: 'Plataforma educativa sin acceso', categorySlug: 'educacion-y-contenidos' },
+  { slug: 'pronostico-no-disponible', name: 'Pronóstico o consulta sin respuesta', categorySlug: 'clima-y-datos' },
+  { slug: 'datos-meteorologicos-no-cargan', name: 'Información no se actualiza', categorySlug: 'clima-y-datos' },
 ] as const;
