@@ -11,7 +11,7 @@ const NAV_LINKS = [ROUTE.services, ROUTE.map, ROUTE.incidents, ROUTE.statistics,
 export function Header() {
   return (
     <header className="pulsove-header sticky top-0 z-40 border-b border-border bg-bg/95 backdrop-blur supports-[backdrop-filter]:bg-bg/85">
-      <div className="mx-auto flex h-[54px] max-w-6xl items-center gap-2 px-3 sm:h-[56px] sm:gap-3 sm:px-6">
+      <div className="mx-auto flex h-[54px] max-w-6xl items-center gap-2 px-3 sm:h-[54px] sm:gap-3 sm:px-6">
         <Link href="/" className="pulsove-brand flex shrink-0 items-center gap-1.5" aria-label="PulsoVE — Inicio">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
             <path
