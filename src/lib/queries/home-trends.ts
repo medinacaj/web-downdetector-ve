@@ -36,19 +36,47 @@ export function sparklinePolyline(counts: readonly number[], width = 300, height
   }).join(' ');
 }
 
+/**
+ * A rapid increase in *distinct, non-suspicious* citizen reports is a
+ * discovery signal, NOT a verified outage. Compare the last 30 minutes to
+ * the average half-hour across the preceding two hours.
+ */
+export interface ReportSurgeWindow {
+  recent30m: number;
+  previous2h: number;
+  uniqueReporters30m: number;
+}
+
+export function reportSurgeScore(input: ReportSurgeWindow): number {
+  const recent = Number.isFinite(input.recent30m) ? Math.max(0, Math.trunc(input.recent30m)) : 0;
+  const past = Number.isFinite(input.previous2h) ? Math.max(0, Math.trunc(input.previous2h)) : 0;
+  const unique = Number.isFinite(input.uniqueReporters30m)
+    ? Math.max(0, Math.trunc(input.uniqueReporters30m))
+    : 0;
+  const previousAverage = past / 4;
+  if (recent < 4 || unique < 3 || unique / recent < 0.3) return 0;
+  if (recent < previousAverage * 1.8 || recent < previousAverage + 3) return 0;
+  return Math.round((recent - previousAverage) * (unique / recent) * 100) / 100;
+}
+
 /** Curated order applies only when all services have zero recent reports. */
 export const HOME_SERVICE_SLUGS = [
   'cantv', 'movistar', 'digitel', 'movilnet', 'corpoelec', 'banco-de-venezuela',
   'banesco', 'mercantil', 'whatsapp', 'instagram', 'sistema-patria', 'seniat',
 ] as const;
 
-export function pickFeaturedServices<T extends { slug: string; reportsLast24h: number; name: string }>(
-  services: readonly T[],
-  limit = 12,
-): T[] {
+export function pickFeaturedServices<T extends {
+  slug: string;
+  reportsLast24h: number;
+  name: string;
+  surgeScore?: number;
+}>(services: readonly T[], limit = 12): T[] {
   const priority = new Map<string, number>(HOME_SERVICE_SLUGS.map((slug, index) => [slug, index]));
   return [...services].sort((a, b) =>
-    (b.reportsLast24h - a.reportsLast24h)
+    // Proven recent accelerations rise first, even if a much bigger service
+    // has a higher *total* count but no unusual change in the last 30 min.
+    ((b.surgeScore ?? 0) - (a.surgeScore ?? 0))
+    || (b.reportsLast24h - a.reportsLast24h)
     || ((priority.get(a.slug) ?? Number.MAX_SAFE_INTEGER) - (priority.get(b.slug) ?? Number.MAX_SAFE_INTEGER))
     || a.name.localeCompare(b.name, 'es')
   ).slice(0, limit);
