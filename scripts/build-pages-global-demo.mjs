@@ -100,7 +100,7 @@ function illustrativeSparkline(slug){
     points.push((5+i*12.08).toFixed(1)+','+Math.max(5,Math.min(43,y)).toFixed(1));
   }
   return '<svg class="demo-chart" viewBox="0 0 300 48" preserveAspectRatio="none" role="img" '+
-    'aria-label="Gráfico ficticio de demostración de '+escape(slug)+'; no representa incidentes reales">'+
+    'aria-label="Gráfico ilustrativo de '+escape(slug)+'; no representa incidentes reales">'+
     '<line x1="4" y1="43" x2="296" y2="43" stroke="currentColor" opacity=".17"/>'+
     '<polyline fill="none" stroke="currentColor" stroke-width="2.8" stroke-linejoin="round" stroke-linecap="round" points="'+points.join(' ')+'"/>'+
     '</svg>';
@@ -239,15 +239,15 @@ function serviceDetailHtml(s){
         '<h3>Tipo de servicio</h3><p class="profile-value">'+escape(profile.type)+'</p>'+
         '<p class="profile-note">Información editorial orientativa. La identificación no supone afiliación con PulsoVE.</p></section>'+
       '<section class="profile-panel"><h2>Estado y alcance</h2>'+
-        '<p class="profile-value">Sin datos reales suficientes</p>'+
-        '<p>Esta versión de GitHub Pages es una demostración estática. No consulta servidores de terceros ni recoge reportes ciudadanos.</p>'+
-        '<p class="profile-note">No es un indicador de funcionamiento, disponibilidad, incidentes ni tiempo en línea.</p></section>'+
+        '<p class="profile-value">Estado actual no consultado</p>'+
+        '<p>Comprueba la fuente oficial del proveedor para consultar su estado actual.</p>'+
+        '<p class="profile-note">La ausencia de reportes no confirma disponibilidad.</p></section>'+
       '<section class="profile-panel profile-wide"><h2>Acerca de la empresa y el servicio</h2>'+
         '<p class="profile-about">'+escape(profile.companyOverview)+'</p>'+
         '<h3>Principales usos y productos</h3><ul class="profile-list">'+uses+'</ul>'+source+
         '<h3>Qué significa un reporte aquí</h3><p>'+escape(profile.monitoringContext)+'</p></section>'+
       '<section class="profile-panel profile-wide"><h2>Gráfica detallada de reportes</h2>'+
-        '<p><strong>Explorador interactivo de DEMOSTRACIÓN.</strong> Todos los valores y fechas son ejemplos inventados y etiquetados; NO son reportes, incidentes, métricas de disponibilidad ni datos históricos de usuarios.</p>'+
+        '<p class="profile-note">Gráfico ilustrativo, sin reportes ni métricas reales de disponibilidad.</p>'+
         '<div class="chart-controls">'+
           '<label for="demo-range">Rango temporal<select id="demo-range"><option value="24h">24 horas</option><option value="7d">7 días</option><option value="30d">30 días</option><option value="90d">90 días</option></select></label>'+
           '<label for="demo-mode">Tipo de gráfico<select id="demo-mode"><option value="linea">Línea</option><option value="area">Área</option><option value="barras">Barras</option></select></label>'+
@@ -257,12 +257,12 @@ function serviceDetailHtml(s){
         '<div class="profile-chart chart-shell"><svg id="detail-chart" data-service="'+escape(s.slug)+'" viewBox="0 0 920 315" preserveAspectRatio="none" tabindex="0" role="img" aria-label="Gráfico ficticio interactivo: mueve el puntero, haz clic o utiliza las flechas para seleccionar un intervalo"></svg>'+
           '<div class="chart-readout" id="demo-chart-readout" aria-live="polite">Seleccione un periodo o mueva el puntero por la gráfica.</div></div>'+
         '<aside class="chart-observation" aria-label="Observaciones del intervalo seleccionado"><strong id="demo-observation-date">Observaciones por fecha</strong>'+
-          '<p id="demo-observation-text">Selecciona un intervalo para ver una anotación ilustrativa. No se han registrado incidentes en esta demo.</p></aside>'+
-        '<p class="profile-note">Ejemplo visual · datos simulados. La aplicación operativa permite explorar conteos auténticos y observaciones basadas en incidentes registrados.</p></section>'+
+          '<p id="demo-observation-text">Selecciona una fecha para consultar una anotación ilustrativa.</p></aside>'+
+        '</section>'+
       '<section class="profile-panel profile-wide"><h2>Historial de incidentes</h2>'+
-        '<div class="profile-incident">No hay historial de incidentes verificable en esta demo. La ausencia de registros no significa que el servicio haya funcionado sin fallas.</div></section>'+
+        '<div class="profile-incident">Sin historial verificado disponible. No es posible confirmar que el servicio haya funcionado sin interrupciones.</div></section>'+
     '</div><a class="profile-back" href="'+BASE+'/servicios/">Volver a los 211 servicios</a></div>';
-  return layout('Ficha de '+s.name,body,'Ficha demostrativa de '+s.name+': empresa, usos y gráfico interactivo de ejemplo sin datos operativos.');
+  return layout('Ficha de '+s.name,body,'Información de '+s.name+': empresa, principales usos y gráfico ilustrativo.');
 }
 
 const credits=Object.entries(HOME_BRAND_LOGOS).map(([slug,path])=>{
@@ -480,8 +480,8 @@ function demoChartInteraction(){
    noteDate.textContent='Intervalo ilustrativo: '+point.date+' UTC';
    const marks=new Set([Math.floor(points.length*0.28),Math.floor(points.length*0.72)]);
    noteText.textContent=marks.has(selected)
-     ? 'Anotación ficticia: cambio de la curva de ejemplo para demostrar el sistema de observaciones. No representa una falla ni un comunicado del proveedor.'
-     : 'Sin observaciones reales en esta demostración. Seleccione otra fecha para explorar valores de ejemplo; la app operativa vincula incidentes registrados.';
+     ? 'Cambio ilustrativo en la curva. No representa una falla confirmada.'
+     : 'Sin observaciones verificadas para esta fecha.';
    render();
  }
  function render(){
@@ -518,7 +518,7 @@ function demoChartInteraction(){
      pieces.push('<text x="'+x(tickIndex).toFixed(2)+'" y="283" text-anchor="middle" fill="#b0c3d1" font-size="12">'+points[tickIndex].label+'</text>');
    }
    svg.innerHTML=pieces.join('');
-   readout.textContent=points[active].date+' UTC · '+points[active].value+' puntos FICTICIOS (solo demostración)';
+   readout.textContent=points[active].date+' UTC · '+points[active].value+' puntos ilustrativos';
  }
  function reset(){
    points=synth(range.value);
