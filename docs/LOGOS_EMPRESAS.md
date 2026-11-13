@@ -29,3 +29,10 @@ Se añaden 20 iconos vectoriales de marcas como Cloudflare, Gmail, Fortnite, Dis
 **Autoría de las representaciones SVG:** colaboradores de [Simple Icons](https://github.com/simple-icons/simple-icons), disponibles bajo [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/) para los gráficos distribuidos en el proyecto. Las **marcas y logotipos pertenecen a sus titulares**: estar en PulsoVE no implica asociación, patrocinio o certificado de disponibilidad. Las referencias específicas de cada icono figuran en [la página pública de créditos](/creditos-marcas).
 
 Las plataformas para las que no existe un recurso de uso verificable, como Outlook y Minecraft en esta ampliación, usan un identificador tipográfico propio, no una representación falsa del logo oficial. El catálogo es de interés internacional, pero el motor de reportes de PulsoVE continúa centrado en Venezuela.
+
+
+## Incorporación adicional de 21 marcas · noviembre 2026
+
+Se añadieron íconos locales de Signal, WeChat, Bluesky, Figma, Apple Music, Crunchyroll, Dota 2, Uber, Railway, Render, Fastly, MongoDB, SoundCloud, Deezer, Airbnb, Wise, Etsy, LINE, Mastodon, Trello y Asana. Se copiaron los SVG de rutas simples verificados en [Simple Icons](https://github.com/simple-icons/simple-icons), se comprobaron contra scripts, imágenes activas y referencias externas, y se añadieron a la lista permitida. En total hay **50** archivos de marca autohospedados.
+
+Los gráficos distribuidos por Simple Icons usan licencia CC0 para la representación, pero **las marcas comerciales conservan sus derechos**. [La página de créditos](/creditos-marcas) contiene enlaces individuales. Las tarjetas muestran exclusivamente el logo disponible y un monograma solo si falla o no existe.
