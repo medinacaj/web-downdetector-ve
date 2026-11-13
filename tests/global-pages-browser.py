@@ -77,8 +77,8 @@ with sync_playwright() as playwright:
 
     response = page.goto(ROOT + "servicios/", wait_until="networkidle")
     assert response and response.status == 200
-    assert page.locator("#directory-cards .card").count() == 142
-    assert page.locator("#directory-cards button[data-report]").count() == 142
+    assert page.locator("#directory-cards .card").count() == 211
+    assert page.locator("#directory-cards button[data-report]").count() == 211
     page.locator("#directory-search").fill("outlook")
     assert page.locator("#directory-cards .card:visible").count() == 1
     assert page.locator("#directory-cards .card:visible .name").inner_text() == "Outlook"
@@ -86,5 +86,5 @@ with sync_playwright() as playwright:
     page.locator("#category-filter").select_option("videojuegos")
     assert page.locator("#directory-cards .card:visible").count() >= 20
     assert remote == [], "Demo must not request third-party hosts"
-    print("PASS: 142 services; logos exclusive with fallback, 142 quick-report modal actions, simulated form without backend, responsive cards and no external requests")
+    print("PASS: 211 services; logos exclusive with fallback, 142 quick-report modal actions, simulated form without backend, responsive cards and no external requests")
     browser.close()
