@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { FAVORITES_KEY, parseFavoriteSlugs, toggleFavorite } from '@/lib/favorites';
+import { FAVORITES_CHANGE_EVENT, FAVORITES_KEY, parseFavoriteSlugs, toggleFavorite } from '@/lib/favorites';
 
 export function FavoriteButton({ slug, name, inline = false }: { slug: string; name: string; inline?: boolean }) {
   const [isFavorite, setIsFavorite] = useState(false);
@@ -13,7 +13,11 @@ export function FavoriteButton({ slug, name, inline = false }: { slug: string; n
     };
     read();
     window.addEventListener('storage', read);
-    return () => window.removeEventListener('storage', read);
+    window.addEventListener(FAVORITES_CHANGE_EVENT, read);
+    return () => {
+      window.removeEventListener('storage', read);
+      window.removeEventListener(FAVORITES_CHANGE_EVENT, read);
+    };
   }, [slug]);
 
   const onToggle = () => {
@@ -22,6 +26,9 @@ export function FavoriteButton({ slug, name, inline = false }: { slug: string; n
       const updated = toggleFavorite(current, slug);
       localStorage.setItem(FAVORITES_KEY, JSON.stringify(updated));
       setIsFavorite(updated.includes(slug));
+      // The storage event is not fired in this document. Keep repeated
+      // cards for a service synchronized without another tab or reload.
+      window.dispatchEvent(new Event(FAVORITES_CHANGE_EVENT));
     } catch {
       // Private browsing/blocked storage: a local UI toggle still works.
       setIsFavorite((value) => !value);
