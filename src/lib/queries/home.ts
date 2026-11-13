@@ -3,7 +3,8 @@ import { db } from '@/lib/db/client';
 import { services, categories, reports, incidents } from '@/lib/db/schema';
 import { statusForService } from './status';
 import type { OperationalStatus } from '@/lib/engine/status-bands';
-import { pickFeaturedServices, reportSurgeScore, selectWorldwideSpotlights, toHourlySeries, type HourlyReportRow } from './home-trends';
+import { pickFeaturedServices, selectWorldwideSpotlights, toHourlySeries, type HourlyReportRow } from './home-trends';
+import { getRecentSurgeScores } from './report-surges';
 
 export interface ServiceSummary {
   slug: string;
@@ -20,8 +21,6 @@ export interface ServiceSummary {
 export async function getHomeData() {
   const now = new Date();
   const since24h = new Date(now.getTime() - 24 * 60 * 60 * 1000);
-  const since30m = new Date(now.getTime() - 30 * 60 * 1000);
-  const since150m = new Date(now.getTime() - 150 * 60 * 1000);
 
   const serviceRows = await db
     .select({
@@ -40,20 +39,7 @@ export async function getHomeData() {
     .groupBy(services.id, categories.slug, categories.name)
     .orderBy(asc(services.name));
 
-  // Compare the last 30 min to the previous 120 min, excluding suspicious
-  // submissions and counting DISTINCT pseudonymous reporters. Reading only
-  // the last 150 min avoids a full-history scan on every homepage refresh.
-  const windowRows = await db.select({
-    serviceId: reports.serviceId,
-    recent30m: sql<number>`count(*) filter (where ${reports.createdAt} >= ${since30m.toISOString()})::int`,
-    previous2h: sql<number>`count(*) filter (where ${reports.createdAt} < ${since30m.toISOString()})::int`,
-    uniqueReporters30m: sql<number>`count(distinct ${reports.anonymousHash}) filter (where ${reports.createdAt} >= ${since30m.toISOString()})::int`,
-  }).from(reports)
-    .where(and(gte(reports.createdAt, since150m), eq(reports.suspicious, false)))
-    .groupBy(reports.serviceId);
-  const surgeByServiceId = new Map(windowRows.map((row) => [
-    row.serviceId, reportSurgeScore(row),
-  ]));
+  const surgeByServiceId = await getRecentSurgeScores(now);
 
   const servicesWithStatus: ServiceSummary[] = await Promise.all(
     serviceRows.map(async ({ id, ...rest }) => ({
