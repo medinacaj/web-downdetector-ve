@@ -3,7 +3,7 @@ import { db } from '@/lib/db/client';
 import { services, categories, reports, incidents } from '@/lib/db/schema';
 import { statusForService } from './status';
 import type { OperationalStatus } from '@/lib/engine/status-bands';
-import { pickFeaturedServices, selectWorldwideSpotlights, toHourlySeries, type HourlyReportRow } from './home-trends';
+import { pickFeaturedServices, reportSurgeScore, selectWorldwideSpotlights, toHourlySeries, type HourlyReportRow } from './home-trends';
 
 export interface ServiceSummary {
   slug: string;
@@ -11,6 +11,8 @@ export interface ServiceSummary {
   categorySlug: string;
   categoryName: string;
   reportsLast24h: number;
+  /** Short-term acceleration in distinct citizen reports, not an outage status. */
+  surgeScore: number;
   status: OperationalStatus;
   isDemo: boolean;
 }
@@ -18,6 +20,8 @@ export interface ServiceSummary {
 export async function getHomeData() {
   const now = new Date();
   const since24h = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+  const since30m = new Date(now.getTime() - 30 * 60 * 1000);
+  const since150m = new Date(now.getTime() - 150 * 60 * 1000);
 
   const serviceRows = await db
     .select({
@@ -36,18 +40,43 @@ export async function getHomeData() {
     .groupBy(services.id, categories.slug, categories.name)
     .orderBy(asc(services.name));
 
+  // Compare the last 30 min to the previous 120 min, excluding suspicious
+  // submissions and counting DISTINCT pseudonymous reporters. Reading only
+  // the last 150 min avoids a full-history scan on every homepage refresh.
+  const windowRows = await db.select({
+    serviceId: reports.serviceId,
+    recent30m: sql<number>`count(*) filter (where ${reports.createdAt} >= ${since30m.toISOString()})::int`,
+    previous2h: sql<number>`count(*) filter (where ${reports.createdAt} < ${since30m.toISOString()})::int`,
+    uniqueReporters30m: sql<number>`count(distinct ${reports.anonymousHash}) filter (where ${reports.createdAt} >= ${since30m.toISOString()})::int`,
+  }).from(reports)
+    .where(and(gte(reports.createdAt, since150m), eq(reports.suspicious, false)))
+    .groupBy(reports.serviceId);
+  const surgeByServiceId = new Map(windowRows.map((row) => [
+    row.serviceId, reportSurgeScore(row),
+  ]));
+
   const servicesWithStatus: ServiceSummary[] = await Promise.all(
     serviceRows.map(async ({ id, ...rest }) => ({
       ...rest,
+      surgeScore: surgeByServiceId.get(id) ?? 0,
       status: await statusForService(id),
     })),
   );
 
   const hasAnyActivity = servicesWithStatus.some((s) => s.reportsLast24h > 0);
+  const hasRapidSurge = servicesWithStatus.some((s) => s.surgeScore > 0);
   // Activity is real data, not fabricated example curves. With no reports, show
   // a curated cross-category selection of services relevant to Venezuela.
   const mostActive = pickFeaturedServices(servicesWithStatus);
-  const worldwideServices = selectWorldwideSpotlights(servicesWithStatus);
+  const worldwideServices = selectWorldwideSpotlights(servicesWithStatus).map((section) => ({
+    ...section,
+    // Keep the editorial section but move active surges toward its front.
+    services: section.services.map((service, index) => ({ service, index }))
+      .sort((a, b) => (b.service.surgeScore - a.service.surgeScore)
+        || (b.service.reportsLast24h - a.service.reportsLast24h)
+        || (a.index - b.index))
+      .map(({ service }) => service),
+  }));
   const idBySlug = new Map(serviceRows.map((row) => [row.slug, row.id]));
   const chartSlugs = new Set([
     ...mostActive.map((service) => service.slug),
@@ -107,6 +136,7 @@ export async function getHomeData() {
     featuredServices,
     globalServiceSections,
     hasAnyActivity,
+    hasRapidSurge,
     totals: {
       reportsAllTime: reportsAllTime?.n ?? 0,
       reportsLast24h: reportsLast24h?.n ?? 0,
