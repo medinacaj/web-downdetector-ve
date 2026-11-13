@@ -1,4 +1,5 @@
 import { readFileSync, appendFileSync } from 'node:fs';
+import { formatProductionAudit } from './production-audit-report.mjs';
 
 const auditFile = process.argv[2] ?? 'dependency-audit.json';
 let data;
@@ -32,8 +33,17 @@ if (!validLevels || data.error) {
       : 'Sin avisos altos o críticos en esta ejecución.',
     'La auditoría del repositorio no confirma por sí sola la versión desplegada en producción.',
   ].join('\n') + '\n';
-  console.log(summary);
-  if (process.env.GITHUB_STEP_SUMMARY) appendFileSync(process.env.GITHUB_STEP_SUMMARY, summary);
+  let detailed = '';
+  if (process.env.AUDIT_SCOPE !== 'all') {
+    try {
+      detailed = '\n' + formatProductionAudit(data);
+    } catch (error) {
+      console.error('No fue posible detallar los paquetes de producción:', error);
+      process.exitCode = 2;
+    }
+  }
+  console.log(summary + detailed);
+  if (process.env.GITHUB_STEP_SUMMARY) appendFileSync(process.env.GITHUB_STEP_SUMMARY, summary + detailed);
   if (process.env.FAIL_ON_HIGH === 'true' && criticalOrHigh > 0) {
     console.error('Fallo de control: hay avisos altos o críticos de dependencias de producción.');
     process.exitCode = 1;
