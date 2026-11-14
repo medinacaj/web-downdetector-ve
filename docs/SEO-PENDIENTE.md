@@ -1,4 +1,7 @@
-# SEO técnico e indexación — estado y pendientes
+# SEO técnico e indexación — auditoría histórica y seguimiento
+
+> **Actualización de estado, 13/11/2026:** este documento contiene la **línea base del 10/10/2026** y sus prioridades originales, que no deben leerse como resultado del código actual. En `main` ya existen `src/app/robots.ts` y `src/app/sitemap.ts`, utilidades de URL canónica en `src/lib/seo.ts` y metadatos Open Graph en `src/app/layout.tsx`. No se observó archivo de favicon en el árbol consultado; los datos estructurados y la validación HTTP/SEO final siguen pendientes. **No activar indexación** sin dominio aprobado, ejecución real de las verificaciones y autorización. Las tablas S1/S2 y observaciones que describen 404 u omisión son hallazgos históricos, no afirmaciones vigentes.
+
 
 > Auditoría del **10 de octubre de 2026** sobre el código de este repositorio
 > ejecutándose en local (`next dev`, PostgreSQL 16, 71 servicios). **No hay sitio
