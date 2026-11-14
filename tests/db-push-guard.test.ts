@@ -34,7 +34,7 @@ it('CLI refuses remote database URL before invoking the schema migration command
   const script=fileURLToPath(new URL('../scripts/guard-local-db-push.mjs', import.meta.url));
   const result=spawnSync(process.execPath,[script],{
     encoding:'utf8',timeout:5000,
-    env:{...process.env,DATABASE_URL:'postgresql://notreal:never@prod.example.test/pulsove',NODE_ENV:'development'}
+    env:{...process.env,DATABASE_URL:'postgresql://notreal:never@prod.example.test/pulsove',CI:'false',NODE_ENV:'development',VERCEL_ENV:'development',DEPLOY_ENV:'development',CF_PAGES_BRANCH:'test'}
   });
   expect(result.status).toBe(1);
   expect(result.stderr).toContain('solo se permite PostgreSQL local');
