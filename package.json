@@ -11,7 +11,7 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
-    "db:migrate": "drizzle-kit push",
+    "db:migrate": "node scripts/guard-local-db-push.mjs",
     "db:migrate:deploy": "drizzle-kit migrate",
     "db:seed": "tsx scripts/seed.ts",
     "db:studio": "drizzle-kit studio",
