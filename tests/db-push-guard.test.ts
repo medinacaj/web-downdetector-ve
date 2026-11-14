@@ -1,4 +1,6 @@
 import { describe, expect, it } from 'vitest';
+import { spawnSync } from 'node:child_process';
+import { fileURLToPath } from 'node:url';
 import { schemaPushBlockReason } from '../scripts/guard-local-db-push.mjs';
 
 const local = { DATABASE_URL: 'postgresql://user:pass@127.0.0.1:5432/pulsove_dev', NODE_ENV: 'development' };
@@ -26,4 +28,15 @@ describe('proteger drizzle-kit push frente a bases no locales', () => {
   it('no convierte credenciales o URLs faltantes en accesos permitidos', () => {
     expect(schemaPushBlockReason({NODE_ENV:'development'})).not.toBeNull();
   });
+});
+
+it('CLI refuses remote database URL before invoking the schema migration command', () => {
+  const script=fileURLToPath(new URL('../scripts/guard-local-db-push.mjs', import.meta.url));
+  const result=spawnSync(process.execPath,[script],{
+    encoding:'utf8',timeout:5000,
+    env:{...process.env,DATABASE_URL:'postgresql://notreal:never@prod.example.test/pulsove',NODE_ENV:'development'}
+  });
+  expect(result.status).toBe(1);
+  expect(result.stderr).toContain('solo se permite PostgreSQL local');
+  expect(result.stderr).not.toContain('notreal:never');
 });
