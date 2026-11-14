@@ -330,3 +330,7 @@ Antes de declarar una entrega pública completa deben comprobarse el despliegue
 real, la configuración y migración de la base de datos, el servicio publicado, la
 seguridad de reportes y la experiencia visual en el sitio final. Los 579 servicios
 del seed no implican monitorización técnica individual de cada proveedor.
+
+## Seguridad de cambios de esquema
+
+`npm run db:migrate` utiliza `drizzle-kit push` **solo para una instancia local de desarrollo**: el ejecutor verifica un `DATABASE_URL` PostgreSQL hacia `localhost`/loopback y rechaza CI o entornos productivos. No lo utilice con túneles que redirijan un puerto local a una base real. Para staging o hosting se debe revisar y ensayar cada migración aditiva/versionada, respaldar y usar `npm run db:migrate:deploy` con credenciales temporales de migración separadas de las de ejecución. Las comprobaciones locales no sustituyen autorización ni pruebas de restauración productiva ([Issue #100](https://github.com/medinacaj/web-pulso-ve/issues/100)).
