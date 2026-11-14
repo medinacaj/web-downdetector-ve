@@ -2,6 +2,7 @@
  * Use db:migrate:deploy for remote/staging/production schema changes.
  */
 import 'dotenv/config';
+import { pathToFileURL } from 'node:url';
 import { spawnSync } from 'node:child_process';
 
 export function schemaPushBlockReason(env=process.env) {
@@ -22,7 +23,7 @@ export function schemaPushBlockReason(env=process.env) {
   return null;
 }
 
-if (process.argv[1] && import.meta.url === new URL('file://' + process.argv[1]).href) {
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   const reason = schemaPushBlockReason();
   if (reason) {
     console.error('db:migrate (drizzle-kit push) bloqueado: '+reason+'. Utiliza migraciones versionadas con db:migrate:deploy después de probar en entorno aislado.');
